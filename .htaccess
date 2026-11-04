@@ -1,0 +1,100 @@
+# ----------------------------------------------------------------------
+# Krishna Education Foundation - Apache Server Configuration
+# ----------------------------------------------------------------------
+
+# 1. Prevent Directory Browsing
+Options -Indexes
+
+# 2. Set Default Directory Index
+DirectoryIndex index.php index.html
+
+# 3. Enable URL Rewriting & Clean SEO URLs
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Sitemap and Robots routes
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+    RewriteRule ^robots\.txt$ robots.txt [L]
+
+    # Don't rewrite actual files or directories
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Public Clean URL Mappings
+    RewriteRule ^about/?$ about.php [L,QSA]
+    RewriteRule ^services/?$ services.php [L,QSA]
+    RewriteRule ^study-in-india/?$ study-in-india.php [L,QSA]
+    RewriteRule ^study-in-australia/?$ study-in-australia.php [L,QSA]
+    RewriteRule ^study-in-uk/?$ study-in-uk.php [L,QSA]
+    RewriteRule ^study-in-usa/?$ study-in-usa.php [L,QSA]
+    RewriteRule ^study-in-canada/?$ study-in-canada.php [L,QSA]
+    RewriteRule ^study-abroad/?$ study-abroad.php [L,QSA]
+    RewriteRule ^universities/?$ cities.php [L,QSA]
+    RewriteRule ^courses/?$ courses.php [L,QSA]
+    RewriteRule ^scholarships/?$ scholarships.php [L,QSA]
+    RewriteRule ^visa-guidance/?$ visa-guidance.php [L,QSA]
+    RewriteRule ^ielts/?$ ielts.php [L,QSA]
+    RewriteRule ^pte/?$ pte.php [L,QSA]
+    RewriteRule ^cee-preparation/?$ cee-preparation.php [L,QSA]
+    RewriteRule ^ctevt-preparation/?$ ctevt-preparation.php [L,QSA]
+    RewriteRule ^career-counselling/?$ career-counselling.php [L,QSA]
+    RewriteRule ^test-preparation/?$ test-preparation.php [L,QSA]
+    
+    # Blog / Resource Guides Routing
+    RewriteRule ^blog/?$ guides.php [L,QSA]
+    RewriteRule ^blog/([a-zA-Z0-9_-]+)/?$ guide-detail.php?slug=$1 [L,QSA]
+    RewriteRule ^guides/([a-zA-Z0-9_-]+)/?$ guide-detail.php?slug=$1 [L,QSA]
+
+    RewriteRule ^contact/?$ contact.php [L,QSA]
+    RewriteRule ^student-success-stories/?$ reviews.php [L,QSA]
+    RewriteRule ^reviews/?$ reviews.php [L,QSA]
+</IfModule>
+
+# 4. Custom Error Pages
+ErrorDocument 404 /404.php
+ErrorDocument 403 /403.php
+ErrorDocument 500 /500.php
+
+# 4. Protect Sensitive Files & Directories
+<FilesMatch "^(\.env|\.git|database\.sql|.*\.sql|TODO\.md|composer\.(json|lock))$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# 5. Default Charset UTF-8
+AddDefaultCharset UTF-8
+
+# 6. MIME Types for Modern Web Formats
+<IfModule mod_mime.c>
+    AddType image/webp .webp
+    AddType image/svg+xml .svg .svgz
+    AddType font/woff2 .woff2
+    AddType font/woff .woff
+    AddType font/ttf .ttf
+    AddType application/json .json
+</IfModule>
+
+# 7. Enable Gzip / Deflate Compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json image/svg+xml
+</IfModule>
+
+# 8. Browser Caching for Performance
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType font/woff2 "access plus 1 month"
+</IfModule>

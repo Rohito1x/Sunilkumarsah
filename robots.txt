@@ -1,0 +1,15 @@
+# Robots.txt for Krishna Education Foundation (https://krishnaeducationfoundation.edu.np/)
+User-agent: *
+Allow: /
+
+# Disallow admin panel and private management endpoints
+Disallow: /jaiswal/
+Disallow: /jaiswal@krishna.php
+Disallow: /check_status.php
+Disallow: /setup.php
+Disallow: /submit_form.php
+Disallow: /logout.php
+
+# Sitemap reference
+Sitemap: https://krishnaeducationfoundation.edu.np/sitemap.xml
+
