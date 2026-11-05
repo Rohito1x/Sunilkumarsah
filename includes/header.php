@@ -144,6 +144,10 @@ if (empty($topMenu)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#0458A0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Vision Point">
     
     <!-- Dynamic Technical & On-Page SEO Meta Tags -->
     <?= generateMetaTags($pageSeo) ?>
