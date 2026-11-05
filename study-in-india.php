@@ -90,8 +90,8 @@ $faqs = [
         'a' => 'Most universities offer on-campus residential hostels with separate wings for boys and girls, 24/7 security, Wi-Fi, and mess facilities serving vegetarian and non-vegetarian meals suitable for Nepali students.'
     ],
     [
-        'q' => 'How does Krishna Education Foundation assist Nepali students?',
-        'a' => 'KEF provides personalized course selection, verified university matching, direct admission letters, scholarship processing, hostel reservations, and continuous guardian support with 100% fee transparency.'
+        'q' => 'How does Vision Point Educational Service assist Nepali students?',
+        'a' => 'Vision Point provides personalized course selection, verified university matching, direct admission letters, scholarship processing, hostel reservations, and continuous guardian support with 100% fee transparency.'
     ]
 ];
 
@@ -184,8 +184,8 @@ require_once __DIR__ . '/includes/institutions.php';
         <div class="row align-items-center g-5">
             <div class="col-lg-7">
                 <article>
-                    <h2 class="fw-bold text-primary mb-3">Study in India with <?= h($siteSettings['site_name'] ?? 'Krishna Education Foundation') ?></h2>
-                    <span class="text-muted d-block mb-3 fs-5"><?= h($siteSettings['site_name'] ?? 'Krishna Education Foundation') ?> is Nepal's premier choice for studying in India with admission opportunities and scholarships.</span>
+                    <h2 class="fw-bold text-primary mb-3">Study in India with <?= h($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?></h2>
+                    <span class="text-muted d-block mb-3 fs-5"><?= h($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?> is Nepal's premier choice for studying in India with admission opportunities and scholarships.</span>
                     <p class="text-muted">Unlock top-quality education at an affordable price. India is home to thousands of highly respected universities, modern research facilities, and a wide range of academic programs in fields like engineering, medicine, business, IT, and the arts. With vibrant cities like Delhi, Bangalore, and Mumbai, students benefit from an active campus life, a multicultural environment, and ample career opportunities.</p>
                     <p class="text-muted">
                         Our experienced team provides personalized support with university selection, admissions, documentation, and student counseling—ensuring a smooth journey from Nepal to India’s top educational institutions.
@@ -200,7 +200,7 @@ require_once __DIR__ . '/includes/institutions.php';
                 <div class="card border border-light p-4 rounded-4 shadow-sm bg-white">
                     <img src="<?= h($basePath) ?>assets/images/student_hero.png?v=<?= filemtime(__DIR__ . '/assets/images/student_hero.png') ?>" alt="Study in India" class="img-fluid rounded-3 mb-3 w-100 object-fit-cover shadow-sm" style="max-height: 280px; object-position: center 20%;">
                     <p class="text-muted small mb-0">
-                        <b><?= h($siteSettings['site_name'] ?? 'Krishna Education Foundation') ?></b> is a trusted educational consultancy based in Nepal, dedicated to helping students pursue higher education in India. With over a decade of experience, we specialize in guiding first-time applicants through every step of the process—from choosing the right university and program to handling admissions, documentation, and student support. Our mission is to make quality education accessible, affordable, and achievable for Nepali students by connecting them with top institutions across India.
+                        <b><?= h($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?></b> is a trusted educational consultancy based in Nepal, dedicated to helping students pursue higher education in India. With over a decade of experience, we specialize in guiding first-time applicants through every step of the process—from choosing the right university and program to handling admissions, documentation, and student support. Our mission is to make quality education accessible, affordable, and achievable for Nepali students by connecting them with top institutions across India.
                     </p>
                 </div>
             </div>

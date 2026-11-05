@@ -12,7 +12,7 @@ $faqs = [
         'a' => 'Eligibility is evaluated based on aggregate percentages in Secondary Education Examination (SEE) and +2 (NEB/CBSE), performance in university entrance assessments, and early registration.'
     ],
     [
-        'q' => 'Does Krishna Education Foundation charge extra fees for scholarship applications?',
+        'q' => 'Does Vision Point Educational Service charge extra fees for scholarship applications?',
         'a' => 'No. We provide 100% transparent counseling and apply for institutional scholarships directly on your behalf without any hidden processing charges.'
     ],
     [
@@ -98,6 +98,83 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
         </div>
+    </div>
+</section>
+
+<!-- Featured Partner University Scholarships Table -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container py-3">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="text-danger fw-bold small text-uppercase">Direct Concessions</span>
+            <h2 class="fw-bold text-primary display-6">Featured Partner University Scholarships (2026 Intakes)</h2>
+            <p class="text-muted small">Tuition waivers and merit concessions available through Vision Point's direct university representation agreements.</p>
+        </div>
+
+        <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+            <table class="table table-hover table-bordered mb-0 align-middle">
+                <thead style="background: #0458A0; color: #ffffff;">
+                    <tr>
+                        <th class="py-3 px-3">Partner University</th>
+                        <th class="py-3 px-3">Location</th>
+                        <th class="py-3 px-3">Eligible Programs</th>
+                        <th class="py-3 px-3 text-center">Scholarship Coverage</th>
+                        <th class="py-3 px-3">Minimum Criteria</th>
+                        <th class="py-3 px-3 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white small">
+                    <tr>
+                        <td class="fw-bold text-dark py-3 px-3">SRM Institute of Science & Technology</td>
+                        <td class="text-muted py-3 px-3">Chennai, Tamil Nadu</td>
+                        <td class="py-3 px-3">B.Tech, B.Sc Nursing, BBA</td>
+                        <td class="text-center py-3 px-3"><span class="badge bg-success-subtle text-success fw-bold px-2.5 py-1.5 rounded-pill fs-7">25% – 50% Tuition Waiver</span></td>
+                        <td class="text-muted py-3 px-3">80%+ in +2 PCM / PCB</td>
+                        <td class="text-center py-3 px-3"><button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">Apply</button></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-dark py-3 px-3">Chandigarh University (CU)</td>
+                        <td class="text-muted py-3 px-3">Mohali / Punjab</td>
+                        <td class="py-3 px-3">B.Tech, B.Pharm, B.Sc Nursing, MBA</td>
+                        <td class="text-center py-3 px-3"><span class="badge bg-success-subtle text-success fw-bold px-2.5 py-1.5 rounded-pill fs-7">30% – 100% Fee Concession</span></td>
+                        <td class="text-muted py-3 px-3">CUCET / 75%+ in +2</td>
+                        <td class="text-center py-3 px-3"><button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">Apply</button></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-dark py-3 px-3">Lovely Professional University (LPU)</td>
+                        <td class="text-muted py-3 px-3">Phagwara, Punjab</td>
+                        <td class="py-3 px-3">Engineering, Agriculture, Pharmacy, BCA</td>
+                        <td class="text-center py-3 px-3"><span class="badge bg-success-subtle text-success fw-bold px-2.5 py-1.5 rounded-pill fs-7">20% – 50% Program Waiver</span></td>
+                        <td class="text-muted py-3 px-3">LPUNEST / +2 Merit</td>
+                        <td class="text-center py-3 px-3"><button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">Apply</button></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-dark py-3 px-3">Parul University</td>
+                        <td class="text-muted py-3 px-3">Vadodara, Gujarat</td>
+                        <td class="py-3 px-3">Nursing, Paramedical, B.Tech, B.Pharm</td>
+                        <td class="text-center py-3 px-3"><span class="badge bg-success-subtle text-success fw-bold px-2.5 py-1.5 rounded-pill fs-7">25% – 60% Tuition Aid</span></td>
+                        <td class="text-muted py-3 px-3">Merit + Early Registration</td>
+                        <td class="text-center py-3 px-3"><button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">Apply</button></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-dark py-3 px-3">Sharda University</td>
+                        <td class="text-muted py-3 px-3">Greater Noida (Delhi NCR)</td>
+                        <td class="py-3 px-3">B.Tech, B.Sc Nursing, BBA, Law</td>
+                        <td class="text-center py-3 px-3"><span class="badge bg-success-subtle text-success fw-bold px-2.5 py-1.5 rounded-pill fs-7">20% – 50% Fee Waiver</span></td>
+                        <td class="text-muted py-3 px-3">SAARC Quota + 70%+ GPA</td>
+                        <td class="text-center py-3 px-3"><button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">Apply</button></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-dark py-3 px-3">Bangalore Group of Institutions</td>
+                        <td class="text-muted py-3 px-3">Bangalore, Karnataka</td>
+                        <td class="py-3 px-3">B.Sc Nursing, BPT, BMLT, Pharmacy</td>
+                        <td class="text-center py-3 px-3"><span class="badge bg-success-subtle text-success fw-bold px-2.5 py-1.5 rounded-pill fs-7">Hostel & Fee Subsidy</span></td>
+                        <td class="text-muted py-3 px-3">+2 Science 60%+ & Early Bird</td>
+                        <td class="text-center py-3 px-3"><button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">Apply</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="text-muted extra-small mt-3 text-center mb-0"><i class="fa-solid fa-circle-info me-1"></i> Scholarships are awarded on a first-come, first-served basis subject to university quota limits. All waivers are officially stated in the admission offer letter.</p>
     </div>
 </section>
 

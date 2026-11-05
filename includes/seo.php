@@ -1,6 +1,6 @@
 <?php
 /**
- * Krishna Education Foundation - Centralized SEO Component
+ * Vision Point Educational Service - Centralized SEO Component
  * 
  * Provides dynamic meta tags, canonical URLs, Open Graph, Twitter Card,
  * Schema.org JSON-LD structured data, breadcrumbs, and 301 redirection.
@@ -14,7 +14,7 @@ if (!function_exists('h')) {
 
 // Global Canonical Domain Definition
 if (!defined('CANONICAL_DOMAIN')) {
-    define('CANONICAL_DOMAIN', 'https://krishnaeducationfoundation.edu.np');
+    define('CANONICAL_DOMAIN', 'https://visionpoint.edu.np');
 }
 
 /**
@@ -107,7 +107,7 @@ if (!function_exists('getSeoData')) {
             'slug' => $customSlug,
             'page_name' => ucwords(str_replace(['-', '_'], ' ', $customSlug)),
             'meta_title' => $defaultTitle,
-            'meta_description' => 'Krishna Education Foundation is a certified education consultancy in Nepal helping students with admissions, scholarships, and visa guidance for India and abroad.',
+            'meta_description' => 'Vision Point Educational Service is a certified education consultancy in Nepal helping students with admissions, scholarships, and visa guidance for India and abroad.',
             'meta_keywords' => 'Education Consultancy in Nepal, Best education consultancy in Nepal, study abroad consultancy Nepal',
             'h1' => $defaultTitle,
             'canonical_url' => generateCanonicalUrl($customSlug),
@@ -165,7 +165,7 @@ if (!function_exists('generateMetaTags')) {
         global $siteSettings;
         $html = '';
 
-        $title = $seoData['meta_title'] ?? 'Krishna Education Foundation';
+        $title = $seoData['meta_title'] ?? 'Vision Point Educational Service';
         $desc = $seoData['meta_description'] ?? '';
         $keywords = $seoData['meta_keywords'] ?? '';
         $robots = $seoData['robots'] ?? 'index,follow';
@@ -224,7 +224,7 @@ if (!function_exists('generateTwitterCardTags')) {
     function generateTwitterCardTags(array $seoData): string {
         $html = '';
 
-        $twTitle = $seoData['og_title'] ?? $seoData['meta_title'] ?? 'Krishna Education Foundation';
+        $twTitle = $seoData['og_title'] ?? $seoData['meta_title'] ?? 'Vision Point Educational Service';
         $twDesc = $seoData['og_description'] ?? $seoData['meta_description'] ?? '';
         $twImg = $seoData['og_image'] ?? generateCanonicalUrl('assets/images/logo1.png');
 
@@ -250,8 +250,8 @@ if (!function_exists('generateSchemaMarkup')) {
         $canonical = $seoData['canonical_url'] ?? generateCanonicalUrl($seoData['slug'] ?? '');
         $logoUrl = generateCanonicalUrl('assets/images/logo1.png');
         $phone = $siteSettings['contact_phone'] ?? '+977 9807765812';
-        $email = $siteSettings['contact_email'] ?? 'info@krishnaeducation.com.np';
-        $location = $siteSettings['contact_location'] ?? 'Krishna Education Foundation, Vasundhara Complex, 12 Roadcess Chowk, Biratnagar 56613, Nepal';
+        $email = $siteSettings['contact_email'] ?? 'info@visionpoint.edu.np';
+        $location = $siteSettings['contact_location'] ?? 'Vision Point Educational Service, Main Road (Opposite Traffic Police Office / Roadcess Chowk), Biratnagar 56613, Morang, Nepal';
 
         // 1. EducationalOrganization Schema (Primary Identity)
         $orgSchema = [
@@ -265,12 +265,12 @@ if (!function_exists('generateSchemaMarkup')) {
                 'url' => $logoUrl
             ],
             'image' => $logoUrl,
-            'description' => 'Krishna Education Foundation is an accredited education consultancy in Nepal offering student counseling, admission processing, and scholarships for universities in India and abroad.',
+            'description' => 'Vision Point Educational Service is an accredited education consultancy in Nepal offering student counseling, admission processing, and scholarships for universities in India and abroad.',
             'telephone' => $phone,
             'email' => $email,
             'address' => [
                 '@type' => 'PostalAddress',
-                'streetAddress' => 'Vasundhara Complex, 12 Roadcess Chowk',
+                'streetAddress' => 'Main Road, Opposite Traffic Police Office / Roadcess Chowk',
                 'addressLocality' => 'Biratnagar',
                 'postalCode' => '56613',
                 'addressCountry' => 'NP'
@@ -281,8 +281,8 @@ if (!function_exists('generateSchemaMarkup')) {
                 'longitude' => 87.2718
             ],
             'sameAs' => [
-                'https://www.facebook.com/krishnaeducationfoundation',
-                'https://www.instagram.com/krishnaeducationfoundation'
+                'https://www.facebook.com/visionpointedu',
+                'https://www.instagram.com/visionpointedu'
             ]
         ];
         $schemas[] = $orgSchema;

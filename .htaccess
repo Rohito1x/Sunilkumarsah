@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------
-# Krishna Education Foundation - Apache Server Configuration
+# Vision Point Educational Service - Apache Server Configuration
 # ----------------------------------------------------------------------
 
 # 1. Prevent Directory Browsing
@@ -49,6 +49,7 @@ DirectoryIndex index.php index.html
     RewriteRule ^contact/?$ contact.php [L,QSA]
     RewriteRule ^student-success-stories/?$ reviews.php [L,QSA]
     RewriteRule ^reviews/?$ reviews.php [L,QSA]
+    RewriteRule ^login/?$ login.php [L,QSA]
 </IfModule>
 
 # 4. Custom Error Pages

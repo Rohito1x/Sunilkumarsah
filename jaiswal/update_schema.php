@@ -1,6 +1,6 @@
 <?php
 /**
- * Database update script for Krishna Education Foundation Bureau website
+ * Database update script for Vision Point Educational Service Bureau website
  * Creates new tables and seeds them with initial data.
  */
 
@@ -479,7 +479,7 @@ try {
         'secondary_color' => '#111111',
         'secondary_hover' => '#222222',
         'hero_banner_image' => 'assets/images/banner.png',
-        'footer_about' => 'Krishna Education Foundation is Nepal\'s premier choice for studying in India, offering expert admission guidance and scholarships for top-tier Indian universities.',
+        'footer_about' => 'Vision Point Educational Service is Nepal\'s premier choice for studying in India, offering expert admission guidance and scholarships for top-tier Indian universities.',
         'footer_copyright' => ''
     ];
     $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)");
@@ -489,7 +489,7 @@ try {
     echo "Seeded additional site settings.<br>\n";
 
 
-    // --- 10. Custom Enhancements (Krishna Education Foundation) ---
+    // --- 10. Custom Enhancements (Vision Point Educational Service) ---
     // Ensure all required columns exist in institutions & destinations tables
     $schemaColumns = [
         'institutions' => [
@@ -575,10 +575,10 @@ try {
     $reviewsCount = $pdo->query("SELECT COUNT(*) FROM reviews")->fetchColumn();
     if ($reviewsCount == 0) {
         $reviews = [
-            ['Priya Sharma', 'priya.sharma@example.com', 'B.Tech CSE - Galgotias University', 5, 'Exceptional Guidance & Seamless Admission!', 'Krishna Education Foundation guided me step-by-step through my application to Galgotias University. From documentation to fee payment and hostel accommodation in Delhi NCR, everything was hassle-free. Highly recommended!', 'Approved'],
-            ['Aashish Adhikari', 'aashish.adhikari@example.com', 'B.Sc Nursing - East Point College Bangalore', 5, 'Best Education Consultancy in Nepal', 'I was very nervous about studying abroad, but the counselors at KEF explained every detail clearly. They secured a tuition scholarship for my nursing degree in Bangalore and helped with visa processing.', 'Approved'],
-            ['Suman Shrestha', 'suman.shrestha@example.com', 'B.Pharm - Sharda University', 5, 'Honest Counselors and Zero Hidden Charges', 'Unlike other agencies, Krishna Education Foundation was completely transparent about college fees and living expenses. The counseling session in Biratnagar was eye-opening and super helpful.', 'Approved'],
-            ['Rohan Thapa', 'rohan.thapa@example.com', 'BBA - Chandigarh University', 4, 'Great Support & Fast Processing', 'The admission team processed my documentation extremely fast. I received my admission offer letter within 3 days. Thank you KEF team for making my study in India dream come true!', 'Approved']
+            ['Priya Sharma', 'priya.sharma@example.com', 'B.Tech CSE - Galgotias University', 5, 'Exceptional Guidance & Seamless Admission!', 'Vision Point Educational Service guided me step-by-step through my application to Galgotias University. From documentation to fee payment and hostel accommodation in Delhi NCR, everything was hassle-free. Highly recommended!', 'Approved'],
+            ['Aashish Adhikari', 'aashish.adhikari@example.com', 'B.Sc Nursing - East Point College Bangalore', 5, 'Best Education Consultancy in Nepal', 'I was very nervous about studying abroad, but the counselors at Vision Point explained every detail clearly. They secured a tuition scholarship for my nursing degree in Bangalore and helped with visa processing.', 'Approved'],
+            ['Suman Shrestha', 'suman.shrestha@example.com', 'B.Pharm - Sharda University', 5, 'Honest Counselors and Zero Hidden Charges', 'Unlike other agencies, Vision Point Educational Service was completely transparent about college fees and living expenses. The counseling session in Biratnagar was eye-opening and super helpful.', 'Approved'],
+            ['Rohan Thapa', 'rohan.thapa@example.com', 'BBA - Chandigarh University', 4, 'Great Support & Fast Processing', 'The admission team processed my documentation extremely fast. I received my admission offer letter within 3 days. Thank you Vision Point team for making my study in India dream come true!', 'Approved']
         ];
         $stmtRev = $pdo->prepare("INSERT INTO `reviews` (`name`, `email`, `course_college`, `rating`, `title`, `comment`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?)");
         foreach ($reviews as $rev) {
@@ -595,12 +595,12 @@ try {
         echo "Added 'Reviews' to navigation menu.<br>\n";
     }
 
-    // Seed/Update Admin User (admin@krishnaeducation.info / adminSecure2026!)
+    // Seed/Update Admin User (admin@visionpoint.edu.np / adminSecure2026!)
     // First remove the default hardcoded admin account admin@krishnaeducation.com.np
     $pdo->exec("DELETE FROM `admin_users` WHERE `email` = 'admin@krishnaeducation.com.np'");
     
     // Add or update the new admin user
-    $adminEmail = 'admin@krishnaeducation.info';
+    $adminEmail = 'admin@visionpoint.edu.np';
     $adminHash = '$2y$10$e4/3wIE6LaBZVNmLIOT7beYwV5G8emOCE2JzEyRrBJHFs/5s4IE/y'; // hash of adminSecure2026!
     $stmtAdmin = $pdo->prepare("INSERT INTO `admin_users` (`email`, `password_hash`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `password_hash` = VALUES(`password_hash`)");
     $stmtAdmin->execute([$adminEmail, $adminHash]);

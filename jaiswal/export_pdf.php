@@ -163,7 +163,7 @@ try {
 
     <div class="row align-items-center mb-4">
         <div class="col-8">
-            <h2 class="header-title mb-1">Krishna Education Foundation Bureau</h2>
+            <h2 class="header-title mb-1">Vision Point Educational Service Bureau</h2>
             <h5 class="text-muted">Student Leads & Management Report: <?= ucfirst(h($type)) ?></h5>
         </div>
         <div class="col-4 text-end">

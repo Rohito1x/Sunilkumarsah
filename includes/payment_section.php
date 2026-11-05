@@ -162,7 +162,7 @@ if ($qrEnabled !== '1' && empty($bankAccounts)) {
                                 <span class="fw-bold text-primary"><i class="fa-solid fa-building-columns me-1"></i> Siddhartha Bank Limited</span>
                                 <span class="badge bg-danger text-white" style="font-size: 9.5px;">Fonepay QR</span>
                             </div>
-                            <div class="text-dark mb-1"><span class="text-muted">A/C Holder:</span> <strong>KRISHNA EDUCATION FOUNDATION PVT LTD</strong></div>
+                            <div class="text-dark mb-1"><span class="text-muted">A/C Holder:</span> <strong>VISION POINT EDUCATIONAL SERVICE PVT LTD</strong></div>
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="text-dark"><span class="text-muted">Account No:</span> <code class="fw-extrabold text-primary font-monospace" style="font-size: 13.5px;">55509839020</code></div>
                                 <button class="btn btn-sm btn-outline-secondary py-0 px-2 btn-copy-acc" data-acc-num="55509839020" style="font-size: 10.5px;" type="button">
@@ -204,7 +204,7 @@ if ($qrEnabled !== '1' && empty($bankAccounts)) {
                 <p class="text-muted small mt-3 mb-0"><?= h($qrDesc) ?></p>
             </div>
             <div class="modal-footer border-0 pt-0 justify-content-center">
-                <a href="<?= h($qrImageUrl) ?>" download="Krishna_Education_Payment_QR.png" class="btn btn-primary rounded-pill px-4 btn-sm fw-bold">
+                <a href="<?= h($qrImageUrl) ?>" download="Vision_Point_Payment_QR.png" class="btn btn-primary rounded-pill px-4 btn-sm fw-bold">
                     <i class="fa-solid fa-download me-1"></i> Download QR Image
                 </a>
                 <button type="button" class="btn btn-light rounded-pill px-4 btn-sm fw-semibold" data-bs-dismiss="modal">Close</button>

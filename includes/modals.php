@@ -343,7 +343,7 @@ if (isset($pdo)) {
 
                     <div class="mb-4">
                         <label class="form-label fw-semibold text-dark small">Detailed Review & Feedback *</label>
-                        <textarea class="form-control bg-light" name="comment" rows="4" placeholder="Share your experience with Krishna Education Foundation..." required></textarea>
+                        <textarea class="form-control bg-light" name="comment" rows="4" placeholder="Share your experience with Vision Point Educational Service..." required></textarea>
                     </div>
 
                     <div class="text-center">

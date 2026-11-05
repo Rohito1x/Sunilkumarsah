@@ -9,6 +9,12 @@ $code = isset($_GET['code']) ? strtoupper(trim((string)$_GET['code'])) : 'USA';
 if ($code === 'US') {
     $code = 'USA';
 }
+if ($code === 'CAN' || $code === 'CANADA') {
+    $code = 'CA';
+}
+if ($code === 'AUS' || $code === 'AUSTRALIA') {
+    $code = 'AU';
+}
 
 // Country rich static database mock map
 $countriesData = [
@@ -22,7 +28,40 @@ $countriesData = [
                     Another path is through community colleges, which offer two-year associate degree programs. These programs are designed either to prepare students for further undergraduate study or to equip them with the skills needed for immediate entry into the workforce. On the other hand, state colleges and universities, commonly referred to as "public universities," were established by U.S. state governments to provide affordable education to state residents. These institutions often boast extensive research opportunities and a wide variety of courses. They are generally larger and more inclusive in their admissions than private universities.<br><br>
                     In the U.S., regardless of the type of institution, students earn credits for the courses they complete, which count towards their degree. Degree programs typically include "core" courses to build a strong academic foundation, "major" courses to focus on a specific subject area, and "electives" to allow exploration of other interests, ensuring a well-rounded education.<br><br>
                     The academic year in the U.S. generally runs from September to May and is usually split into two semesters of 16-18 weeks. However, some schools operate on a quarter or trimester system, with terms lasting 10-12 weeks.<br><br>
-                    With such a variety of higher education options available, students in the U.S. are sure to find the perfect fit for their academic ambitions, financial circumstances, and personal preferences.'
+                    With such a variety of higher education options available, students in the U.S. are sure to find the perfect fit for their academic ambitions, financial circumstances, and personal preferences.',
+        'colleges' => [
+            ['name' => 'University of South Florida', 'logo' => 'https://www.usf.edu/favicon.ico', 'website' => 'https://www.usf.edu/', 'location' => '4202 E Fowler Ave, Tampa, FL 33620, USA', 'photo' => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Arizona State University', 'logo' => 'https://www.asu.edu/favicon.ico', 'website' => 'https://www.asu.edu/', 'location' => 'Tempe, AZ 85281, United States', 'photo' => 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'George Mason University', 'logo' => 'https://www.gmu.edu/favicon.ico', 'website' => 'https://www.gmu.edu/', 'location' => '4400 University Dr, Fairfax, VA 22030, USA', 'photo' => 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'University of North Texas', 'logo' => 'https://www.unt.edu/favicon.ico', 'website' => 'https://www.unt.edu/', 'location' => '1155 Union Cir, Denton, TX 76203, USA', 'photo' => 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Western Kentucky University', 'logo' => 'https://www.wku.edu/favicon.ico', 'website' => 'https://www.wku.edu/', 'location' => '1906 College Heights Blvd, Bowling Green, KY 42101', 'photo' => 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Wichita State University', 'logo' => 'https://www.wichita.edu/favicon.ico', 'website' => 'https://www.wichita.edu/', 'location' => '1845 Fairmount St, Wichita, KS 67260, USA', 'photo' => 'https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?w=600&auto=format&fit=crop&q=60']
+        ],
+        'requirements' => [
+            'personal' => [
+                'Full Name (as per Passport)',
+                'Email Address & Phone Number',
+                'Permanent & Current Address in Nepal',
+                'Emergency Contact Details of Parents/Guardians'
+            ],
+            'academic' => [
+                'School Leaving Certificate (SEE) Marksheet & Character Certificate',
+                'Higher Secondary (+2 / CBSE) Transcript & Migration Certificate',
+                'Bachelor Degree Transcript & Provisional (for Master applicants)',
+                'Statement of Purpose (SOP) tailored to course',
+                '2 Letters of Recommendation (LOR) from teachers/professors',
+                'Valid Passport (minimum 6 months validity)',
+                'English Proficiency: IELTS 6.0+ / PTE 54+ / Duolingo 105+ / TOEFL 80+'
+            ],
+            'visa' => [
+                'Official I-20 Form from US University',
+                'DS-160 Confirmation Page',
+                'SEVIS I-901 Fee Payment Receipt ($350)',
+                'MRV Visa Application Fee Payment Receipt ($185)',
+                'Bank Balance Certificate & Statement showing 1-year tuition + living',
+                'Source of Income & Property Valuation Certificates'
+            ]
+        ]
     ],
     'UK' => [
         'name' => 'United Kingdom',
@@ -40,7 +79,7 @@ $countriesData = [
             ['name' => 'Ulster University', 'logo' => 'https://www.ulster.ac.uk/favicon.ico', 'website' => 'https://www.ulster.ac.uk/', 'location' => 'St James\' House, 10 Rosebery Avenue, Holborn, London EC1R 4TF', 'photo' => 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=60'],
             ['name' => 'Northumbria University', 'logo' => 'https://www.northumbria.ac.uk/favicon.ico', 'website' => 'https://www.northumbria.ac.uk/', 'location' => 'Ellison Pl, Newcastle upon Tyne NE1 8ST, United Kingdom', 'photo' => 'https://images.unsplash.com/photo-1527891751199-7225231a68dd?w=600&auto=format&fit=crop&q=60'],
             ['name' => 'Ravensbourne University London', 'logo' => 'https://www.ravensbourne.ac.uk/favicon.ico', 'website' => 'https://www.ravensbourne.ac.uk/', 'location' => 'Plot No. 2, Yamuna Expy, opposite Buddha International Circuit, Sector 17A, Greater Noida, Uttar Pradesh 203201, India', 'photo' => 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&auto=format&fit=crop&q=60'],
-            ['name' => 'Coventry University', 'logo' => 'https://www.coventry.ac.uk/favicon.ico', 'website' => 'https://www.coventry.ac.uk/', 'location' => 'University House, 109–117 Middlesex Street, London E1 7JF', 'photo' => 'https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Coventry University', 'logo' => 'https://www.coventry.ac.uk/favicon.ico', 'website' => 'https://www.coventry.ac.uk/', 'location' => 'University House, 109 - 117 Middlesex Street, London E1 7JF', 'photo' => 'https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?w=600&auto=format&fit=crop&q=60'],
             ['name' => 'University of Sunderland', 'logo' => 'https://www.sunderland.ac.uk/favicon.ico', 'website' => 'https://www.sunderland.ac.uk/', 'location' => 'Edinburgh Building, City Campus, Chester Road, Sunderland SR1 3SD', 'photo' => 'https://images.unsplash.com/photo-1504805572947-34fad45aed93?w=600&auto=format&fit=crop&q=60'],
             ['name' => 'University of West London', 'logo' => 'https://www.uwl.ac.uk/favicon.ico', 'website' => 'https://www.uwl.ac.uk/', 'location' => 'St Mary\'s Rd, London W5 5RF, United Kingdom', 'photo' => 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5c?w=600&auto=format&fit=crop&q=60'],
             ['name' => 'University of Chester', 'logo' => 'https://www.chester.ac.uk/favicon.ico', 'website' => 'https://www.chester.ac.uk/', 'location' => 'Parkgate Rd, Chester CH1 4BJ, UK', 'photo' => 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=600&auto=format&fit=crop&q=60'],
@@ -93,7 +132,39 @@ $countriesData = [
         'banner' => 'https://images.unsplash.com/photo-1507608869274-d3177c8bb4c7?w=1200&auto=format&fit=crop&q=80',
         'about' => 'Canada is recognized globally for its high academic standards, safe campus environments, and highly welcoming immigration policies. Canadian universities and colleges rank among the best in the world, offering programs that integrate academic learning with practical cooperative education (Co-op) programs.<br><br>
                     One of Canada\'s biggest highlights is the Post-Graduation Work Permit (PGWP) program. International graduates from eligible designated learning institutions (DLIs) can obtain open work permits for up to three years, providing them with valuable Canadian work experience that counts towards permanent residency pathways.<br><br>
-                    Additionally, living in Canada offers a premium quality of life with clean natural spaces, vibrant multicultural cities, and lower average tuition costs compared to neighboring destinations. Canada is consistently ranked by the United Nations as one of the best countries in the world to live and study.'
+                    Additionally, living in Canada offers a premium quality of life with clean natural spaces, vibrant multicultural cities, and lower average tuition costs compared to neighboring destinations. Canada is consistently ranked by the United Nations as one of the best countries in the world to live and study.',
+        'colleges' => [
+            ['name' => 'Humber College', 'logo' => 'https://humber.ca/favicon.ico', 'website' => 'https://humber.ca/', 'location' => '205 Humber College Blvd, Toronto, ON M9W 5L7, Canada', 'photo' => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Seneca Polytechnic', 'logo' => 'https://www.senecapolytechnic.ca/favicon.ico', 'website' => 'https://www.senecapolytechnic.ca/', 'location' => '1750 Finch Ave E, North York, ON M2J 2X5, Canada', 'photo' => 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Fanshawe College', 'logo' => 'https://www.fanshawec.ca/favicon.ico', 'website' => 'https://www.fanshawec.ca/', 'location' => '1001 Fanshawe College Blvd, London, ON N5Y 5R6, Canada', 'photo' => 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Conestoga College', 'logo' => 'https://www.conestogac.on.ca/favicon.ico', 'website' => 'https://www.conestogac.on.ca/', 'location' => '299 Doon Valley Dr, Kitchener, ON N2G 4M4, Canada', 'photo' => 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Langara College', 'logo' => 'https://langara.ca/favicon.ico', 'website' => 'https://langara.ca/', 'location' => '100 W 49th Ave, Vancouver, BC V5Y 2Z6, Canada', 'photo' => 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Cape Breton University', 'logo' => 'https://www.cbu.ca/favicon.ico', 'website' => 'https://www.cbu.ca/', 'location' => '1250 Grand Lake Rd, Sydney, NS B1P 6L2, Canada', 'photo' => 'https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?w=600&auto=format&fit=crop&q=60']
+        ],
+        'requirements' => [
+            'personal' => [
+                'Full Name (as per Passport)',
+                'Email Address & Contact Information',
+                'Government Issued Citizenship Certificate',
+                'Emergency Contacts of Parents/Guardian'
+            ],
+            'academic' => [
+                'SEE Marksheet & Character Certificate',
+                '+2 / Intermediate Transcript & Migration Certificate',
+                'Bachelor Degree Transcript & Degree Certificate (for PGWP programs)',
+                'Statement of Purpose (SOP / Study Plan)',
+                'Letters of Recommendation & Resume/CV',
+                'English Test: IELTS 6.0 (no band < 6.0) or PTE 60+ (for SDS)'
+            ],
+            'visa' => [
+                'Letter of Acceptance (LOA) from DLI-approved Canadian institution',
+                'Provincial Attestation Letter (PAL) where applicable',
+                'Guaranteed Investment Certificate (GIC) of CAD 20,635',
+                'Full 1st Year Tuition Fee Payment Receipt',
+                'Upfront Medical Examination by Panel Physician in Nepal',
+                'Police Clearance Certificate (PCC) from Nepal Police'
+            ]
+        ]
     ],
     'AU' => [
         'name' => 'Australia',
@@ -101,7 +172,39 @@ $countriesData = [
         'banner' => 'https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=1200&auto=format&fit=crop&q=80',
         'about' => 'Australia offers a diverse and vibrant learning destination, featuring highly respected institutions, modern laboratory infrastructures, and laid-back coastal lifestyles. Australian qualifications are highly sought after by global recruiters due to the country\'s practical and industry-aligned teaching methodologies.<br><br>
                     The Australian education system is heavily regulated by the government through the Education Services for Overseas Students (ESOS) framework, ensuring that international students receive tuition protection and quality courses.<br><br>
-                    Australia offers generous post-study work rights, allowing international graduates to stay, work, and gain professional experience in their field. Combine this with competitive student support frameworks and some of the sunniest cities in the world, and it is easy to see why Australia remains a top study abroad choice.'
+                    Australia offers generous post-study work rights, allowing international graduates to stay, work, and gain professional experience in their field. Combine this with competitive student support frameworks and some of the sunniest cities in the world, and it is easy to see why Australia remains a top study abroad choice.',
+        'colleges' => [
+            ['name' => 'Macquarie University', 'logo' => 'https://www.mq.edu.au/favicon.ico', 'website' => 'https://www.mq.edu.au/', 'location' => 'Wallumattagal Campus, Macquarie Park NSW 2109, Australia', 'photo' => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Deakin University', 'logo' => 'https://www.deakin.edu.au/favicon.ico', 'website' => 'https://www.deakin.edu.au/', 'location' => '221 Burwood Hwy, Burwood VIC 3125, Australia', 'photo' => 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'University of Wollongong', 'logo' => 'https://www.uow.edu.au/favicon.ico', 'website' => 'https://www.uow.edu.au/', 'location' => 'Northfields Ave, Wollongong NSW 2522, Australia', 'photo' => 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Western Sydney University', 'logo' => 'https://www.westernsydney.edu.au/favicon.ico', 'website' => 'https://www.westernsydney.edu.au/', 'location' => 'Locked Bag 1797, Penrith NSW 2751, Australia', 'photo' => 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Griffith University', 'logo' => 'https://www.griffith.edu.au/favicon.ico', 'website' => 'https://www.griffith.edu.au/', 'location' => '170 Kessels Rd, Nathan QLD 4111, Australia', 'photo' => 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=60'],
+            ['name' => 'Edith Cowan University', 'logo' => 'https://www.ecu.edu.au/favicon.ico', 'website' => 'https://www.ecu.edu.au/', 'location' => '270 Joondalup Dr, Joondalup WA 6027, Australia', 'photo' => 'https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?w=600&auto=format&fit=crop&q=60']
+        ],
+        'requirements' => [
+            'personal' => [
+                'Full Name as shown in Machine Readable Passport',
+                'Email Address & Active Mobile Number',
+                'Permanent Address & Family Relationship Verification Certificate',
+                'Citizenship Certificates of Student & Financial Sponsors'
+            ],
+            'academic' => [
+                'SEE Marksheet & Character Certificate',
+                '+2 / Intermediate Transcript, Migration & Character Certificates',
+                'Bachelor Degree Transcripts & Degree Certificate (for Master)',
+                'Genuine Student (GS) Statement addressing career trajectory',
+                'English Test: IELTS 6.0+ (no band < 5.5) or PTE 50+ (undergrad) / IELTS 6.5+ (master)',
+                'Letter of Recommendation & Medium of Instruction certificate'
+            ],
+            'visa' => [
+                'Confirmation of Enrolment (CoE) from CRICOS registered provider',
+                'Overseas Student Health Cover (OSHC) policy receipt',
+                'Evidence of 1-Year Living Costs (AUD 29,710) + 1-Year Tuition + Return Airfare',
+                'Approved Education Loan Sanction Letter from Class A Commercial Bank',
+                'Income Verification Certificates, Tax Clearance & Property Valuation',
+                'Biometrics appointment at VFS Global in Kathmandu'
+            ]
+        ]
     ]
 ];
 
@@ -143,11 +246,11 @@ $country = $countriesData[$code];
                     </div>
                 </article>
 
-                <?php if ($code === 'UK' && !empty($country['colleges'])): ?>
+                <?php if (!empty($country['colleges'])): ?>
                     <!-- UK Top Brand Colleges -->
                     <div class="mt-5 animate-fade-in">
                         <h3 class="fw-bold text-primary mb-4 position-relative d-inline-block" style="font-size: 22px;">
-                            <i class="fa-solid fa-graduation-cap text-warning me-2"></i>Our Top Brand Colleges in UK
+                            <i class="fa-solid fa-graduation-cap text-warning me-2"></i>Top Partner Universities & Colleges in <?= h($country['short_name']) ?>
                             <span class="position-absolute start-0 bottom-0 bg-warning rounded-pill" style="height: 3px; width: 50px; margin-bottom: -5px;"></span>
                         </h3>
                         <div class="row g-3 mt-2">
@@ -157,7 +260,7 @@ $country = $countriesData[$code];
                                         <div class="position-relative overflow-hidden" style="height: 140px;">
                                             <img src="<?= h($col['photo']) ?>" class="w-100 h-100 object-fit-cover" alt="Campus Photo">
                                             <div class="position-absolute bottom-0 start-0 m-2 bg-white rounded-circle p-1 border shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; z-index: 2;">
-                                                <img src="<?= h($col['logo']) ?>" class="object-fit-contain w-100 h-100" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/8074/8074788.png';" alt="College logo">
+                                                <img src="<?= h($col['logo']) ?>" class="object-fit-contain w-100 h-100" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512 - 8074/8074788.png';" alt="College logo">
                                             </div>
                                         </div>
                                         <div class="p-3 d-flex flex-column justify-content-between flex-grow-1">
@@ -315,7 +418,7 @@ $country = $countriesData[$code];
                             <i class="fa-solid fa-envelope text-warning mt-1 fs-5"></i>
                             <div>
                                 <div class="small text-white-50">Email Support</div>
-                                <a href="mailto:<?= htmlspecialchars($siteSettings['contact_email'] ?? 'info@krishnaeducation.com.np') ?>" class="text-white text-decoration-none small"><?= htmlspecialchars($siteSettings['contact_email'] ?? 'info@krishnaeducation.com.np') ?></a>
+                                <a href="mailto:<?= htmlspecialchars($siteSettings['contact_email'] ?? 'info@visionpoint.edu.np') ?>" class="text-white text-decoration-none small"><?= htmlspecialchars($siteSettings['contact_email'] ?? 'info@visionpoint.edu.np') ?></a>
                             </div>
                         </li>
                     </ul>

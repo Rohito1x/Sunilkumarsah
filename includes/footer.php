@@ -31,6 +31,14 @@ if (isset($pdo)) {
         // Fallback
     }
 }
+if (empty($dbSocials)) {
+    $dbSocials = [
+        ['platform_name' => 'Facebook', 'url' => 'https://www.facebook.com/visionpointedu', 'icon' => 'fa-brands fa-facebook'],
+        ['platform_name' => 'Instagram', 'url' => 'https://www.instagram.com/visionpointedu', 'icon' => 'fa-brands fa-instagram'],
+        ['platform_name' => 'YouTube', 'url' => 'https://youtube.com/@visionpointedu', 'icon' => 'fa-brands fa-youtube'],
+        ['platform_name' => 'WhatsApp', 'url' => 'https://wa.me/9779807765812', 'icon' => 'fa-brands fa-whatsapp']
+    ];
+}
 ?>
 <footer class="susankya-site-footer text-white pt-5 pb-4 mt-5" style="background-color: #0458A0 !important; border-top: 4px solid #D91F23;">
     <div class="container">
@@ -53,7 +61,7 @@ if (isset($pdo)) {
                     <span class="text-white"><?= h($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?></span>
                 </h5>
                 <p class="text-white small mb-3" style="line-height: 1.7;">
-                    <?= htmlspecialchars($siteSettings['footer_about'] ?? "Krishna Education Foundation is Nepal's premier choice for studying in India, offering expert admission guidance and scholarships for top-tier Indian universities.") ?>
+                    <?= htmlspecialchars($siteSettings['footer_about'] ?? "Vision Point Educational Service is Nepal's premier choice for studying in India and abroad, offering expert admission guidance and scholarships for top-tier universities.") ?>
                 </p>
                 <!-- Social Links -->
                 <div class="d-flex align-items-center gap-2 mt-3">
@@ -107,11 +115,11 @@ if (isset($pdo)) {
                     </li>
                     <li class="mb-2.5 d-flex align-items-start gap-2">
                         <i class="fa-solid fa-envelope mt-1 text-danger"></i>
-                        <a href="mailto:<?= h($siteSettings['contact_email'] ?? 'info@krishnaeducation.com.np') ?>" class="footer-link text-white text-decoration-none"><?= h($siteSettings['contact_email'] ?? 'info@krishnaeducation.com.np') ?></a>
+                        <a href="mailto:<?= h($siteSettings['contact_email'] ?? 'info@visionpoint.edu.np') ?>" class="footer-link text-white text-decoration-none"><?= h($siteSettings['contact_email'] ?? 'info@visionpoint.edu.np') ?></a>
                     </li>
                     <li class="mb-2.5 d-flex align-items-start gap-2">
                         <i class="fa-solid fa-location-dot mt-1 text-danger"></i>
-                        <span class="text-white"><?= h($siteSettings['contact_location'] ?? 'Krishna Education Foundation, Vasundhara Complex, 12 Roadcess Chowk, Biratnagar 56613, Biratnagar, Nepal') ?></span>
+                        <span class="text-white"><?= h($siteSettings['contact_location'] ?? 'Vision Point Educational Service, Main Road (Opposite Traffic Police Office / Roadcess Chowk), Biratnagar 56613, Morang, Nepal') ?></span>
                     </li>
                 </ul>
                 <button class="btn btn-secondary btn-sm rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">
@@ -124,7 +132,7 @@ if (isset($pdo)) {
         
         <div class="row align-items-center">
             <div class="col-12 col-md-6 text-center text-md-start text-white small mb-2 mb-md-0">
-                &copy; <?= date('Y') ?> <?= h($siteSettings['site_name'] ?? 'Krishna Education Foundation') ?>. All rights reserved.
+                &copy; <?= date('Y') ?> <?= h($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?>. All rights reserved.
             </div>
             <div class="col-12 col-md-6 text-center text-md-end text-white extra-small">
                 <span>Designed & Optimized for Nepalese Students</span>
@@ -465,6 +473,32 @@ $(document).ready(function() {
 });
 </script>
 
+
+<!-- Floating Quick Contact & Scroll-to-Top -->
+<a href="https://wa.me/9779807765812?text=Hello%20Vision%20Point,%20I%20would%20like%20to%20inquire%20about%20university%20admissions." target="_blank" class="floating-whatsapp-btn" title="Chat with Admissions Counselor on WhatsApp" aria-label="WhatsApp Chat">
+    <i class="fa-brands fa-whatsapp"></i>
+</a>
+<button type="button" class="floating-back-to-top" id="btnBackToTop" title="Scroll to Top" aria-label="Scroll to Top">
+    <i class="fa-solid fa-arrow-up"></i>
+</button>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnBackToTop = document.getElementById('btnBackToTop');
+    if (btnBackToTop) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 300) {
+                btnBackToTop.classList.add('active');
+            } else {
+                btnBackToTop.classList.remove('active');
+            }
+        });
+        btnBackToTop.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+});
+</script>
 
 </body>
 </html>

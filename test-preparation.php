@@ -49,7 +49,7 @@ if ($pageData && !empty($pageData['content'])) {
                 ['Listening', '30 minutes (4 sections, 40 questions)'],
                 ['Reading', '60 minutes (3 texts, 40 questions)'],
                 ['Writing', '60 minutes (2 tasks - descriptive & essay)'],
-                ['Speaking', '11–14 minutes (Face-to-face interview)']
+                ['Speaking', '11 - 14 minutes (Face-to-face interview)']
             ]
         ],
         'pte' => [
@@ -60,9 +60,9 @@ if ($pageData && !empty($pageData['content'])) {
             'target' => '58+',
             'validity' => '2 Yrs',
             'format' => [
-                ['Speaking & Writing', '54–67 minutes (combined section with essays/read alouds)'],
-                ['Reading', '29–30 minutes (multiple-choice, fill in blanks)'],
-                ['Listening', '30–43 minutes (dictation, summaries, audio playback)']
+                ['Speaking & Writing', '54 - 67 minutes (combined section with essays/read alouds)'],
+                ['Reading', '29 - 30 minutes (multiple-choice, fill in blanks)'],
+                ['Listening', '30 - 43 minutes (dictation, summaries, audio playback)']
             ]
         ],
         'toefl' => [
@@ -176,7 +176,7 @@ if ($pageData && !empty($pageData['content'])) {
             </div>
 
             <!-- Features of Prep Classes -->
-            <h3 class="fw-bold text-primary mb-4 mt-5">Why Prepare at Krishna Education Foundation?</h3>
+            <h3 class="fw-bold text-primary mb-4 mt-5">Why Prepare at Vision Point Educational Service?</h3>
             <div class="row g-4">
                 <?php foreach ($features as $feat): ?>
                     <div class="col-12 col-md-6">

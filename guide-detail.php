@@ -94,7 +94,7 @@ $encodedTitle = urlencode($guide['title']);
                     </div>
                     <div class="d-flex align-items-center gap-1">
                         <i class="fa-solid fa-user-tie text-primary"></i>
-                        <span>Author: <strong><?= h($guide['meta_author'] ?? 'Krishna Education Foundation') ?></strong></span>
+                        <span>Author: <strong><?= h($guide['meta_author'] ?? 'Vision Point Educational Service') ?></strong></span>
                     </div>
                 </div>
 

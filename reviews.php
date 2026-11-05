@@ -41,7 +41,7 @@ if (empty($reviews)) {
             'course_college' => 'B.Tech CSE (SRM University)',
             'rating' => 5,
             'title' => 'Exceptional Guidance & Support!',
-            'comment' => 'Krishna Education Foundation guided me through every step of my admission process to SRM University. They helped me secure a scholarship and made the documentation smooth and hassle-free!',
+            'comment' => 'Vision Point Educational Service guided me through every step of my admission process to SRM University. They helped me secure a scholarship and made the documentation smooth and hassle-free!',
             'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
             'created_at' => '2026-05-10 10:00:00'
         ],
@@ -51,7 +51,7 @@ if (empty($reviews)) {
             'course_college' => 'B.Sc Nursing (Chandigarh University)',
             'rating' => 5,
             'title' => 'Best Consultancy for India',
-            'comment' => 'I am currently studying Nursing in India thanks to KEF. Their admission advisors were available 24/7 to clear all my doubts about fees, hostel facilities, and visas.',
+            'comment' => 'I am currently studying Nursing in India thanks to Vision Point. Their admission advisors were available 24/7 to clear all my doubts about fees, hostel facilities, and visas.',
             'avatar' => 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
             'created_at' => '2026-04-18 14:30:00'
         ],
@@ -61,7 +61,7 @@ if (empty($reviews)) {
             'course_college' => 'BBA (Lovely Professional University)',
             'rating' => 5,
             'title' => 'Transparent & Very Helpful Team',
-            'comment' => 'Transparent advice without any hidden charges. Krishna Education Foundation made my dream of pursuing higher education in India a reality.',
+            'comment' => 'Transparent advice without any hidden charges. Vision Point Educational Service made my dream of pursuing higher education in India a reality.',
             'avatar' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
             'created_at' => '2026-03-22 11:15:00'
         ],
@@ -98,7 +98,7 @@ if (empty($reviews)) {
                     <span class="position-absolute start-0 bottom-0 bg-warning rounded-pill" style="height: 4px; width: 60px; margin-bottom: -8px;"></span>
                 </h1>
                 <p class="text-white-50 mt-3 mb-0 fs-6 max-w-600">
-                    Read authentic experiences and testimonials from students guided by Krishna Education Foundation for top Indian universities. Share your own feedback to help future scholars!
+                    Read authentic experiences and testimonials from students guided by Vision Point Educational Service for top Indian universities. Share your own feedback to help future scholars!
                 </p>
             </div>
             <div class="col-lg-4 text-lg-end">

@@ -21,7 +21,7 @@ $faqs = [
     ],
     [
         'q' => 'How can students prepare for the US F-1 visa interview in Kathmandu?',
-        'a' => 'KEF conducts extensive mock visa interviews focused on explaining university choice, academic preparedness, financial documentation clarity, and clear intent to return or utilize skills post-graduation.'
+        'a' => 'Vision Point Educational Service conducts extensive mock visa interviews focused on explaining university choice, academic preparedness, financial documentation clarity, and clear intent to return or utilize skills post-graduation.'
     ]
 ];
 

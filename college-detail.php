@@ -257,7 +257,7 @@ $uniImg = !empty($uni['img']) ? ( (strpos($uni['img'], 'http') === 0) ? $uni['im
                             <i class="fa-solid fa-envelope text-warning mt-1"></i>
                             <div>
                                 <div class="small text-white-50">Email Support</div>
-                                <a href="mailto:<?= htmlspecialchars($siteSettings['contact_email'] ?? 'info@krishnaeducation.com.np') ?>" class="text-white fw-bold text-decoration-none"><?= htmlspecialchars($siteSettings['contact_email'] ?? 'info@krishnaeducation.com.np') ?></a>
+                                <a href="mailto:<?= htmlspecialchars($siteSettings['contact_email'] ?? 'info@visionpoint.edu.np') ?>" class="text-white fw-bold text-decoration-none"><?= htmlspecialchars($siteSettings['contact_email'] ?? 'info@visionpoint.edu.np') ?></a>
                             </div>
                         </li>
                         <li class="d-flex align-items-start gap-2">

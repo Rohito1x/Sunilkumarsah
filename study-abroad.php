@@ -115,9 +115,9 @@ if ($pageData && !empty($pageData['content'])) {
     <div class="about-block-wrap">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h2 class="about-block-title">About <span><?= h($siteSettings['site_name'] ?? 'KEB') ?></span></h2>
+                <h2 class="about-block-title">About <span><?= h($siteSettings['site_name'] ?? 'Vision Point') ?></span></h2>
                 <p class="about-block-text">
-                    At <?= h($siteSettings['site_name'] ?? 'Krishna Education Foundation') ?>, we specialize in guiding students and professionals through the complex world of international education. Our mission is to make studying abroad an achievable and rewarding experience by offering expert advice, tailored services, and comprehensive support throughout your academic journey.
+                    At <?= h($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?>, we specialize in guiding students and professionals through the complex world of international education. Our mission is to make studying abroad an achievable and rewarding experience by offering expert advice, tailored services, and comprehensive support throughout your academic journey.
                 </p>
             </div>
             <div class="col-md-4 about-block-logo-col text-center">

@@ -17,27 +17,37 @@ if (isset($pdo)) {
     try {
         $stmtD = $pdo->query('SELECT * FROM destinations ORDER BY display_order ASC, name ASC');
         $destinations = $stmtD->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {}
 
+    try {
         $stmtC = $pdo->query('SELECT * FROM course_streams ORDER BY display_order ASC, name ASC');
         $courses = $stmtC->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {}
 
+    try {
         $stmtG = $pdo->query("SELECT id, title, publish_date as date, image_path as img, slug, summary as `desc` FROM guides WHERE status = 'published' ORDER BY publish_date DESC, id DESC");
         $guides = $stmtG->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {}
 
+    try {
         $stmtF = $pdo->query('SELECT * FROM fun_facts ORDER BY display_order ASC');
         $funFacts = $stmtF->fetchAll(PDO::FETCH_ASSOC);
-        
+    } catch (PDOException $e) {}
+    
+    try {
         $stmtCo = $pdo->query('SELECT * FROM countries WHERE is_active = 1 ORDER BY display_order ASC, name ASC');
         $countries = $stmtCo->fetchAll(PDO::FETCH_ASSOC);
-        
+    } catch (PDOException $e) {}
+    
+    try {
         $stmtBa = $pdo->query('SELECT * FROM bank_accounts WHERE is_active = 1 ORDER BY display_order ASC, bank_name ASC');
         $bankAccounts = $stmtBa->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {}
 
+    try {
         $stmtRev = $pdo->query("SELECT * FROM reviews WHERE status = 'Approved' ORDER BY created_at DESC");
         $homeReviews = $stmtRev->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        // Fallback
-    }
+    } catch (PDOException $e) {}
 }
 $bankAccounts = $bankAccounts ?? [];
 $homeReviews = $homeReviews ?? [];
@@ -50,7 +60,7 @@ if (empty($homeReviews)) {
             'course_college' => 'B.Tech CSE (SRM University)',
             'rating' => 5,
             'title' => 'Exceptional Guidance & Support!',
-            'comment' => 'Krishna Education Foundation guided me through every step of my admission process to SRM University. They helped me secure a scholarship and made the documentation smooth and hassle-free!',
+            'comment' => 'Vision Point Educational Service guided me through every step of my admission process to SRM University. They helped me secure a scholarship and made the documentation smooth and hassle-free!',
             'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
             'created_at' => '2026-05-10 10:00:00'
         ],
@@ -60,7 +70,7 @@ if (empty($homeReviews)) {
             'course_college' => 'B.Sc Nursing (Chandigarh University)',
             'rating' => 5,
             'title' => 'Best Consultancy for India',
-            'comment' => 'I am currently studying Nursing in India thanks to KEF. Their admission advisors were available 24/7 to clear all my doubts about fees, hostel facilities, and visas.',
+            'comment' => 'I am currently studying Nursing in India thanks to Vision Point. Their admission advisors were available 24/7 to clear all my doubts about fees, hostel facilities, and visas.',
             'avatar' => 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
             'created_at' => '2026-04-18 14:30:00'
         ],
@@ -70,7 +80,7 @@ if (empty($homeReviews)) {
             'course_college' => 'BBA (Lovely Professional University)',
             'rating' => 5,
             'title' => 'Transparent & Very Helpful Team',
-            'comment' => 'Transparent advice without any hidden charges. Krishna Education Foundation made my dream of pursuing higher education in India a reality.',
+            'comment' => 'Transparent advice without any hidden charges. Vision Point Educational Service made my dream of pursuing higher education in India a reality.',
             'avatar' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
             'created_at' => '2026-03-22 11:15:00'
         ],
@@ -97,7 +107,7 @@ if (empty($homeReviews)) {
                 <div class="d-inline-flex align-items-center gap-2 bg-white px-3 py-2 rounded-pill shadow-sm border border-light mb-4 hero-badge-container hero-reveal-item">
                     <span class="d-inline-block bg-success rounded-circle pulse-dot" style="width: 8px; height: 8px;"></span>
                     <span class="text-primary fw-bold small uppercase" style="font-size: 12px; letter-spacing: 0.5px;">
-                        <i class="fa-solid fa-star text-warning me-1"></i> Nepal's Top Education Consultancy for India
+                        <i class="fa-solid fa-star text-warning me-1"></i> Nepal's Top Education Consultancy for India & Abroad
                     </span>
                 </div>
                 
@@ -1238,7 +1248,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <div class="col-12 form-group">
                             <label class="form-label fw-semibold small text-dark">Your Review / Experience <span class="text-danger">*</span></label>
-                            <textarea name="comment" class="form-control" rows="4" placeholder="Share your experience studying through Krishna Education Foundation..." required></textarea>
+                            <textarea name="comment" class="form-control" rows="4" placeholder="Share your experience studying through Vision Point Educational Service..." required></textarea>
                         </div>
                     </div>
                 </div>
@@ -1346,14 +1356,20 @@ require_once __DIR__ . '/includes/payment_section.php';
                 <p class="text-muted mb-4">Fill out the inquiry form, and our education counselor will call you within 24 hours to clarify your questions about programs, fees, and scholarships.</p>
                 
                 <!-- Counselor Contact Highlight -->
-                <div class="mt-4 p-3 bg-light rounded-4 d-flex align-items-center gap-3 border border-light shadow-sm" style="max-width: 380px;">
-                    <div class="overflow-hidden rounded-circle flex-shrink-0 shadow-sm border border-2 border-warning" style="width: 58px; height: 58px;">
-                        <img src="<?= h($basePath) ?>assets/images/kimg.png" alt="Krishna Jaiswal - Senior Admissions Advisor" class="w-100 h-100 object-fit-cover">
+                <div class="mt-4 p-3 bg-white rounded-4 d-flex align-items-center gap-3 border border-light-subtle shadow-sm counselor-spotlight-card" style="max-width: 410px; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                    <div class="position-relative flex-shrink-0" style="width: 64px; height: 64px;">
+                        <div class="overflow-hidden rounded-circle shadow-sm border border-2 border-primary w-100 h-100">
+                            <img src="<?= h($basePath) ?>assets/images/counselor.png" alt="Senior Admissions Advisor - Vision Point Educational Service" class="w-100 h-100 object-fit-cover" style="object-position: center 15%;">
+                        </div>
+                        <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle pulse-dot" style="width: 14px; height: 14px;" title="Online Now"></span>
                     </div>
-                    <div>
-                        <div class="fw-bold text-primary mb-0 fs-6">Krishna Jaiswal</div>
-                        <div class="text-secondary small mb-1"><i class="fa-solid fa-graduation-cap text-warning me-1"></i>Senior Admissions Advisor</div>
-                        <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2 rounded-pill fw-semibold" style="font-size: 10px;"><i class="fa-solid fa-circle-check me-1"></i>Ready to Assist You!</span>
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="fw-bold text-primary mb-0 fs-6">Aaradhya Sharma</div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle py-0 px-2 rounded-pill fw-semibold" style="font-size: 10px;"><i class="fa-solid fa-circle-check me-1"></i>Verified</span>
+                        </div>
+                        <div class="text-secondary small mb-1" style="font-size: 12px;"><i class="fa-solid fa-graduation-cap text-primary me-1"></i>Lead Admissions Advisor</div>
+                        <div class="text-muted extra-small" style="font-size: 11px;">100% Free 1-on-1 University Guidance</div>
                     </div>
                 </div>
             </div>

@@ -47,7 +47,7 @@ require_once __DIR__ . '/includes/header.php';
                 <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold text-uppercase mb-3">
                     <i class="fa-solid fa-location-dot me-1"></i> Biratnagar Office
                 </span>
-                <h1 class="fw-bold display-5 text-white mb-3">Contact Krishna Education Foundation</h1>
+                <h1 class="fw-bold display-5 text-white mb-3">Contact Vision Point Educational Service</h1>
                 <p class="lead text-white-50 mb-4" style="line-height: 1.7;">
                     Have questions about courses, university admissions, scholarships, or visa procedures? Visit our office in Biratnagar or reach out to our counselors directly.
                 </p>
@@ -55,7 +55,7 @@ require_once __DIR__ . '/includes/header.php';
                     <a href="tel:+9779807765812" class="btn btn-warning text-dark fw-bold px-4 py-2 rounded-pill shadow-sm">
                         <i class="fa-solid fa-phone me-2"></i>+977 9807765812
                     </a>
-                    <a href="mailto:info@krishnaeducation.com.np" class="btn btn-outline-light px-4 py-2 rounded-pill fw-semibold">
+                    <a href="mailto:info@visionpoint.edu.np" class="btn btn-outline-light px-4 py-2 rounded-pill fw-semibold">
                         <i class="fa-solid fa-envelope me-2"></i>Send Email
                     </a>
                 </div>
@@ -88,9 +88,9 @@ require_once __DIR__ . '/includes/header.php';
                         <div>
                             <h5 class="fw-bold text-dark fs-6 mb-1">Official Address</h5>
                             <p class="text-muted small mb-0" style="line-height: 1.6;">
-                                <strong>Krishna Education Foundation</strong><br>
-                                Vasundhara Complex, 12 Roadcess Chowk<br>
-                                Biratnagar 56613, Biratnagar, Nepal
+                                <strong>Vision Point Educational Service</strong><br>
+                                Main Road (Opposite Traffic Police Office / Roadcess Chowk)<br>
+                                Biratnagar 56613, Morang, Nepal
                             </p>
                         </div>
                     </div>
@@ -114,7 +114,7 @@ require_once __DIR__ . '/includes/header.php';
                         <div>
                             <h5 class="fw-bold text-dark fs-6 mb-1">Email Inquiries</h5>
                             <p class="text-muted small mb-0">
-                                <a href="mailto:info@krishnaeducation.com.np" class="text-decoration-none text-muted">info@krishnaeducation.com.np</a>
+                                <a href="mailto:info@visionpoint.edu.np" class="text-decoration-none text-muted">info@visionpoint.edu.np</a>
                             </p>
                         </div>
                     </div>
@@ -197,12 +197,107 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </section>
 
+<!-- Visit Preparation & FAQ Section -->
+<section class="py-5 bg-white border-top">
+    <div class="container py-3">
+        <div class="row g-5 align-items-center">
+            <!-- Left: What to Bring -->
+            <div class="col-lg-6">
+                <span class="text-danger fw-bold small text-uppercase">Visit Preparation</span>
+                <h2 class="fw-bold text-primary fs-3 mb-3">What to Bring to Your Counseling Session</h2>
+                <p class="text-muted small mb-4" style="line-height: 1.8;">
+                    To make the most of your 1-on-1 session with our education advisors, we recommend carrying copies of the following documents:
+                </p>
+
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex align-items-start gap-3 p-3 bg-light rounded-3">
+                        <div class="p-2 bg-primary text-white rounded-circle flex-shrink-0" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-file-lines small"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-1">Academic Transcripts & Character Certificates</h6>
+                            <p class="text-muted extra-small mb-0">Class 10 (SEE) grade sheet and Class 11/12 (+2 / CBSE) mark sheets or predicted grade letters.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3 p-3 bg-light rounded-3">
+                        <div class="p-2 bg-warning text-dark rounded-circle flex-shrink-0" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-id-card small"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-1">Identification Document</h6>
+                            <p class="text-muted extra-small mb-0">Original or photocopy of Nepalese Citizenship Certificate or Valid National Passport.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3 p-3 bg-light rounded-3">
+                        <div class="p-2 bg-success text-white rounded-circle flex-shrink-0" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-award small"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-1">Entrance & Test Scorecards (If Available)</h6>
+                            <p class="text-muted extra-small mb-0">Scorecards for CEE, NEET, JEE, IELTS, or PTE if you have already appeared for exams.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Office Visit FAQ -->
+            <div class="col-lg-6">
+                <span class="text-danger fw-bold small text-uppercase">Visitor Information</span>
+                <h2 class="fw-bold text-primary fs-3 mb-3">Frequently Asked Questions</h2>
+                
+                <div class="accordion shadow-sm rounded-4 overflow-hidden" id="contactFaqAcc">
+                    <div class="accordion-item border-0 border-bottom">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#cfaq1" aria-expanded="true">
+                                Is there any consultation fee for the initial counseling?
+                            </button>
+                        </h3>
+                        <div id="cfaq1" class="accordion-collapse collapse show" data-bs-parent="#contactFaqAcc">
+                            <div class="accordion-body text-muted small" style="line-height: 1.8;">
+                                No. All academic counseling, profile assessments, and university shortlisting sessions at Vision Point Educational Service are completely free of charge.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 border-bottom">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#cfaq2">
+                                Can parents accompany students to the counseling session?
+                            </button>
+                        </h3>
+                        <div id="cfaq2" class="accordion-collapse collapse" data-bs-parent="#contactFaqAcc">
+                            <div class="accordion-body text-muted small" style="line-height: 1.8;">
+                                Yes, absolutely! We strongly encourage parents and guardians to join the counseling session so that all aspects of course suitability, hostel safety, fee structures, and scholarship terms can be discussed openly together.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#cfaq3">
+                                Do I need an appointment before visiting the Biratnagar office?
+                            </button>
+                        </h3>
+                        <div id="cfaq3" class="accordion-collapse collapse" data-bs-parent="#contactFaqAcc">
+                            <div class="accordion-body text-muted small" style="line-height: 1.8;">
+                                Walk-ins are always welcome during our standard business hours (Sunday to Friday, 9:00 AM – 6:00 PM). However, booking an appointment in advance guarantees dedicated one-on-one time with a senior specialized advisor.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Google Map Embed Section -->
 <section class="py-0">
     <div class="container-fluid p-0">
         <div class="ratio ratio-21x9" style="min-height: 380px;">
             <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d114227.18956926955!2d87.21051515!3d26.4524744!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39ef744704331a99%3A0x892a01d674251f28!2sBiratnagar!5e0!3m2!1sen!2snp!4v1700000000000!5m2!1sen!2snp" 
-                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Krishna Education Foundation Biratnagar Office Map">
+                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Vision Point Educational Service Biratnagar Office Map">
             </iframe>
         </div>
     </div>

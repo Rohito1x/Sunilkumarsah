@@ -4,7 +4,7 @@ require_once __DIR__ . '/includes/db.php';
 if (file_exists(__DIR__ . '/includes/seo.php')) { require_once __DIR__ . '/includes/seo.php'; }
 
 $pageSeo = [
-    'meta_title' => '404 - Page Not Found | Krishna Education Foundation',
+    'meta_title' => '404 - Page Not Found | Vision Point Educational Service',
     'meta_description' => 'The page you requested could not be found. Explore our study in India guides, universities, scholarships, and career counseling.',
     'robots' => 'noindex, follow'
 ];

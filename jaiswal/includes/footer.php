@@ -5,7 +5,7 @@
 <!-- Admin Layout Copyright Footer -->
 <footer class="py-3 bg-white border-top text-center text-muted small">
     <div class="container">
-        &copy; <?= date('Y') ?> Krishna Education Foundation Management Console. All rights reserved.
+        &copy; <?= date('Y') ?> Vision Point Educational Service Management Console. All rights reserved.
     </div>
 </footer>
 

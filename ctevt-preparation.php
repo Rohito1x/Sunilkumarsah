@@ -141,7 +141,7 @@ require_once __DIR__ . '/includes/header.php';
 <!-- CTA -->
 <section class="py-5 text-center text-white" style="background: #0458A0;">
     <div class="container py-3">
-        <h2 class="fw-bold text-white display-6 mb-3">Begin Your CTEVT Preparation Journey with KEF</h2>
+        <h2 class="fw-bold text-white display-6 mb-3">Begin Your CTEVT Preparation Journey with Vision Point</h2>
         <p class="text-white-50 max-w-600 mx-auto mb-4">Classes start immediately following the SEE board examinations.</p>
         <button class="btn btn-warning text-dark fw-bold px-4 py-2 rounded-pill shadow" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">
             <i class="fa-solid fa-paper-plane me-2"></i>Register for CTEVT Coaching

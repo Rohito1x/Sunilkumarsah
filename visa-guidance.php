@@ -16,7 +16,7 @@ $faqs = [
         'a' => 'Requires a valid CAS letter from a licensed UK university, 28-day maintenance funds proof, Tuberculosis (TB) medical test certificate, Immigration Health Surcharge (IHS) payment, and biometric submission at VFS Global in Kathmandu.'
     ],
     [
-        'q' => 'How does KEF prepare students for visa interviews?',
+        'q' => 'How does Vision Point prepare students for visa interviews?',
         'a' => 'We conduct multiple one-on-one mock interview sessions focusing on course rationale, career goals, university selection justification, and financial clarity.'
     ]
 ];

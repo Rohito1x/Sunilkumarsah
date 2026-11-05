@@ -4,7 +4,7 @@ if (file_exists(__DIR__ . '/includes/seo.php')) { require_once __DIR__ . '/inclu
 
 $faqs = [
     [
-        'q' => 'What is 1-on-1 Career Counselling at Krishna Education Foundation?',
+        'q' => 'What is 1-on-1 Career Counselling at Vision Point Educational Service?',
         'a' => 'Our 1-on-1 career counselling is an individualized advisory session where experienced counselors assess your academic strengths (+2 GPA/Marks), personal passions, career goals, and family budget to recommend the best matching courses and universities.'
     ],
     [
@@ -17,7 +17,7 @@ $faqs = [
     ],
     [
         'q' => 'Is there any fee for initial career counselling?',
-        'a' => 'Initial academic counseling and university shortlisting at Krishna Education Foundation are 100% free of charge.'
+        'a' => 'Initial academic counseling and university shortlisting at Vision Point Educational Service are 100% free of charge.'
     ]
 ];
 

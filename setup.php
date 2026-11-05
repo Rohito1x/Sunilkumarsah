@@ -1,6 +1,6 @@
 <?php
 /**
- * Setup script for Krishna Education Foundation Website Database
+ * Setup script for Vision Point Educational Service Website Database
  */
 
 if (file_exists(__DIR__ . '/config.php')) {
@@ -41,7 +41,7 @@ try {
 
     echo "<hr><p><b>Next Steps:</b></p>";
     echo "<p><a href='index.php'>Go to Website Homepage</a></p>";
-    echo "<p><a href='jaiswal@krishna.php'>Go to Admin Login</a></p>";
+    echo "<p><a href='login.php'>Go to Admin Login</a></p>";
     exit;
     
     // Create admin_users table
@@ -190,10 +190,10 @@ try {
 
     // Seed default reviews
     $reviews = [
-        ['Priya Sharma', 'priya.sharma@example.com', 'B.Tech CSE - Galgotias University', 5, 'Exceptional Guidance & Seamless Admission!', 'Krishna Education Foundation guided me step-by-step through my application to Galgotias University. From documentation to fee payment and hostel accommodation in Delhi NCR, everything was hassle-free. Highly recommended!', 'Approved'],
-        ['Aashish Adhikari', 'aashish.adhikari@example.com', 'B.Sc Nursing - East Point College Bangalore', 5, 'Best Education Consultancy in Nepal', 'I was very nervous about studying abroad, but the counselors at KEF explained every detail clearly. They secured a tuition scholarship for my nursing degree in Bangalore and helped with visa processing.', 'Approved'],
-        ['Suman Shrestha', 'suman.shrestha@example.com', 'B.Pharm - Sharda University', 5, 'Honest Counselors and Zero Hidden Charges', 'Unlike other agencies, Krishna Education Foundation was completely transparent about college fees and living expenses. The counseling session in Biratnagar was eye-opening and super helpful.', 'Approved'],
-        ['Rohan Thapa', 'rohan.thapa@example.com', 'BBA - Chandigarh University', 4, 'Great Support & Fast Processing', 'The admission team processed my documentation extremely fast. I received my admission offer letter within 3 days. Thank you KEF team for making my study in India dream come true!', 'Approved']
+        ['Priya Sharma', 'priya.sharma@example.com', 'B.Tech CSE - Galgotias University', 5, 'Exceptional Guidance & Seamless Admission!', 'Vision Point Educational Service guided me step-by-step through my application to Galgotias University. From documentation to fee payment and hostel accommodation in Delhi NCR, everything was hassle-free. Highly recommended!', 'Approved'],
+        ['Aashish Adhikari', 'aashish.adhikari@example.com', 'B.Sc Nursing - East Point College Bangalore', 5, 'Best Education Consultancy in Nepal', 'I was very nervous about studying abroad, but the counselors at Vision Point explained every detail clearly. They secured a tuition scholarship for my nursing degree in Bangalore and helped with visa processing.', 'Approved'],
+        ['Suman Shrestha', 'suman.shrestha@example.com', 'B.Pharm - Sharda University', 5, 'Honest Counselors and Zero Hidden Charges', 'Unlike other agencies, Vision Point Educational Service was completely transparent about college fees and living expenses. The counseling session in Biratnagar was eye-opening and super helpful.', 'Approved'],
+        ['Rohan Thapa', 'rohan.thapa@example.com', 'BBA - Chandigarh University', 4, 'Great Support & Fast Processing', 'The admission team processed my documentation extremely fast. I received my admission offer letter within 3 days. Thank you Vision Point team for making my study in India dream come true!', 'Approved']
     ];
     $stmtRev = $pdo->prepare("INSERT INTO `reviews` (`name`, `email`, `course_college`, `rating`, `title`, `comment`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?)");
     foreach ($reviews as $rev) {
@@ -201,8 +201,8 @@ try {
     }
     echo "Default student reviews seeded.<br>";
     
-    // Seed secure admin account: admin@krishnaeducation.info / adminSecure2026!
-    $adminEmail = 'admin@krishnaeducation.info';
+    // Seed secure admin account: admin@visionpoint.edu.np / adminSecure2026!
+    $adminEmail = 'admin@visionpoint.edu.np';
     $adminPassHash = '$2y$10$e4/3wIE6LaBZVNmLIOT7beYwV5G8emOCE2JzEyRrBJHFs/5s4IE/y';
     
     $stmt = $pdo->prepare("INSERT INTO `admin_users` (`email`, `password_hash`) VALUES (?, ?)");
@@ -224,8 +224,8 @@ try {
         'hero_title' => "Unlock Your Full \r\nEducational Potential in India",
         'hero_subtitle' => 'Maximize your potential and reach new academic peaks with our expert guidance, university listings, and scholarships every step of the way.',
         'contact_phone' => '+977 9807765812',
-        'contact_email' => 'info@krishnaeducation.com.np',
-        'contact_location' => 'Krishna Education Foundation, Vasundhara Complex, 12 Roadcess Chowk, Biratnagar 56613, Biratnagar, Nepal',
+        'contact_email' => 'info@visionpoint.edu.np',
+        'contact_location' => 'Vision Point Educational Service, Main Road (Opposite Traffic Police Office / Roadcess Chowk), Biratnagar 56613, Morang, Nepal',
         'qr_code_enabled' => '1',
         'qr_code_image' => 'assets/images/siddhartha_qr.png',
         'qr_code_title' => 'Scan to Pay',

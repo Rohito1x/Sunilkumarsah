@@ -1,7 +1,7 @@
 <?php
 /**
- * Krishna Education Foundation - Server Diagnostic & Health Check Tool
- * Access via: https://krishnaeducationfoundation.edu.np/check_status.php
+ * Vision Point Educational Service - Server Diagnostic & Health Check Tool
+ * Access via: https://visionpoint.edu.np/check_status.php
  */
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -101,7 +101,7 @@ $checks[] = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server Diagnostics | Krishna Education Foundation</title>
+    <title>Server Diagnostics | Vision Point Educational Service</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -120,7 +120,7 @@ $checks[] = [
             <h2 class="fw-bold text-primary mb-1">
                 <i class="fa-solid fa-heart-pulse text-danger me-2"></i>System Diagnostic & Status
             </h2>
-            <p class="text-muted small">Krishna Education Foundation Server Health & Database Verifier</p>
+            <p class="text-muted small">Vision Point Educational Service Server Health & Database Verifier</p>
         </div>
 
         <div class="diag-card p-4 p-md-5 mb-4">

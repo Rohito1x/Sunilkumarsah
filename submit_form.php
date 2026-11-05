@@ -27,7 +27,7 @@ if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csr
 
 // Ensure database connection is active
 if (!isset($pdo) || !$pdo) {
-    jsonResponse(false, 'Database service is currently undergoing maintenance. Please reach out to us at info@krishnaeducation.com.np or +977 9807765812.', [], 503);
+    jsonResponse(false, 'Database service is currently undergoing maintenance. Please reach out to us at info@visionpoint.edu.np or +977 9807765812.', [], 503);
 }
 
 $action = isset($_POST['action']) ? trim((string)$_POST['action']) : '';

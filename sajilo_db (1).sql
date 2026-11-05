@@ -55,7 +55,7 @@ CREATE TABLE `admin_users` (
 --
 
 INSERT INTO `admin_users` (`id`, `email`, `password_hash`, `created_at`) VALUES
-(1, 'admin@krishnaeducation.com.np', '$2y$10$F6MrsxYw2Af/P8ZBz9O4JesQ3zXGoA1KJSffZD.7MO.TTjv0nTsR6', '2026-06-27 19:12:10');
+(1, 'admin@visionpoint.edu.np', '$2y$10$F6MrsxYw2Af/P8ZBz9O4JesQ3zXGoA1KJSffZD.7MO.TTjv0nTsR6', '2026-06-27 19:12:10');
 
 -- --------------------------------------------------------
 
@@ -443,10 +443,10 @@ CREATE TABLE `site_settings` (
 --
 
 INSERT INTO `site_settings` (`key`, `value`) VALUES
-('contact_email', 'info@krishnaeducation.com.np'),
-('contact_location', 'Krishna Education Foundation, Vasundhara Complex, 12 Roadcess Chowk, Biratnagar 56613, Biratnagar, Nepal'),
+('contact_email', 'info@visionpoint.edu.np'),
+('contact_location', 'Vision Point Educational Service, Vasundhara Complex, 12 Roadcess Chowk, Biratnagar 56613, Biratnagar, Nepal'),
 ('contact_phone', '+977 9807765812'),
-('footer_about', 'Krishna Education Foundation is Nepal\'s premier choice for studying in India, offering expert admission guidance and scholarships for top-tier Indian universities.'),
+('footer_about', 'Vision Point Educational Service is Nepal\'s premier choice for studying in India, offering expert admission guidance and scholarships for top-tier Indian universities.'),
 ('footer_copyright', ''),
 ('hero_banner_image', 'assets/images/banner.png'),
 ('hero_subtitle', 'Maximize your potential and reach new academic peaks with our expert guidance, university listings, and scholarships every step of the way.'),

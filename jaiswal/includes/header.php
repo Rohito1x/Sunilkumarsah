@@ -26,7 +26,7 @@ if (isset($pdo)) {
 
 $isAdmin = isset($_SESSION['admin_id']);
 if (!$isAdmin) {
-    header('Location: ../jaiswal@krishna.php');
+    header('Location: ../login.php');
     exit;
 }
 ?>

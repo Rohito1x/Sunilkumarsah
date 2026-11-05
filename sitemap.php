@@ -1,6 +1,6 @@
 <?php
 /**
- * Krishna Education Foundation - Dynamic XML Sitemap Generator
+ * Vision Point Educational Service - Dynamic XML Sitemap Generator
  * 
  * Generates standards-compliant XML sitemap dynamically from database.
  * Supports public indexable URLs, lastmod timestamps, changefreq, and priorities.

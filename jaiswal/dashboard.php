@@ -7,7 +7,7 @@ require_once __DIR__ . '/../includes/db.php';
 
 // Auth check
 if (!isset($_SESSION['admin_id'])) {
-    header('Location: ../jaiswal@krishna.php');
+    header('Location: ../login.php');
     exit;
 }
 
@@ -3125,7 +3125,7 @@ require_once __DIR__ . '/includes/header.php';
                                         </div>
                                         <div class="form-group mb-3">
                                             <label>Site Brand Name</label>
-                                            <input type="text" name="site_name" class="form-control" value="<?= htmlspecialchars($siteSettings['site_name'] ?? 'Krishna Education Foundation') ?>">
+                                            <input type="text" name="site_name" class="form-control" value="<?= htmlspecialchars($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?>">
                                         </div>
                                         <div class="form-group mb-3">
                                             <label>Site Logo File (Upload)</label>
@@ -4713,7 +4713,7 @@ require_once __DIR__ . '/includes/header.php';
 
                                                                             <div class="col-12 form-group">
                                                                                 <label class="fw-semibold">Canonical URL Override (Optional)</label>
-                                                                                <input type="url" name="canonical_url" class="form-control font-monospace" value="<?= htmlspecialchars($sp['canonical_url'] ?? '') ?>" placeholder="https://krishnaeducationfoundation.edu.np/...">
+                                                                                <input type="url" name="canonical_url" class="form-control font-monospace" value="<?= htmlspecialchars($sp['canonical_url'] ?? '') ?>" placeholder="https://visionpoint.edu.np/...">
                                                                                 <div class="form-text text-muted">Leave blank to auto-generate canonical link based on route slug.</div>
                                                                             </div>
 
@@ -4786,19 +4786,19 @@ require_once __DIR__ . '/includes/header.php';
                                                                                         <img src="../assets/images/logo1.png" alt="Favicon" style="max-height: 18px; max-width: 18px; object-fit: contain;">
                                                                                     </div>
                                                                                     <div>
-                                                                                        <div class="text-dark small fw-bold" style="font-size: 13px; line-height: 1.2;">Krishna Education Foundation</div>
-                                                                                        <div class="text-muted" style="font-size: 11px; line-height: 1.2;">https://krishnaeducationfoundation.edu.np &rsaquo; <?= htmlspecialchars($sp['slug']) ?></div>
+                                                                                        <div class="text-dark small fw-bold" style="font-size: 13px; line-height: 1.2;">Vision Point Educational Service</div>
+                                                                                        <div class="text-muted" style="font-size: 11px; line-height: 1.2;">https://visionpoint.edu.np &rsaquo; <?= htmlspecialchars($sp['slug']) ?></div>
                                                                                     </div>
                                                                                 </div>
 
                                                                                 <!-- SERP Title -->
                                                                                 <h5 class="serp-title text-primary mb-1 mt-2" style="font-family: Arial, sans-serif; font-size: 18px; line-height: 1.3; color: #1a0dab !important; cursor: pointer; text-decoration: none;">
-                                                                                    <?= htmlspecialchars($sp['meta_title'] ?: 'Krishna Education Foundation | Best Education Consultancy') ?>
+                                                                                    <?= htmlspecialchars($sp['meta_title'] ?: 'Vision Point Educational Service | Best Education Consultancy') ?>
                                                                                 </h5>
 
                                                                                 <!-- SERP Description -->
                                                                                 <p class="serp-desc text-muted mb-0" style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.5; color: #4d5156 !important;">
-                                                                                    <?= htmlspecialchars($sp['meta_description'] ?: 'Krishna Education Foundation is Nepal\'s top education consultancy in Biratnagar for Study in India admissions, engineering, nursing, and medical scholarships.') ?>
+                                                                                    <?= htmlspecialchars($sp['meta_description'] ?: 'Vision Point Educational Service is Nepal\'s top education consultancy in Biratnagar for Study in India admissions, engineering, nursing, and medical scholarships.') ?>
                                                                                 </p>
                                                                             </div>
 
@@ -5107,7 +5107,7 @@ require_once __DIR__ . '/includes/header.php';
                                                                 <div class="form-group mb-3">
                                                                     <label class="fw-semibold">Destination Target URL (To) <span class="text-danger">*</span></label>
                                                                     <input type="text" name="new_url" class="form-control font-monospace" value="<?= htmlspecialchars($red['new_url']) ?>" required>
-                                                                    <div class="form-text text-muted">e.g. <code>/about</code> or <code>https://krishnaeducationfoundation.edu.np/about.php</code></div>
+                                                                    <div class="form-text text-muted">e.g. <code>/about</code> or <code>https://visionpoint.edu.np/about.php</code></div>
                                                                 </div>
                                                                 <div class="form-group mb-3">
                                                                     <label class="fw-semibold">HTTP Status Code</label>
@@ -5618,7 +5618,7 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="modal-body p-4">
                             <div class="form-group mb-3">
                                 <label>Admin Email Address</label>
-                                <input type="email" name="email" class="form-control" placeholder="e.g. counselor@krishnaeducation.com.np" required>
+                                <input type="email" name="email" class="form-control" placeholder="e.g. counselor@visionpoint.edu.np" required>
                             </div>
                             <div class="form-group mb-3">
                                 <label>Password</label>
@@ -5650,7 +5650,7 @@ require_once __DIR__ . '/includes/header.php';
                                 </div>
                                 <div class="col-12 col-md-6 form-group">
                                     <label class="fw-semibold">Account Holder Name <span class="text-danger">*</span></label>
-                                    <input type="text" name="account_name" class="form-control" placeholder="e.g. KRISHNA EDUCATION FOUNDATION PVT. LTD." required>
+                                    <input type="text" name="account_name" class="form-control" placeholder="e.g. VISION POINT EDUCATIONAL SERVICE PVT. LTD." required>
                                 </div>
                                 <div class="col-12 col-md-6 form-group">
                                     <label class="fw-semibold">Account Number <span class="text-danger">*</span></label>
@@ -5816,7 +5816,7 @@ require_once __DIR__ . '/includes/header.php';
 
                                         <div class="col-12 form-group">
                                             <label class="fw-semibold">Canonical URL Override (Optional)</label>
-                                            <input type="url" name="canonical_url" class="form-control font-monospace" placeholder="https://krishnaeducationfoundation.edu.np/study-in-germany">
+                                            <input type="url" name="canonical_url" class="form-control font-monospace" placeholder="https://visionpoint.edu.np/study-in-germany">
                                             <div class="form-text text-muted">Leave blank to auto-generate canonical link.</div>
                                         </div>
 
@@ -5886,8 +5886,8 @@ require_once __DIR__ . '/includes/header.php';
                                                     <img src="../assets/images/logo1.png" alt="Favicon" style="max-height: 18px; max-width: 18px; object-fit: contain;">
                                                 </div>
                                                 <div>
-                                                    <div class="text-dark small fw-bold" style="font-size: 13px; line-height: 1.2;">Krishna Education Foundation</div>
-                                                    <div class="text-muted" style="font-size: 11px; line-height: 1.2;">https://krishnaeducationfoundation.edu.np &rsaquo; <span id="addSerpSlugPreview">new-page</span></div>
+                                                    <div class="text-dark small fw-bold" style="font-size: 13px; line-height: 1.2;">Vision Point Educational Service</div>
+                                                    <div class="text-muted" style="font-size: 11px; line-height: 1.2;">https://visionpoint.edu.np &rsaquo; <span id="addSerpSlugPreview">new-page</span></div>
                                                 </div>
                                             </div>
 
@@ -5944,7 +5944,7 @@ require_once __DIR__ . '/includes/header.php';
                             </div>
                             <div class="form-group mb-3">
                                 <label class="fw-semibold">Destination Target URL (To) <span class="text-danger">*</span></label>
-                                <input type="text" name="new_url" class="form-control font-monospace" placeholder="e.g. /courses or https://krishnaeducationfoundation.edu.np/courses" required>
+                                <input type="text" name="new_url" class="form-control font-monospace" placeholder="e.g. /courses or https://visionpoint.edu.np/courses" required>
                                 <div class="form-text text-muted">The destination where users and search crawlers should be routed.</div>
                             </div>
                             <div class="form-group mb-3">

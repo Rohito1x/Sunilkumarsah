@@ -8,7 +8,7 @@
 require_once __DIR__ . '/includes/db.php';
 
 // 👇 SET YOUR DESIRED ADMIN EMAIL & NEW PASSWORD HERE
-$adminEmail = 'admin@krishnaeducation.info';
+$adminEmail = 'admin@visionpoint.edu.np';
 $newPassword = 'adminSecure2026!'; // 👈 Change this to your desired password
 
 $message = '';
@@ -65,7 +65,7 @@ if ($pdo) {
                 <p class="mb-1"><strong>Email:</strong> <code><?= htmlspecialchars($adminEmail) ?></code></p>
                 <p class="mb-0"><strong>Password:</strong> <code><?= htmlspecialchars($newPassword) ?></code></p>
             </div>
-            <a href="jaiswal@krishna.php" class="btn btn-primary w-100 py-2 fw-semibold rounded-pill mb-2">Go to Admin Login</a>
+            <a href="login.php" class="btn btn-primary w-100 py-2 fw-semibold rounded-pill mb-2">Go to Admin Login</a>
             <p class="text-muted small mb-0">⚠️ <em>For security, you can now delete <code>reset_admin.php</code> from Hostinger.</em></p>
         <?php else: ?>
             <div class="alert alert-danger text-start">

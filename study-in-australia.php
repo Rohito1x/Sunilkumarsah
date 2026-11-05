@@ -187,7 +187,7 @@ require_once __DIR__ . '/includes/header.php';
 <!-- CTA -->
 <section class="py-5 text-center text-white" style="background: #0458A0;">
     <div class="container py-3">
-        <h2 class="fw-bold text-white display-6 mb-3">Apply to Top Australian Universities with KEF</h2>
+        <h2 class="fw-bold text-white display-6 mb-3">Apply to Top Australian Universities with Vision Point</h2>
         <p class="text-white-50 max-w-600 mx-auto mb-4">Get your academic transcripts assessed and submit your application for the upcoming Australian intake.</p>
         <button class="btn btn-warning text-dark fw-bold px-4 py-2 rounded-pill shadow" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal" data-country="Australia">
             <i class="fa-solid fa-paper-plane me-2"></i>Book Free Australian Counseling
