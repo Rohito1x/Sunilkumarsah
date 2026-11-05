@@ -130,12 +130,27 @@
     --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
+html {
+    height: 100%;
+}
+
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     color: var(--text-dark);
     background-color: #ffffff;
     line-height: 1.6;
     overflow-x: hidden;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.susankya-site-footer,
+footer {
+    margin-top: auto !important;
+    margin-bottom: 0 !important;
 }
 
 /* /* Typography Extensions - Indo-Global Black Letter Colors */
@@ -906,7 +921,12 @@ header .navbar,
 /* Mobile Bottom Navigation Bar Adjustments */
 @media (max-width: 767.98px) {
     body {
-        padding-bottom: 85px !important;
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
+    .susankya-site-footer {
+        padding-bottom: calc(1.5rem + 68px) !important;
+        margin-bottom: 0 !important;
     }
 }
 
@@ -2067,7 +2087,8 @@ header .navbar,
     body {
         font-size: 0.92rem;
         line-height: 1.5;
-        padding-bottom: 72px !important; /* Proper clearance for bottom navigation */
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
     }
 
     h1, .h1 { font-size: 1.65rem !important; }
@@ -3011,15 +3032,28 @@ a.nav-link,
         padding-bottom: calc(6px + env(safe-area-inset-bottom)) !important;
         height: calc(60px + env(safe-area-inset-bottom)) !important;
     }
-    body {
-        padding-bottom: calc(70px + env(safe-area-inset-bottom)) !important;
+    @media (max-width: 767.98px) {
+        .susankya-site-footer {
+            padding-bottom: calc(1.5rem + 68px + env(safe-area-inset-bottom)) !important;
+            margin-bottom: 0 !important;
+        }
     }
 }
 
-/* Body padding so mobile bottom nav doesn't overlap content */
+/* Ensure ZERO gap under footer across all viewports */
+body {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
 @media (max-width: 767.98px) {
     body {
-        padding-bottom: 70px !important;
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
+    .susankya-site-footer {
+        padding-bottom: calc(1.5rem + 68px) !important;
+        margin-bottom: 0 !important;
     }
 }
 
@@ -3737,4 +3771,29 @@ body > .container:first-of-type {
 }
 .pulse-dot {
     animation: pulseGlow 2s infinite ease-in-out;
+}
+
+/* ============================================================
+   ZERO UNWANTED SPACE UNDER FOOTER
+   ============================================================ */
+html, body {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.susankya-site-footer,
+footer {
+    margin-bottom: 0 !important;
+}
+
+@media (max-width: 767.98px) {
+    body {
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
+    .susankya-site-footer,
+    footer {
+        padding-bottom: calc(1.5rem + 68px) !important;
+        margin-bottom: 0 !important;
+    }
 }
