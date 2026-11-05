@@ -60,8 +60,13 @@ if (empty($dbSocials)) {
                     <?php endif; ?>
                     <span class="text-white"><?= h($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?></span>
                 </h5>
+                <div class="mb-2">
+                    <span class="badge bg-warning text-dark px-2.5 py-1 rounded-pill extra-small fw-bold">
+                        <i class="fa-solid fa-certificate me-1 text-danger"></i> Est. 2070 B.S. &bull; MoEST Approved &bull; TITI Certified
+                    </span>
+                </div>
                 <p class="text-white small mb-3" style="line-height: 1.7;">
-                    <?= htmlspecialchars($siteSettings['footer_about'] ?? "Vision Point Educational Service is Nepal's premier choice for studying in India and abroad, offering expert admission guidance and scholarships for top-tier universities.") ?>
+                    Established in 2070 B.S. (वि.सं. २०७०) in Biratnagar, Vision Point Educational Service is approved by the <strong>Ministry of Education, Science & Technology (MoEST)</strong> with <strong>TITI certified counselors</strong>, providing ethical admission guidance and scholarships for top-tier universities in India and abroad.
                 </p>
                 <!-- Social Links -->
                 <div class="d-flex align-items-center gap-2 mt-3">
@@ -132,7 +137,7 @@ if (empty($dbSocials)) {
         
         <div class="row align-items-center">
             <div class="col-12 col-md-6 text-center text-md-start text-white small mb-2 mb-md-0">
-                &copy; <?= date('Y') ?> <?= h($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?>. All rights reserved.
+                &copy; <?= date('Y') ?> <?= h($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?> (Est. 2070 B.S.). Approved by MoEST &bull; TITI Certified Counselors. All rights reserved.
             </div>
             <div class="col-12 col-md-6 text-center text-md-end text-white extra-small">
                 <span>Designed & Optimized for Nepalese Students</span>

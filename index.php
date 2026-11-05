@@ -107,7 +107,7 @@ if (empty($homeReviews)) {
                 <div class="d-inline-flex align-items-center gap-2 bg-white px-3 py-2 rounded-pill shadow-sm border border-light mb-4 hero-badge-container hero-reveal-item">
                     <span class="d-inline-block bg-success rounded-circle pulse-dot" style="width: 8px; height: 8px;"></span>
                     <span class="text-primary fw-bold small uppercase" style="font-size: 12px; letter-spacing: 0.5px;">
-                        <i class="fa-solid fa-star text-warning me-1"></i> Nepal's Top Education Consultancy for India & Abroad
+                        <i class="fa-solid fa-certificate text-danger me-1"></i> Est. 2070 B.S. &bull; MoEST Approved &bull; TITI Certified Counselors
                     </span>
                 </div>
                 
@@ -157,29 +157,29 @@ if (empty($homeReviews)) {
                     <div class="row g-3 mt-4 pt-2 border-top border-light-subtle max-w-600">
                         <div class="col-4 d-flex align-items-center gap-2">
                             <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                <i class="fa-solid fa-university"></i>
+                                <i class="fa-solid fa-calendar-check"></i>
                             </div>
                             <div class="lh-sm">
-                                <div class="fw-bold text-dark" style="font-size: 14px;">100+ Partner</div>
-                                <div class="text-muted" style="font-size: 11px;">Universities</div>
+                                <div class="fw-bold text-dark" style="font-size: 13px;">Est. 2070 B.S.</div>
+                                <div class="text-muted" style="font-size: 11px;">13+ Yrs of Trust</div>
                             </div>
                         </div>
                         <div class="col-4 d-flex align-items-center gap-2">
                             <div class="bg-warning-subtle text-warning-emphasis rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                <i class="fa-solid fa-graduation-cap"></i>
+                                <i class="fa-solid fa-user-graduate"></i>
                             </div>
                             <div class="lh-sm">
-                                <div class="fw-bold text-dark" style="font-size: 14px;">100% Free</div>
-                                <div class="text-muted" style="font-size: 11px;">Counseling</div>
+                                <div class="fw-bold text-dark" style="font-size: 13px;">TITI Certified</div>
+                                <div class="text-muted" style="font-size: 11px;">Expert Counselors</div>
                             </div>
                         </div>
                         <div class="col-4 d-flex align-items-center gap-2">
                             <div class="bg-success-subtle text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                <i class="fa-solid fa-award"></i>
+                                <i class="fa-solid fa-landmark"></i>
                             </div>
                             <div class="lh-sm">
-                                <div class="fw-bold text-dark" style="font-size: 14px;">Govt. Approved</div>
-                                <div class="text-muted" style="font-size: 11px;">Consultancy</div>
+                                <div class="fw-bold text-dark" style="font-size: 13px;">MoEST Approved</div>
+                                <div class="text-muted" style="font-size: 11px;">Ministry Education</div>
                             </div>
                         </div>
                     </div>
@@ -1095,6 +1095,85 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+<!-- Leadership Perspectives Showcase: Chairman Say & Director Message -->
+<section class="py-5 bg-light border-top border-bottom">
+    <div class="container py-3">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="badge bg-warning text-dark px-3 py-1.5 rounded-pill fw-bold text-uppercase mb-2">
+                <i class="fa-solid fa-crown text-danger me-1"></i> Leadership Perspectives
+            </span>
+            <h2 class="fw-bold text-primary display-6">Voices of Trust & Commitment</h2>
+            <p class="text-muted small">Guided by ethical principles, Ministry of Education (MoEST) recognition, and TITI-certified professional excellence since 2070 B.S.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Chairman Say Card -->
+            <div class="col-lg-6">
+                <div class="card h-100 p-4 border-0 shadow-sm rounded-4 bg-white d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="rounded-circle overflow-hidden shadow-sm flex-shrink-0" style="width: 65px; height: 65px;">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80" alt="Chairman - Vision Point" class="w-100 h-100 object-fit-cover">
+                            </div>
+                            <div>
+                                <span class="badge bg-danger-subtle text-danger rounded-pill px-2.5 py-1 extra-small fw-bold mb-1">Chairman Say • अध्यक्षको भनाइ</span>
+                                <h5 class="fw-bold text-dark fs-6 mb-0">Chairman's Perspective</h5>
+                                <p class="text-muted extra-small mb-0">Vision Point Educational Service (Est. 2070 B.S.)</p>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-light rounded-3 border-start border-3 border-danger mb-3">
+                            <p class="fst-italic text-dark mb-0 small" style="line-height: 1.7;">
+                                "When we founded Vision Point in 2070 B.S. in Biratnagar, our core commitment was simple yet uncompromising: to provide honest, transparent, and student-centered educational guidance without commercial bias."
+                            </p>
+                        </div>
+                        <p class="text-muted small" style="line-height: 1.7;">
+                            Every student carries the heartfelt trust of their family. Our advisory is strictly compliant with the Ministry of Education, Science and Technology (MoEST) and professional counselor standards certified by TITI.
+                        </p>
+                    </div>
+                    <div class="pt-2 border-top mt-auto d-flex align-items-center justify-content-between">
+                        <span class="text-muted extra-small"><i class="fa-solid fa-shield-halved text-success me-1"></i> Ethical Counseling Guarantee</span>
+                        <a href="about.php" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-semibold">
+                            Read Chairman Say <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Director Message Card -->
+            <div class="col-lg-6">
+                <div class="card h-100 p-4 border-0 shadow-sm rounded-4 bg-white d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="rounded-circle overflow-hidden shadow-sm flex-shrink-0" style="width: 65px; height: 65px;">
+                                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&auto=format&fit=crop&q=80" alt="Managing Director - Vision Point" class="w-100 h-100 object-fit-cover">
+                            </div>
+                            <div>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1 extra-small fw-bold mb-1">Director Message • निर्देशकको सन्देश</span>
+                                <h5 class="fw-bold text-dark fs-6 mb-0">Managing Director</h5>
+                                <p class="text-muted extra-small mb-0">Vision Point Educational Service (Est. 2070 B.S.)</p>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-light rounded-3 border-start border-3 border-primary mb-3">
+                            <p class="fst-italic text-dark mb-0 small" style="line-height: 1.7;">
+                                "Our senior counselors are formally trained and certified by TITI (Training Institute for Technical Instruction). Operating with official MoEST approval, we bridge students directly to 80+ top universities with 100% transparent fee structures."
+                            </p>
+                        </div>
+                        <p class="text-muted small" style="line-height: 1.7;">
+                            From institutional scholarship advocacy and council recognitions (NMC, NNC, NEC, NPC) to pre-departure travel orientation and on-campus guardian support, we stand with our students at every step.
+                        </p>
+                    </div>
+                    <div class="pt-2 border-top mt-auto d-flex align-items-center justify-content-between">
+                        <span class="text-muted extra-small"><i class="fa-solid fa-award text-primary me-1"></i> Direct University Tie-ups</span>
+                        <a href="about.php" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold">
+                            Read Director Message <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Fun Facts Section -->
 <section class="fun-facts-section position-relative py-5">
