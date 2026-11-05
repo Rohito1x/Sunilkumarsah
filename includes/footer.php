@@ -83,12 +83,13 @@ if (empty($dbSocials)) {
                 <h6 class="text-uppercase fw-bold mb-3 text-warning" style="letter-spacing: 0.8px; font-size: 13px;">Quick Links</h6>
                 <ul class="list-unstyled text-white small mb-0">
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>index.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Home</a></li>
+                    <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>about.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> About Us</a></li>
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>study-in-india.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Study in India</a></li>
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>cities.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Institutions</a></li>
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>courses.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Courses</a></li>
-                    <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>guides.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Guides</a></li>
-                    <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>study-abroad.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Study Abroad</a></li>
+                    <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>scholarships.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Scholarships</a></li>
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>reviews.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Reviews & Feedback</a></li>
+                    <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>contact.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Contact Us</a></li>
                 </ul>
             </div>
             

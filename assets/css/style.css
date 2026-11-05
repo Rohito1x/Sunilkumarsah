@@ -1762,17 +1762,18 @@ header .navbar,
     box-shadow: 0 4px 10px rgba(217, 31, 35, 0.25) !important;
 }
 
-/* Mobile Header Layout Adjustments */
+/* Mobile Header Layout Adjustments - Clean Natural Flexbox */
 @media (max-width: 991.98px) {
     .susankya-site-header .navbar-brand {
-        position: absolute !important;
-        left: 50% !important;
-        top: 20px !important;
-        transform: translateX(-50%) !important;
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
         margin: 0 !important;
-        z-index: 1000 !important;
-        text-align: center !important;
-        justify-content: center !important;
+        z-index: 1 !important;
+        text-align: left !important;
+        justify-content: flex-start !important;
+        max-width: calc(100% - 130px) !important;
     }
     
     .susankya-site-header .navbar-toggler {
@@ -1782,11 +1783,12 @@ header .navbar,
         background-color: transparent !important;
         color: #4C4F52 !important;
         box-shadow: none !important;
-        order: 1 !important;
     }
     
     .susankya-site-header .mobile-header-enroll-btn {
-        order: 3 !important;
+        font-size: 11.5px !important;
+        padding: 4px 11px !important;
+        border-radius: 20px !important;
     }
 }
 
@@ -1989,14 +1991,14 @@ header .navbar,
     }
 
     .susankya-site-header .navbar-brand {
-        position: absolute !important;
-        left: 50% !important;
-        top: 50% !important;
-        transform: translate(-50%, -50%) !important;
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
         margin: 0 !important;
-        z-index: 1000 !important;
-        text-align: center !important;
-        justify-content: center !important;
+        z-index: 1 !important;
+        text-align: left !important;
+        justify-content: flex-start !important;
     }
 
     .susankya-site-header .navbar-brand img {
@@ -3551,5 +3553,85 @@ img {
 @media (max-width: 480px) {
     .hero-video-container video {
         min-height: 220px !important;
+    }
+}
+
+
+/* ============================================================
+   PREMIUM DESKTOP & MOBILE NAVBAR ENHANCEMENTS
+   ============================================================ */
+@media (min-width: 992px) and (max-width: 1280px) {
+    .susankya-site-header .nav-link {
+        font-size: 13px !important;
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+    }
+    .susankya-site-header .navbar-brand .logo-text {
+        font-size: 0.95rem !important;
+        max-width: 190px !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .susankya-site-header .navbar {
+        background-color: #ffffff !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    .navbar-collapse {
+        background: #ffffff !important;
+        border-radius: 14px !important;
+        box-shadow: 0 16px 40px rgba(4, 88, 160, 0.12) !important;
+        border: 1px solid rgba(4, 88, 160, 0.08) !important;
+        padding: 16px !important;
+        margin-top: 10px !important;
+        max-height: 80vh !important;
+        overflow-y: auto !important;
+    }
+    .navbar-collapse .nav-link {
+        padding: 10px 14px !important;
+        border-radius: 8px !important;
+        font-size: 14.5px !important;
+        font-weight: 600 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        transition: all 0.2s ease !important;
+    }
+    .navbar-collapse .nav-link:hover,
+    .navbar-collapse .nav-link.active {
+        background-color: rgba(4, 88, 160, 0.08) !important;
+        color: #0458A0 !important;
+    }
+    .navbar-collapse .dropdown-menu {
+        border-radius: 8px !important;
+        background: #f8fafc !important;
+        padding: 6px !important;
+        margin-top: 4px !important;
+        box-shadow: none !important;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    }
+    .navbar-collapse .dropdown-item {
+        padding: 8px 12px !important;
+        border-radius: 6px !important;
+        font-size: 13.5px !important;
+    }
+}
+
+/* Hero Search Bar Responsive Polish */
+@media (max-width: 575.98px) {
+    .hero-search-form {
+        padding: 4px 6px !important;
+    }
+    .hero-search-form input {
+        font-size: 14px !important;
+    }
+    .hero-search-form button {
+        padding: 8px 14px !important;
+        font-size: 13px !important;
+    }
+    .hero-title {
+        font-size: 1.95rem !important;
+        line-height: 1.25 !important;
     }
 }

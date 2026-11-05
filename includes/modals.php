@@ -95,11 +95,11 @@ if (isset($pdo)) {
                                 <label>Interested Country <span class="text-danger">*</span></label>
                                 <select name="interested_country" class="form-select" required>
                                     <option value="">Select Interested Country</option>
-                                    <option value="US">US</option>
-                                    <option value="Canada">Canada</option>
-                                    <option value="UK">UK</option>
+                                    <option value="India" selected>India (Top Universities)</option>
                                     <option value="Australia">Australia</option>
-                                    <option value="India">India</option>
+                                    <option value="UK">United Kingdom (UK)</option>
+                                    <option value="Canada">Canada</option>
+                                    <option value="US">United States (USA)</option>
                                     <option value="Bangladesh">Bangladesh</option>
                                     <option value="Europe">Europe</option>
                                 </select>
@@ -151,9 +151,10 @@ if (isset($pdo)) {
                                 <label>Level <span class="text-danger">*</span></label>
                                 <select name="level" class="form-select" required>
                                     <option value="">Select Level</option>
-                                    <option value="Diploma">Diploma</option>
-                                    <option value="Undergraduate">Undergraduate</option>
-                                    <option value="Postgraduate">Postgraduate</option>
+                                    <option value="Undergraduate" selected>Undergraduate (Bachelor's)</option>
+                                    <option value="Diploma">Diploma / CTEVT</option>
+                                    <option value="Postgraduate">Postgraduate (Master's)</option>
+                                    <option value="Doctorate">Doctorate / Ph.D / MD</option>
                                 </select>
                             </div>
                             <div class="col-12 col-sm-6 form-group">
@@ -165,9 +166,11 @@ if (isset($pdo)) {
                                 <label>Highest Level of Education <span class="text-danger">*</span></label>
                                 <select name="highest_level_of_education" class="form-select" required>
                                     <option value="">Select Highest Level of Education</option>
-                                    <option value="Undergraduate">Undergraduate</option>
-                                    <option value="Diploma">Diploma</option>
-                                    <option value="Postgraduate">Postgraduate</option>
+                                    <option value="+2 / Higher Secondary (+2 / NEB / CBSE)" selected>+2 / Higher Secondary (Grade 12 / NEB / CBSE)</option>
+                                    <option value="SEE / Class 10">SEE / Class 10 (Secondary)</option>
+                                    <option value="Undergraduate / Bachelor's">Undergraduate / Bachelor's</option>
+                                    <option value="Diploma / CTEVT">Diploma / CTEVT</option>
+                                    <option value="Postgraduate / Master's">Postgraduate / Master's</option>
                                 </select>
                             </div>
                             <div class="col-12 col-sm-6 form-group">

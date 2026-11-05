@@ -133,13 +133,14 @@ if (empty($homeReviews)) {
                 <!-- 4. CTA Buttons & Search Wrapper -->
                 <div class="hero-cta-wrapper hero-reveal-item">
                     <!-- Premium Search Bar -->
-                    <form action="<?= h($basePath) ?>cities.php" method="GET" class="hero-search-form p-2 bg-white rounded-pill shadow d-flex align-items-center mt-2 max-w-600">
-                        <div class="d-flex align-items-center flex-grow-1 ps-3">
+                    <form action="<?= h($basePath) ?>cities.php" method="GET" class="hero-search-form p-1.5 p-sm-2 bg-white rounded-pill shadow d-flex align-items-center mt-2 max-w-600">
+                        <div class="d-flex align-items-center flex-grow-1 ps-2 ps-sm-3">
                             <i class="fa-solid fa-magnifying-glass text-primary fs-5 me-2"></i>
-                            <input type="text" name="search" placeholder="Search programs, colleges, streams..." class="form-control border-0 bg-transparent flex-grow-1" style="box-shadow:none; font-size:16px;">
+                            <input type="text" name="search" placeholder="Search programs, colleges, streams..." class="form-control border-0 bg-transparent flex-grow-1" style="box-shadow:none; font-size:15px;">
                         </div>
-                        <button type="submit" class="btn btn-secondary px-4 py-3 rounded-pill fw-bold text-white shadow-sm hover-scale d-flex align-items-center gap-2">
-                            <span>Search Programs</span>
+                        <button type="submit" class="btn btn-secondary px-3 px-sm-4 py-2.5 py-sm-3 rounded-pill fw-bold text-white shadow-sm hover-scale d-flex align-items-center gap-1.5 flex-shrink-0">
+                            <span class="d-none d-sm-inline">Search Programs</span>
+                            <span class="d-inline d-sm-none">Search</span>
                             <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </form>
@@ -236,7 +237,7 @@ if (empty($homeReviews)) {
                             </div>
 
                             <!-- Float Badge (Bottom-Left) -->
-                            <div class="position-absolute bottom-3 start-3 bg-white bg-opacity-95 backdrop-blur p-2.5 rounded-3 shadow border border-light-subtle d-flex align-items-center gap-2 z-3 float-card-1 anim-float" style="max-width: 240px;">
+                            <div class="position-absolute bottom-3 start-3 bg-white bg-opacity-95 backdrop-blur p-2.5 rounded-3 shadow border border-light-subtle d-none d-md-flex align-items-center gap-2 z-3 float-card-1 anim-float" style="max-width: 240px;">
                                 <div class="bg-success text-white rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 34px; height: 34px;">
                                     <i class="fa-solid fa-check fs-6"></i>
                                 </div>
@@ -684,6 +685,27 @@ document.addEventListener('DOMContentLoaded', function() {
         if (viewport) {
             viewport.addEventListener('mouseenter', stopAutoPlay);
             viewport.addEventListener('mouseleave', startAutoPlay);
+
+            // Native Touch Swipe Gesture Support for iOS & Android
+            let touchStartX = 0;
+            let touchEndX = 0;
+            viewport.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+                stopAutoPlay();
+            }, {passive: true});
+
+            viewport.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                const diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 40) {
+                    if (diff > 0) {
+                        slideTo(currentIndex + 1);
+                    } else {
+                        slideTo(currentIndex - 1);
+                    }
+                }
+                startAutoPlay();
+            }, {passive: true});
         }
 
         window.addEventListener('resize', function() {

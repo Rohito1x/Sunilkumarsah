@@ -248,15 +248,10 @@ if (empty($topMenu)) {
 
 <header class="susankya-site-header">
 
-    <nav class="navbar navbar-expand-lg fixed-top border-bottom py-3">
-        <div class="container-fluid px-3 px-xl-5">
-            <!-- Mobile Menu Toggler (Left, order-1) -->
-            <button class="navbar-toggler d-lg-none order-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <!-- Brand Logo (Center on mobile, Left on desktop, order-2 / order-lg-1) -->
-            <a class="navbar-brand d-flex align-items-center order-2 order-lg-1 mx-auto mx-lg-0 me-lg-3 me-xl-4 text-nowrap" href="<?= h($basePath) ?>index.php">
+    <nav class="navbar navbar-expand-lg fixed-top border-bottom py-2.5">
+        <div class="container-fluid px-3 px-xl-4">
+            <!-- Brand Logo (Left on both mobile and desktop) -->
+            <a class="navbar-brand d-flex align-items-center me-2 me-lg-3 me-xl-4 flex-shrink-0" href="<?= h($basePath) ?>index.php">
                 <?php
                 $logoPath = !empty($siteSettings['site_logo']) ? $siteSettings['site_logo'] : 'assets/images/logo1.png';
                 $logoUrl = (strpos($logoPath, 'http') === 0) ? $logoPath : $basePath . $logoPath;
@@ -265,19 +260,26 @@ if (empty($topMenu)) {
                     $logoUrl .= '?v=' . filemtime($localLogoFile);
                 }
                 if (file_exists($localLogoFile) || (strpos($logoPath, 'http') === 0)): ?>
-                    <img src="<?= h($logoUrl) ?>" alt="Vision Point Logo" class="me-2 rounded shadow-sm" style="max-height: 44px; width: auto; object-fit: contain;">
+                    <img src="<?= h($logoUrl) ?>" alt="Vision Point Logo" class="me-2 rounded shadow-sm header-brand-logo" style="max-height: 40px; width: auto; object-fit: contain;">
                 <?php else: ?>
-                    <i class="fa-solid fa-graduation-cap me-2 text-primary"></i>
+                    <i class="fa-solid fa-graduation-cap me-2 text-primary fs-4"></i>
                 <?php endif; ?>
-                <span class="logo-text fw-bold text-primary fs-6 fs-xxl-5 d-none d-sm-inline-block text-nowrap"><?= h($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?></span>
+                <span class="logo-text fw-bold text-primary fs-6 d-none d-sm-inline-block text-truncate" style="max-width: 260px; letter-spacing: -0.2px;"><?= h($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?></span>
             </a>
-            
-            <!-- Mobile Enroll Now Button (Right, order-3) -->
-            <button class="btn btn-primary fw-semibold px-3 rounded-pill btn-sm text-white mobile-header-enroll-btn d-lg-none order-3" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">Enroll Now</button>
 
-            <!-- Navbar Collapse Menu (order-4 / order-lg-2) -->
-            <div class="collapse navbar-collapse order-4 order-lg-2" id="navbarScroll">
-                <ul class="navbar-nav ms-auto me-auto mb-2 mb-lg-0 justify-content-center">
+            <!-- Mobile Action Items (Right on mobile) -->
+            <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
+                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 py-1 fw-bold text-white shadow-sm mobile-header-enroll-btn" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal" style="font-size: 12px;">
+                    <i class="fa-solid fa-graduation-cap me-1"></i>Apply
+                </button>
+                <button class="navbar-toggler border-0 shadow-none p-1.5" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <!-- Navbar Collapse Menu -->
+            <div class="collapse navbar-collapse" id="navbarScroll">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 justify-content-center">
                     <?php foreach ($topMenu as $item): 
                         $isCurrent = false;
                         $hasChildren = !empty($item['children']);
@@ -293,40 +295,49 @@ if (empty($topMenu)) {
                                         $isCurrent = true;
                                         break;
                                     }
+                                } elseif ($currentFilename === $child['url']) {
+                                    $isCurrent = true;
+                                    break;
                                 }
                             }
                         }
                         
                         if ($hasChildren): ?>
-                            <li class="nav-item dropdown px-1 px-xxl-2">
-                                <a class="nav-link dropdown-toggle fw-semibold text-nowrap <?= $isCurrent ? 'active text-primary' : 'text-dark' ?>" href="#" id="navbarDropdown_<?= $item['id'] ?>" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 14px;">
+                            <li class="nav-item dropdown px-0.5 px-xxl-1">
+                                <a class="nav-link dropdown-toggle fw-semibold text-nowrap <?= $isCurrent ? 'active text-primary' : 'text-dark' ?>" href="#" id="navbarDropdown_<?= $item['id'] ?>" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 13.5px; padding: 6px 9px;">
                                     <?= h($item['label']) ?>
                                 </a>
-                                <ul class="dropdown-menu border-0 shadow-sm" aria-labelledby="navbarDropdown_<?= $item['id'] ?>">
+                                <ul class="dropdown-menu border-0 shadow-lg rounded-3 py-2" aria-labelledby="navbarDropdown_<?= $item['id'] ?>">
                                     <?php foreach ($item['children'] as $child): 
                                         $childUrl = (strpos($child['url'], 'http') === 0 || strpos($child['url'], '#') === 0) ? $child['url'] : $basePath . $child['url'];
                                     ?>
-                                        <li><a class="dropdown-item" href="<?= h($childUrl) ?>"><?= h($child['label']) ?></a></li>
+                                        <li><a class="dropdown-item py-2 px-3 fw-medium" style="font-size: 13.5px;" href="<?= h($childUrl) ?>"><?= h($child['label']) ?></a></li>
                                     <?php endforeach; ?>
                                 </ul>
                             </li>
                         <?php else: 
                             $itemUrl = (strpos($item['url'], 'http') === 0 || strpos($item['url'], '#') === 0) ? $item['url'] : $basePath . $item['url'];
                         ?>
-                            <li class="nav-item px-1 px-xxl-2">
-                                <a class="nav-link fw-semibold text-nowrap <?= ($currentFilename === $item['url']) ? 'active text-primary' : 'text-dark' ?>" href="<?= h($itemUrl) ?>" style="font-size: 14px;"><?= h($item['label']) ?></a>
+                            <li class="nav-item px-0.5 px-xxl-1">
+                                <a class="nav-link fw-semibold text-nowrap <?= ($currentFilename === $item['url']) ? 'active text-primary' : 'text-dark' ?>" href="<?= h($itemUrl) ?>" style="font-size: 13.5px; padding: 6px 9px;"><?= h($item['label']) ?></a>
                             </li>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </ul>
-                <div class="action-group d-flex align-items-center gap-2 flex-shrink-0 ms-lg-2">
-                    <button class="btn btn-outline-warning text-dark fw-bold px-3 px-xl-3 rounded-pill btn-sm text-nowrap" data-bs-toggle="modal" data-bs-target="#submitReviewModal"><i class="fa-solid fa-star text-warning me-1"></i>Write Review</button>
-                    <button class="btn btn-outline-secondary fw-semibold px-3 px-xl-4 rounded-pill btn-sm text-nowrap" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">Scholarships</button>
-                    <button class="btn btn-primary fw-semibold px-3 px-xl-4 rounded-pill btn-sm text-white text-nowrap" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">Enroll Now</button>
+
+                <div class="action-group d-flex align-items-center gap-2 flex-shrink-0 ms-lg-2 mt-3 mt-lg-0 pt-2 pt-lg-0 border-top border-lg-0">
+                    <a href="tel:+9779807765812" class="btn btn-outline-primary fw-semibold px-2.5 py-1.5 rounded-pill btn-sm text-nowrap d-none d-xl-inline-flex align-items-center gap-1.5" style="font-size: 12.5px;">
+                        <i class="fa-solid fa-phone text-danger"></i>
+                        <span>+977 9807765812</span>
+                    </a>
+                    <button class="btn btn-primary fw-bold px-3.5 py-1.5 rounded-pill btn-sm text-white text-nowrap shadow-sm d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal" style="font-size: 13px;">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Apply Now</span>
+                    </button>
                     
                     <?php if ($isAdmin): ?>
-                        <a href="<?= h($basePath) ?>jaiswal/dashboard.php" class="btn btn-success fw-semibold px-3 rounded-pill btn-sm text-white text-nowrap"><i class="fa-solid fa-gauge me-1"></i>Dashboard</a>
-                        <a href="<?= h($basePath) ?>logout.php" class="btn btn-outline-danger fw-semibold px-3 rounded-pill btn-sm text-nowrap"><i class="fa-solid fa-sign-out me-1"></i>Logout</a>
+                        <a href="<?= h($basePath) ?>jaiswal/dashboard.php" class="btn btn-success fw-semibold px-2.5 py-1.5 rounded-pill btn-sm text-white text-nowrap" style="font-size: 12px;"><i class="fa-solid fa-gauge me-1"></i>Admin</a>
+                        <a href="<?= h($basePath) ?>logout.php" class="btn btn-outline-danger fw-semibold px-2.5 py-1.5 rounded-pill btn-sm text-nowrap" style="font-size: 12px;"><i class="fa-solid fa-sign-out"></i></a>
                     <?php endif; ?>
                 </div>
             </div>
