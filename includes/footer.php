@@ -84,6 +84,7 @@ if (empty($dbSocials)) {
                 <ul class="list-unstyled text-white small mb-0">
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>index.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Home</a></li>
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>about.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> About Us</a></li>
+                    <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>about.php#counselors-team" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Certified Counselors</a></li>
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>study-in-india.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Study in India</a></li>
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>cities.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Institutions</a></li>
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>courses.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Courses</a></li>

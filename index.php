@@ -12,6 +12,7 @@ $courses = [];
 $guides = [];
 $funFacts = [];
 $countries = [];
+$teamMembers = [];
 
 if (isset($pdo)) {
     try {
@@ -48,9 +49,15 @@ if (isset($pdo)) {
         $stmtRev = $pdo->query("SELECT * FROM reviews WHERE status = 'Approved' ORDER BY created_at DESC");
         $homeReviews = $stmtRev->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {}
+
+    try {
+        $stmtTm = $pdo->query("SELECT * FROM team_members WHERE is_active = 1 ORDER BY display_order ASC, id ASC");
+        $teamMembers = $stmtTm->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {}
 }
 $bankAccounts = $bankAccounts ?? [];
 $homeReviews = $homeReviews ?? [];
+$teamMembers = $teamMembers ?? [];
 
 if (empty($homeReviews)) {
     $homeReviews = [
@@ -93,6 +100,95 @@ if (empty($homeReviews)) {
             'comment' => 'Great experience! Got my college seat reserved quickly with full guidance regarding eligibility and document attestation.',
             'avatar' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
             'created_at' => '2026-02-14 09:45:00'
+        ]
+    ];
+}
+
+if (empty($teamMembers)) {
+    $teamMembers = [
+        [
+            'id' => 1,
+            'name' => 'Roshni Bhattarai',
+            'role' => 'Chief Counseling Officer & Senior Advisor',
+            'department' => 'Study in India',
+            'qualification' => 'TITI Certified Senior Counselor (CTEVT) | M.A. Counseling Psychology',
+            'specialization' => 'MBBS, BDS, B.Sc Nursing, B.Tech CSE, Scholarship Allocations',
+            'bio' => '10+ years of dedicated academic counseling helping over 1,200 Nepali students secure direct admissions and up to 100% scholarships across premier Indian universities.',
+            'experience_years' => 10,
+            'email' => 'roshni@visionpoint.edu.np',
+            'phone' => '+977-9807765812',
+            'photo' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80',
+            'display_order' => 1
+        ],
+        [
+            'id' => 2,
+            'name' => 'Suresh K. Nepal',
+            'role' => 'Head of Study Abroad & Visa Compliance',
+            'department' => 'Study Abroad',
+            'qualification' => 'Certified Qualified Education Agent Counselor (QEAC) | MBA',
+            'specialization' => 'Australia (Subclass 500), UK CAS, USA F-1, Canada SDS',
+            'bio' => 'Licensed overseas counselor with 8+ years specializing in Genuine Student (GS) compliance, Statement of Purpose (SOP) auditing, and complex visa applications.',
+            'experience_years' => 8,
+            'email' => 'suresh@visionpoint.edu.np',
+            'phone' => '+977-9807765812',
+            'photo' => 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=500&auto=format&fit=crop&q=80',
+            'display_order' => 2
+        ],
+        [
+            'id' => 3,
+            'name' => 'Pooja Regmi',
+            'role' => 'Director of Healthcare & Allied Science Admissions',
+            'department' => 'Study in India',
+            'qualification' => 'TITI Certified Education Counselor | B.Sc Nursing, M.Sc Health Admin',
+            'specialization' => 'B.Sc Nursing, Post Basic Nursing, B.Pharm, Paramedical & Equivalence',
+            'bio' => '7+ years guiding prospective nurses and allied medical students through INC/NMC council recognitions, hospital tie-ups, and clinical internship setups.',
+            'experience_years' => 7,
+            'email' => 'pooja@visionpoint.edu.np',
+            'phone' => '+977-9807765812',
+            'photo' => 'https://images.unsplash.com/photo-1594824813511-193e819b1388?w=500&auto=format&fit=crop&q=80',
+            'display_order' => 3
+        ],
+        [
+            'id' => 4,
+            'name' => 'Amit Shrestha',
+            'role' => 'Head of Test Preparation & English Department',
+            'department' => 'Test Preparation',
+            'qualification' => 'British Council & Pearson Certified Master Trainer | M.A. English Literature',
+            'specialization' => 'IELTS Academic (Band 7.5+), PTE Academic (Score 65+), SAT, Duolingo',
+            'bio' => '9+ years helping hundreds of Nepali students attain high test scores with tailored mock tests, band score diagnostic rubrics, and modern computer-based lab training.',
+            'experience_years' => 9,
+            'email' => 'amit@visionpoint.edu.np',
+            'phone' => '+977-9807765812',
+            'photo' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80',
+            'display_order' => 4
+        ],
+        [
+            'id' => 5,
+            'name' => 'Anil Kumar Jha',
+            'role' => 'Senior Admissions & University Liaison Officer',
+            'department' => 'Admissions & Scholarships',
+            'qualification' => 'TITI Certified Education Counselor | BBA, PGD Educational Management',
+            'specialization' => 'Engineering (AI, Data Science, Mechanical), Management (MBA, BBA)',
+            'bio' => 'Direct liaison with 80+ partner institutions in Delhi NCR, Punjab, Bangalore, and Pune. Expert in negotiating institutional fee concessions for Nepali students.',
+            'experience_years' => 6,
+            'email' => 'anil@visionpoint.edu.np',
+            'phone' => '+977-9807765812',
+            'photo' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=80',
+            'display_order' => 5
+        ],
+        [
+            'id' => 6,
+            'name' => 'Sunita Thapa',
+            'role' => 'Student Welfare & Pre-Departure Coordinator',
+            'department' => 'Student Care',
+            'qualification' => 'B.A. Social Work & Student Welfare Specialist',
+            'specialization' => 'Hostel Inspection, Border & Airport Transit, Medical Insurance, Nepal Embassy Registration',
+            'bio' => 'Ensures seamless transitions for students relocating from Nepal to college campuses, providing continuous emergency assistance and guardian coordination.',
+            'experience_years' => 5,
+            'email' => 'sunita@visionpoint.edu.np',
+            'phone' => '+977-9807765812',
+            'photo' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
+            'display_order' => 6
         ]
     ];
 }
@@ -1293,62 +1389,237 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </section>
 
+<!-- Certified Education Counselors & Advisory Team Section -->
+<section class="py-5 bg-white border-top border-light position-relative" id="counselors-team">
+    <div class="container py-3">
+        <div class="d-flex align-items-end justify-content-between mb-4 flex-wrap gap-3">
+            <div>
+                <div class="d-inline-flex align-items-center gap-2 bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-bold extra-small text-uppercase mb-2">
+                    <i class="fa-solid fa-certificate"></i> MoEST Approved &bull; TITI Certified Counselors
+                </div>
+                <h2 class="fw-extrabold text-dark mb-1" style="font-size: 2rem; color: #1e293b;">Meet Our Certified Education Counselors</h2>
+                <p class="text-muted mb-0 small" style="max-width: 680px;">
+                    Trained and certified by CTEVT's Training Institute for Technical Instruction (TITI) and global education councils. Dedicated to ethical, transparent, and student-first academic counseling.
+                </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-outline-danger btn-sm rounded-pill px-4 fw-bold hover-scale" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">
+                    <i class="fa-solid fa-calendar-check me-1"></i> Book Free Consultation
+                </button>
+                <a href="<?= h($basePath) ?>about.php#counselors-team" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold hover-scale">
+                    All Team Profiles <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Counselor Grid -->
+        <div class="row g-4">
+            <?php foreach ($teamMembers as $member): 
+                $mPhoto = !empty($member['photo']) ? $member['photo'] : 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80';
+                $isTiti = stripos($member['qualification'] ?? '', 'TITI') !== false;
+                $isQeac = stripos($member['qualification'] ?? '', 'QEAC') !== false;
+                $isBritishCouncil = stripos($member['qualification'] ?? '', 'British Council') !== false;
+                $firstName = explode(' ', $member['name'])[0];
+            ?>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 border rounded-4 overflow-hidden shadow-sm counselor-card-premium bg-white position-relative d-flex flex-column justify-content-between">
+                    <!-- Top Department & Experience Bar -->
+                    <div class="counselor-top-bar d-flex justify-content-between align-items-center px-4 py-2 bg-light border-bottom">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 extra-small fw-semibold">
+                            <i class="fa-solid fa-briefcase me-1"></i><?= h($member['department']) ?>
+                        </span>
+                        <span class="badge bg-warning-subtle text-dark border border-warning-subtle rounded-pill px-2.5 py-1 extra-small fw-bold">
+                            <i class="fa-solid fa-clock-rotate-left me-1 text-primary"></i><?= (int)$member['experience_years'] ?>+ Years Exp
+                        </span>
+                    </div>
+
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <div class="position-relative flex-shrink-0" style="width: 72px; height: 72px;">
+                                <img src="<?= h($mPhoto) ?>" alt="<?= h($member['name']) ?>" class="w-100 h-100 rounded-circle object-fit-cover shadow-sm border border-2 border-primary">
+                                <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle pulse-dot" style="width: 13px; height: 13px;" title="Active Advisor"></span>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-1.5 flex-wrap mb-1">
+                                    <?php if ($isTiti): ?>
+                                        <span class="badge bg-danger text-white rounded-pill extra-small px-2 py-0.5" title="Trained & Certified by CTEVT TITI">
+                                            <i class="fa-solid fa-award me-1"></i>TITI Certified
+                                        </span>
+                                    <?php elseif ($isQeac): ?>
+                                        <span class="badge bg-success text-white rounded-pill extra-small px-2 py-0.5">
+                                            <i class="fa-solid fa-stamp me-1"></i>QEAC Certified
+                                        </span>
+                                    <?php elseif ($isBritishCouncil): ?>
+                                        <span class="badge bg-info text-dark rounded-pill extra-small px-2 py-0.5">
+                                            <i class="fa-solid fa-chalkboard-user me-1"></i>Master Trainer
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary text-white rounded-pill extra-small px-2 py-0.5">
+                                            <i class="fa-solid fa-user-check me-1"></i>Certified
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-0 fs-6"><?= h($member['name']) ?></h5>
+                                <div class="text-primary small fw-semibold"><?= h($member['role']) ?></div>
+                            </div>
+                        </div>
+
+                        <!-- Qualification & Specialization -->
+                        <div class="mb-3 bg-light rounded-3 p-2.5 small">
+                            <div class="text-secondary mb-1 extra-small">
+                                <i class="fa-solid fa-graduation-cap text-danger me-1"></i><strong>Education:</strong> <?= h($member['qualification']) ?>
+                            </div>
+                            <div class="text-muted extra-small">
+                                <i class="fa-solid fa-tags text-primary me-1"></i><strong>Specialty:</strong> <?= h($member['specialization']) ?>
+                            </div>
+                        </div>
+
+                        <p class="text-secondary small mb-4 flex-grow-1" style="line-height: 1.55;">
+                            <?= h($member['bio']) ?>
+                        </p>
+
+                        <!-- Card Action CTAs -->
+                        <div class="pt-3 border-top mt-auto d-flex align-items-center justify-content-between gap-2">
+                            <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-semibold w-100 hover-scale" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">
+                                <i class="fa-solid fa-user-plus me-1"></i> Consult <?= h($firstName) ?>
+                            </button>
+                            <a href="tel:<?= h($member['phone'] ?? '+9779807765812') ?>" class="btn btn-light btn-sm rounded-circle border shadow-2xs text-primary flex-shrink-0 d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Call Advisor">
+                                <i class="fa-solid fa-phone"></i>
+                            </a>
+                            <a href="mailto:<?= h($member['email'] ?? 'info@visionpoint.edu.np') ?>" class="btn btn-light btn-sm rounded-circle border shadow-2xs text-secondary flex-shrink-0 d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Email Advisor">
+                                <i class="fa-solid fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- Staff Credential Trust Footer Strip -->
+        <div class="mt-4 p-3 bg-light rounded-4 border d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
+                    <i class="fa-solid fa-shield-halved fs-5"></i>
+                </div>
+                <div>
+                    <div class="fw-bold text-dark small mb-0">Government of Nepal MoEST & TITI Certified Advisory Standards</div>
+                    <div class="text-muted extra-small">All counselors follow strict ethical counseling codes, zero visa misrepresentation, and direct transparent fee invoices.</div>
+                </div>
+            </div>
+            <a href="tel:+9779807765812" class="btn btn-sm btn-primary rounded-pill px-4 fw-bold hover-scale">
+                <i class="fa-solid fa-headset me-1"></i> Helpline: +977 9807765812
+            </a>
+        </div>
+    </div>
+</section>
+
 <!-- Testimonials Section -->
-<section class="py-5" style="background-color: #FAF7F5;">
+<section class="py-5" style="background-color: #FAF7F5;" id="testimonials">
     <div class="container py-3">
         <!-- Section Header -->
-        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div class="d-flex align-items-end justify-content-between mb-4 flex-wrap gap-3">
             <div class="section-intro mb-0">
-                <div class="text-uppercase fw-bold text-danger mb-1" style="color: #D91F23 !important; letter-spacing: 1.5px; font-size: 13px;">OUR TESTIMONIALS</div>
-                <h2 class="fw-extrabold text-dark mb-0" style="font-size: 2rem; color: #242628;">Let’s Explore Why People Say About Our Services</h2>
+                <div class="d-inline-flex align-items-center gap-2 bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-bold extra-small text-uppercase mb-2">
+                    <i class="fa-solid fa-star text-warning"></i> VERIFIED STUDENT EXPERIENCES
+                </div>
+                <h2 class="fw-extrabold text-dark mb-1" style="font-size: 2rem; color: #1e293b;">Trusted by Students & Families Across Nepal</h2>
+                <p class="text-muted mb-0 small" style="max-width: 680px;">
+                    Real feedback and success stories from Nepali students who achieved their dream college admissions, scholarships, and international visas through Vision Point.
+                </p>
             </div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <button type="button" class="btn btn-outline-danger rounded-pill px-4 btn-sm fw-bold shadow-sm hover-scale" data-bs-toggle="modal" data-bs-target="#homeAddReviewModal" style="border-color: #D91F23 !important; color: #D91F23 !important;">
                     <i class="fa-solid fa-pen-to-square me-1"></i> Write a Review
                 </button>
                 <button type="button" class="btn btn-danger rounded-pill px-4 btn-sm fw-bold shadow-sm hover-scale toggle-home-reviews-btn" style="background-color: #D91F23 !important; border-color: #D91F23 !important; color: #ffffff !important;">
-                    View All <i class="fa-solid fa-arrow-right ms-1"></i>
+                    View All Reviews <i class="fa-solid fa-chevron-down ms-1"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Review Cards Primary Grid -->
+        <!-- Trust Stats Bar -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card border-0 rounded-4 shadow-sm bg-white p-3 text-center h-100">
+                    <div class="text-warning fs-5 fw-bold mb-1">
+                        <i class="fa-solid fa-star"></i> 5.0 / 5.0
+                    </div>
+                    <div class="text-muted extra-small">Average Student Rating</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 rounded-4 shadow-sm bg-white p-3 text-center h-100">
+                    <div class="text-primary fs-5 fw-bold mb-1">
+                        <i class="fa-solid fa-user-graduate"></i> 1,200+
+                    </div>
+                    <div class="text-muted extra-small">Admissions Guided</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 rounded-4 shadow-sm bg-white p-3 text-center h-100">
+                    <div class="text-success fs-5 fw-bold mb-1">
+                        <i class="fa-solid fa-award"></i> 80%
+                    </div>
+                    <div class="text-muted extra-small">Scholarship Success Rate</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 rounded-4 shadow-sm bg-white p-3 text-center h-100">
+                    <div class="text-danger fs-5 fw-bold mb-1">
+                        <i class="fa-solid fa-shield-check"></i> 100%
+                    </div>
+                    <div class="text-muted extra-small">Council Equivalence Valid</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Cards Primary Grid (Top 3) -->
         <div class="row g-4 justify-content-center">
             <?php 
-            $primaryReviews = array_slice($homeReviews, 0, 2);
-            $extraReviews = array_slice($homeReviews, 2);
+            $primaryReviews = array_slice($homeReviews, 0, 3);
+            $extraReviews = array_slice($homeReviews, 3);
             
             foreach ($primaryReviews as $rev): 
                 $revName = h($rev['name']);
                 $revCourse = !empty($rev['course_college']) ? h($rev['course_college']) : 'Student';
+                $revTitle = !empty($rev['title']) ? h($rev['title']) : 'Excellent Guidance';
                 $revComment = h($rev['comment']);
-                $revDate = !empty($rev['created_at']) ? date('F j, Y', strtotime($rev['created_at'])) : 'Recent';
+                $revRating = !empty($rev['rating']) ? (int)$rev['rating'] : 5;
+                $revDate = !empty($rev['created_at']) ? date('M d, Y', strtotime($rev['created_at'])) : 'Recent';
                 $revAvatar = !empty($rev['avatar']) ? $rev['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
             ?>
-                <div class="col-12 col-md-6 col-lg-6">
-                    <div class="card border-0 rounded-4 shadow-sm bg-white h-100 overflow-hidden position-relative d-flex flex-column justify-content-between testimonial-card-custom">
-                        <div class="p-4 pb-3">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card border-0 rounded-4 shadow-sm bg-white h-100 overflow-hidden position-relative d-flex flex-column justify-content-between testimonial-card-custom hover-scale p-4">
+                        <div>
+                            <!-- Star Rating & Quote Mark -->
                             <div class="d-flex align-items-center justify-content-between mb-3">
-                                <div class="d-flex align-items-center gap-3">
-                                    <img src="<?= $revAvatar ?>" alt="<?= $revName ?>" class="rounded-circle object-fit-cover shadow-sm" style="width: 60px; height: 60px; border: 2px solid #ffffff;">
-                                    <div>
-                                        <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem; color: #1E293B;"><?= $revName ?></h5>
-                                        <div class="text-muted small" style="color: #83898D; font-size: 0.88rem;"><?= $revCourse ?></div>
-                                    </div>
+                                <div class="d-flex align-items-center text-warning small gap-1">
+                                    <?php for ($s = 1; $s <= 5; $s++): ?>
+                                        <i class="fa-solid fa-star <?= $s <= $revRating ? 'text-warning' : 'text-black-50' ?>"></i>
+                                    <?php endfor; ?>
                                 </div>
-                                <div class="text-danger flex-shrink-0 ms-2">
-                                    <i class="fa-solid fa-quote-right fs-2" style="color: #D91F23;"></i>
-                                </div>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill extra-small px-2 py-0.5">
+                                    <i class="fa-solid fa-circle-check me-1"></i>Verified Student
+                                </span>
                             </div>
-                            
-                            <p class="text-secondary mb-4" style="color: #555555; line-height: 1.6; font-size: 0.95rem;">
-                                <?= $revComment ?>
+
+                            <h6 class="fw-bold text-dark mb-2"><?= $revTitle ?></h6>
+                            <p class="text-secondary mb-4 small" style="line-height: 1.6; font-size: 0.92rem;">
+                                &ldquo;<?= $revComment ?>&rdquo;
                             </p>
                         </div>
 
-                        <div class="testimonial-red-banner w-100 px-4 py-2.5 text-white fw-semibold position-relative" style="background-color: #D91F23; font-size: 0.88rem;">
-                            <div class="speech-arrow-up"></div>
-                            <?= $revDate ?>
+                        <!-- Student Profile Footer -->
+                        <div class="pt-3 border-top mt-auto d-flex align-items-center justify-content-between gap-3">
+                            <div class="d-flex align-items-center gap-2.5">
+                                <img src="<?= $revAvatar ?>" alt="<?= $revName ?>" class="rounded-circle object-fit-cover shadow-2xs border" style="width: 46px; height: 46px;">
+                                <div>
+                                    <div class="fw-bold text-dark mb-0 small"><?= $revName ?></div>
+                                    <div class="text-muted extra-small text-truncate" style="max-width: 170px;" title="<?= $revCourse ?>"><?= $revCourse ?></div>
+                                </div>
+                            </div>
+                            <span class="text-muted extra-small flex-shrink-0"><?= $revDate ?></span>
                         </div>
                     </div>
                 </div>
@@ -1357,38 +1628,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <?php if (!empty($extraReviews)): ?>
             <!-- Additional Reviews Expanded Grid (Inline View All on Home Page) -->
-            <div class="row g-4 justify-content-center mt-0 d-none" id="home-extra-reviews">
+            <div class="row g-4 justify-content-center mt-1 d-none" id="home-extra-reviews">
                 <?php foreach ($extraReviews as $rev): 
                     $revName = h($rev['name']);
                     $revCourse = !empty($rev['course_college']) ? h($rev['course_college']) : 'Student';
+                    $revTitle = !empty($rev['title']) ? h($rev['title']) : 'Smooth Admission Process';
                     $revComment = h($rev['comment']);
-                    $revDate = !empty($rev['created_at']) ? date('F j, Y', strtotime($rev['created_at'])) : 'Recent';
+                    $revRating = !empty($rev['rating']) ? (int)$rev['rating'] : 5;
+                    $revDate = !empty($rev['created_at']) ? date('M d, Y', strtotime($rev['created_at'])) : 'Recent';
                     $revAvatar = !empty($rev['avatar']) ? $rev['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
                 ?>
-                    <div class="col-12 col-md-6 col-lg-6">
-                        <div class="card border-0 rounded-4 shadow-sm bg-white h-100 overflow-hidden position-relative d-flex flex-column justify-content-between testimonial-card-custom">
-                            <div class="p-4 pb-3">
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card border-0 rounded-4 shadow-sm bg-white h-100 overflow-hidden position-relative d-flex flex-column justify-content-between testimonial-card-custom hover-scale p-4">
+                            <div>
+                                <!-- Star Rating & Quote Mark -->
                                 <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <img src="<?= $revAvatar ?>" alt="<?= $revName ?>" class="rounded-circle object-fit-cover shadow-sm" style="width: 60px; height: 60px; border: 2px solid #ffffff;">
-                                        <div>
-                                            <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem; color: #1E293B;"><?= $revName ?></h5>
-                                            <div class="text-muted small" style="color: #83898D; font-size: 0.88rem;"><?= $revCourse ?></div>
-                                        </div>
+                                    <div class="d-flex align-items-center text-warning small gap-1">
+                                        <?php for ($s = 1; $s <= 5; $s++): ?>
+                                            <i class="fa-solid fa-star <?= $s <= $revRating ? 'text-warning' : 'text-black-50' ?>"></i>
+                                        <?php endfor; ?>
                                     </div>
-                                    <div class="text-danger flex-shrink-0 ms-2">
-                                        <i class="fa-solid fa-quote-right fs-2" style="color: #D91F23;"></i>
-                                    </div>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill extra-small px-2 py-0.5">
+                                        <i class="fa-solid fa-circle-check me-1"></i>Verified Student
+                                    </span>
                                 </div>
-                                
-                                <p class="text-secondary mb-4" style="color: #555555; line-height: 1.6; font-size: 0.95rem;">
-                                    <?= $revComment ?>
+
+                                <h6 class="fw-bold text-dark mb-2"><?= $revTitle ?></h6>
+                                <p class="text-secondary mb-4 small" style="line-height: 1.6; font-size: 0.92rem;">
+                                    &ldquo;<?= $revComment ?>&rdquo;
                                 </p>
                             </div>
 
-                            <div class="testimonial-red-banner w-100 px-4 py-2.5 text-white fw-semibold position-relative" style="background-color: #D91F23; font-size: 0.88rem;">
-                                <div class="speech-arrow-up"></div>
-                                <?= $revDate ?>
+                            <!-- Student Profile Footer -->
+                            <div class="pt-3 border-top mt-auto d-flex align-items-center justify-content-between gap-3">
+                                <div class="d-flex align-items-center gap-2.5">
+                                    <img src="<?= $revAvatar ?>" alt="<?= $revName ?>" class="rounded-circle object-fit-cover shadow-2xs border" style="width: 46px; height: 46px;">
+                                    <div>
+                                        <div class="fw-bold text-dark mb-0 small"><?= $revName ?></div>
+                                        <div class="text-muted extra-small text-truncate" style="max-width: 170px;" title="<?= $revCourse ?>"><?= $revCourse ?></div>
+                                    </div>
+                                </div>
+                                <span class="text-muted extra-small flex-shrink-0"><?= $revDate ?></span>
                             </div>
                         </div>
                     </div>
@@ -1421,20 +1701,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (extraGrid.classList.contains('d-none')) {
                     extraGrid.classList.remove('d-none');
                     toggleBtns.forEach(b => {
-                        if (b.classList.contains('btn-outline-danger')) {
-                            b.innerHTML = 'Show Less <i class="fa-solid fa-chevron-up ms-1"></i>';
-                        } else {
-                            b.innerHTML = 'Show Less <i class="fa-solid fa-chevron-up ms-1"></i>';
-                        }
+                        b.innerHTML = 'Show Less <i class="fa-solid fa-chevron-up ms-1"></i>';
                     });
                 } else {
                     extraGrid.classList.add('d-none');
                     toggleBtns.forEach(b => {
-                        if (b.classList.contains('btn-outline-danger')) {
-                            b.innerHTML = 'View All Reviews <i class="fa-solid fa-chevron-down ms-1"></i>';
-                        } else {
-                            b.innerHTML = 'View All <i class="fa-solid fa-arrow-right ms-1"></i>';
-                        }
+                        b.innerHTML = 'View All Reviews <i class="fa-solid fa-chevron-down ms-1"></i>';
                     });
                 }
             });

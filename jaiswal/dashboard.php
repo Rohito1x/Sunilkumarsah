@@ -208,6 +208,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $alert = ['type' => 'success', 'msg' => 'Review status toggled successfully.'];
         }
 
+        if ($action === 'delete_team_member' && isset($_POST['id'])) {
+            $id = (int)$_POST['id'];
+            $stmt = $pdo->prepare('DELETE FROM team_members WHERE id = ?');
+            $stmt->execute([$id]);
+            logActivity("Deleted Team Member #$id");
+            $alert = ['type' => 'success', 'msg' => 'Staff / Team member deleted successfully.'];
+        }
+
+        if ($action === 'toggle_team_member' && isset($_POST['id'])) {
+            $id = (int)$_POST['id'];
+            $stmt = $pdo->prepare("UPDATE team_members SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END WHERE id = ?");
+            $stmt->execute([$id]);
+            logActivity("Toggled Team Member #$id Status");
+            $alert = ['type' => 'success', 'msg' => 'Team member status toggled successfully.'];
+        }
+
+        if ($action === 'add_team_member') {
+            $name = trim((string)$_POST['name']);
+            $role = trim((string)$_POST['role']);
+            $department = trim((string)($_POST['department'] ?? 'Admissions'));
+            $qualification = trim((string)($_POST['qualification'] ?? ''));
+            $specialization = trim((string)($_POST['specialization'] ?? ''));
+            $bio = trim((string)($_POST['bio'] ?? ''));
+            $exp = (int)($_POST['experience_years'] ?? 0);
+            $email = trim((string)($_POST['email'] ?? ''));
+            $phone = trim((string)($_POST['phone'] ?? ''));
+            $photo = trim((string)($_POST['photo'] ?? ''));
+            $order = (int)($_POST['display_order'] ?? 0);
+            $isActive = isset($_POST['is_active']) ? 1 : 0;
+
+            if ($name === '' || $role === '') {
+                throw new Exception('Staff Name and Role are required.');
+            }
+
+            if (isset($_FILES['photo_file']) && $_FILES['photo_file']['error'] == UPLOAD_ERR_OK) {
+                $uploaded = handleFileUpload('photo_file', 'staff_');
+                if ($uploaded) {
+                    $photo = $uploaded;
+                }
+            }
+
+            $stmt = $pdo->prepare("INSERT INTO team_members (name, role, department, qualification, specialization, bio, experience_years, email, phone, photo, display_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$name, $role, $department, $qualification, $specialization, $bio, $exp, $email, $phone, $photo, $order, $isActive]);
+            $tmId = $pdo->lastInsertId();
+            logActivity("Added Team Member #$tmId", $name);
+            $alert = ['type' => 'success', 'msg' => 'Staff member added successfully.'];
+        }
+
+        if ($action === 'edit_team_member' && isset($_POST['id'])) {
+            $id = (int)$_POST['id'];
+            $name = trim((string)$_POST['name']);
+            $role = trim((string)$_POST['role']);
+            $department = trim((string)($_POST['department'] ?? 'Admissions'));
+            $qualification = trim((string)($_POST['qualification'] ?? ''));
+            $specialization = trim((string)($_POST['specialization'] ?? ''));
+            $bio = trim((string)($_POST['bio'] ?? ''));
+            $exp = (int)($_POST['experience_years'] ?? 0);
+            $email = trim((string)($_POST['email'] ?? ''));
+            $phone = trim((string)($_POST['phone'] ?? ''));
+            $photo = trim((string)($_POST['photo'] ?? ''));
+            $order = (int)($_POST['display_order'] ?? 0);
+            $isActive = isset($_POST['is_active']) ? 1 : 0;
+
+            if ($name === '' || $role === '') {
+                throw new Exception('Staff Name and Role are required.');
+            }
+
+            if (isset($_FILES['photo_file']) && $_FILES['photo_file']['error'] == UPLOAD_ERR_OK) {
+                $uploaded = handleFileUpload('photo_file', 'staff_');
+                if ($uploaded) {
+                    $photo = $uploaded;
+                }
+            }
+
+            $stmt = $pdo->prepare("UPDATE team_members SET name = ?, role = ?, department = ?, qualification = ?, specialization = ?, bio = ?, experience_years = ?, email = ?, phone = ?, photo = ?, display_order = ?, is_active = ? WHERE id = ?");
+            $stmt->execute([$name, $role, $department, $qualification, $specialization, $bio, $exp, $email, $phone, $photo, $order, $isActive, $id]);
+            logActivity("Updated Team Member #$id", $name);
+            $alert = ['type' => 'success', 'msg' => 'Staff member updated successfully.'];
+        }
+
         if ($action === 'add_review') {
             $name = trim((string)$_POST['name']);
             $email = trim((string)$_POST['email']);
@@ -1382,6 +1462,11 @@ if (!isset($pdo) || !$pdo) {
         } catch (\Throwable $e) {
             $dbReviews = [];
         }
+        try {
+            $dbTeamMembers = $pdo->query('SELECT * FROM team_members ORDER BY display_order ASC, id ASC')->fetchAll() ?: [];
+        } catch (\Throwable $e) {
+            $dbTeamMembers = [];
+        }
         $dbInstitutions = $pdo->query('SELECT * FROM institutions ORDER BY created_at DESC')->fetchAll() ?: [];
         $dbDestinations = $pdo->query('SELECT * FROM destinations ORDER BY display_order ASC, name ASC')->fetchAll() ?: [];
         $dbStreams = $pdo->query('SELECT * FROM course_streams ORDER BY display_order ASC, name ASC')->fetchAll() ?: [];
@@ -1619,6 +1704,7 @@ require_once __DIR__ . '/includes/header.php';
                     <li class="nav-item"><button class="nav-link fw-bold px-3 rounded-pill btn-sm" id="inquiries-tab" data-bs-toggle="tab" data-bs-target="#inquiries-panel" type="button" role="tab">Inquiries</button></li>
                     <li class="nav-item"><button class="nav-link fw-bold px-3 rounded-pill btn-sm" id="subscribers-tab" data-bs-toggle="tab" data-bs-target="#subscribers-panel" type="button" role="tab">Subscribers</button></li>
                     <li class="nav-item"><button class="nav-link fw-bold px-3 rounded-pill btn-sm" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-panel" type="button" role="tab">Reviews & Feedback</button></li>
+                    <li class="nav-item"><button class="nav-link fw-bold px-3 rounded-pill btn-sm" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff-panel" type="button" role="tab">Staff & Counselors (<?= count($dbTeamMembers) ?>)</button></li>
                     
                     <!-- Content CRUD Dropdown -->
                     <li class="nav-item dropdown">
@@ -2505,7 +2591,255 @@ require_once __DIR__ . '/includes/header.php';
                         </div>
                     </div>
 
-                    <!-- UNIVERSITIES PANEL (CRUD) -->
+                    <!-- STAFF & COUNSELORS PANEL -->
+                    <div class="tab-pane fade" id="staff-panel" role="tabpanel">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                            <div>
+                                <h5 class="fw-bold text-primary mb-0"><i class="fa-solid fa-user-tie text-danger me-2"></i>Staff & Education Counselors</h5>
+                                <p class="text-muted small mb-0">Manage certified counselors, qualifications (TITI / QEAC), contact information, and order of appearance on the site.</p>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary rounded-pill px-3 py-2">Total Staff: <?= count($dbTeamMembers) ?></span>
+                                <button class="btn btn-primary btn-sm rounded-pill px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#addStaffModal"><i class="fa-solid fa-plus me-1"></i>Add Staff Member</button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table align-middle table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 50px;">Order</th>
+                                        <th style="width: 70px;">Photo</th>
+                                        <th>Counselor Name & Role</th>
+                                        <th>Department</th>
+                                        <th>Qualifications & Badges</th>
+                                        <th>Experience</th>
+                                        <th>Status</th>
+                                        <th class="text-center" style="width: 140px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($dbTeamMembers)): ?>
+                                        <tr><td colspan="8" class="text-center text-muted py-5"><i class="fa-regular fa-folder-open fs-2 mb-2 d-block"></i>No staff or counselors recorded yet.</td></tr>
+                                    <?php else: ?>
+                                        <?php foreach ($dbTeamMembers as $tm): 
+                                            $tmPhoto = !empty($tm['photo']) ? $tm['photo'] : 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80';
+                                            $isTiti = stripos($tm['qualification'] ?? '', 'TITI') !== false;
+                                            $isQeac = stripos($tm['qualification'] ?? '', 'QEAC') !== false;
+                                        ?>
+                                            <tr>
+                                                <td class="fw-bold text-muted text-center"><?= (int)$tm['display_order'] ?></td>
+                                                <td>
+                                                    <img src="<?= htmlspecialchars($tmPhoto) ?>" alt="<?= htmlspecialchars($tm['name']) ?>" class="rounded-circle object-fit-cover shadow-2xs border" style="width: 44px; height: 44px;">
+                                                </td>
+                                                <td>
+                                                    <div class="fw-bold text-dark"><?= htmlspecialchars($tm['name']) ?></div>
+                                                    <div class="text-primary small"><?= htmlspecialchars($tm['role']) ?></div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-light text-dark border"><?= htmlspecialchars($tm['department'] ?? 'Admissions') ?></span>
+                                                </td>
+                                                <td>
+                                                    <?php if ($isTiti): ?>
+                                                        <span class="badge bg-danger text-white rounded-pill extra-small me-1"><i class="fa-solid fa-award me-1"></i>TITI Certified</span>
+                                                    <?php endif; ?>
+                                                    <?php if ($isQeac): ?>
+                                                        <span class="badge bg-success text-white rounded-pill extra-small me-1"><i class="fa-solid fa-stamp me-1"></i>QEAC</span>
+                                                    <?php endif; ?>
+                                                    <div class="text-muted extra-small mt-1 text-truncate" style="max-width: 250px;" title="<?= htmlspecialchars($tm['qualification'] ?? '') ?>">
+                                                        <?= htmlspecialchars($tm['qualification'] ?? '') ?>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-warning-subtle text-dark border border-warning-subtle"><?= (int)$tm['experience_years'] ?> Yrs</span>
+                                                </td>
+                                                <td>
+                                                    <form method="POST" class="d-inline">
+                                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                                        <input type="hidden" name="action" value="toggle_team_member">
+                                                        <input type="hidden" name="id" value="<?= $tm['id'] ?>">
+                                                        <?php if ($tm['is_active']): ?>
+                                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 py-0 fw-bold" title="Click to hide from website" style="font-size: 12px;">Active</button>
+                                                        <?php else: ?>
+                                                            <button type="submit" class="btn btn-sm btn-secondary rounded-pill px-3 py-0 fw-bold" title="Click to show on website" style="font-size: 12px;">Inactive</button>
+                                                        <?php endif; ?>
+                                                    </form>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex justify-content-center gap-1">
+                                                        <button class="btn btn-outline-secondary btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#editStaffModal<?= $tm['id'] ?>" title="Edit Staff Member"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                        <form method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this staff member?');">
+                                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                                            <input type="hidden" name="action" value="delete_team_member">
+                                                            <input type="hidden" name="id" value="<?= $tm['id'] ?>">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill" title="Delete Staff Member"><i class="fa-solid fa-trash"></i></button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <!-- EDIT STAFF MEMBER MODAL -->
+                                            <div class="modal fade" id="editStaffModal<?= $tm['id'] ?>" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                    <div class="modal-content border-0 rounded-4">
+                                                        <form method="POST" enctype="multipart/form-data">
+                                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                                            <input type="hidden" name="action" value="edit_team_member">
+                                                            <input type="hidden" name="id" value="<?= $tm['id'] ?>">
+                                                            <div class="modal-header bg-primary text-white py-3">
+                                                                <h5 class="modal-title fw-bold text-white"><i class="fa-solid fa-pen-to-square me-2"></i>Edit Staff Member #<?= $tm['id'] ?></h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body p-4">
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 form-group">
+                                                                        <label class="form-label fw-semibold small">Full Name *</label>
+                                                                        <input type="text" name="name" class="form-control" value="<?= htmlspecialchars($tm['name']) ?>" required>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 form-group">
+                                                                        <label class="form-label fw-semibold small">Role / Designation *</label>
+                                                                        <input type="text" name="role" class="form-control" value="<?= htmlspecialchars($tm['role']) ?>" required>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-4 form-group">
+                                                                        <label class="form-label fw-semibold small">Department</label>
+                                                                        <input type="text" name="department" class="form-control" value="<?= htmlspecialchars($tm['department'] ?? 'Study in India') ?>" placeholder="e.g. Study in India">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-4 form-group">
+                                                                        <label class="form-label fw-semibold small">Experience (Years)</label>
+                                                                        <input type="number" name="experience_years" class="form-control" value="<?= (int)($tm['experience_years'] ?? 0) ?>" min="0">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-4 form-group">
+                                                                        <label class="form-label fw-semibold small">Display Order</label>
+                                                                        <input type="number" name="display_order" class="form-control" value="<?= (int)($tm['display_order'] ?? 0) ?>">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 form-group">
+                                                                        <label class="form-label fw-semibold small">Qualifications (include TITI if applicable)</label>
+                                                                        <input type="text" name="qualification" class="form-control" value="<?= htmlspecialchars($tm['qualification'] ?? '') ?>" placeholder="e.g. TITI Certified Senior Counselor | M.A. Psychology">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 form-group">
+                                                                        <label class="form-label fw-semibold small">Specialization Focus</label>
+                                                                        <input type="text" name="specialization" class="form-control" value="<?= htmlspecialchars($tm['specialization'] ?? '') ?>" placeholder="e.g. MBBS, Nursing, B.Tech">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 form-group">
+                                                                        <label class="form-label fw-semibold small">Email Address</label>
+                                                                        <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($tm['email'] ?? '') ?>">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 form-group">
+                                                                        <label class="form-label fw-semibold small">Phone / Mobile</label>
+                                                                        <input type="text" name="phone" class="form-control" value="<?= htmlspecialchars($tm['phone'] ?? '') ?>">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 form-group">
+                                                                        <label class="form-label fw-semibold small">Photo URL</label>
+                                                                        <input type="text" name="photo" class="form-control" value="<?= htmlspecialchars($tm['photo'] ?? '') ?>">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 form-group">
+                                                                        <label class="form-label fw-semibold small">Or Upload New Photo</label>
+                                                                        <input type="file" name="photo_file" class="form-control" accept="image/*">
+                                                                    </div>
+                                                                    <div class="col-12 form-group">
+                                                                        <label class="form-label fw-semibold small">Short Bio / Background</label>
+                                                                        <textarea name="bio" class="form-control" rows="3"><?= htmlspecialchars($tm['bio'] ?? '') ?></textarea>
+                                                                    </div>
+                                                                    <div class="col-12 form-group">
+                                                                        <div class="form-check form-switch mt-2">
+                                                                            <input class="form-check-input" type="checkbox" name="is_active" id="edit_active_<?= $tm['id'] ?>" <?= $tm['is_active'] ? 'checked' : '' ?>>
+                                                                            <label class="form-check-label fw-semibold small" for="edit_active_<?= $tm['id'] ?>">Active (Visible on Website)</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer bg-light">
+                                                                <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                                                                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4">Save Changes</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ADD STAFF MEMBER MODAL -->
+                    <div class="modal fade" id="addStaffModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content border-0 rounded-4">
+                                <form method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                    <input type="hidden" name="action" value="add_team_member">
+                                    <div class="modal-header bg-primary text-white py-3">
+                                        <h5 class="modal-title fw-bold text-white"><i class="fa-solid fa-plus-circle me-2"></i>Add Staff / Counselor</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="row g-3">
+                                            <div class="col-12 col-md-6 form-group">
+                                                <label class="form-label fw-semibold small">Full Name *</label>
+                                                <input type="text" name="name" class="form-control" placeholder="e.g. Roshni Bhattarai" required>
+                                            </div>
+                                            <div class="col-12 col-md-6 form-group">
+                                                <label class="form-label fw-semibold small">Role / Designation *</label>
+                                                <input type="text" name="role" class="form-control" placeholder="e.g. Senior Admissions Advisor" required>
+                                            </div>
+                                            <div class="col-12 col-md-4 form-group">
+                                                <label class="form-label fw-semibold small">Department</label>
+                                                <input type="text" name="department" class="form-control" placeholder="e.g. Study in India" value="Study in India">
+                                            </div>
+                                            <div class="col-12 col-md-4 form-group">
+                                                <label class="form-label fw-semibold small">Experience (Years)</label>
+                                                <input type="number" name="experience_years" class="form-control" value="5" min="0">
+                                            </div>
+                                            <div class="col-12 col-md-4 form-group">
+                                                <label class="form-label fw-semibold small">Display Order</label>
+                                                <input type="number" name="display_order" class="form-control" value="0">
+                                            </div>
+                                            <div class="col-12 col-md-6 form-group">
+                                                <label class="form-label fw-semibold small">Qualifications (include TITI if applicable)</label>
+                                                <input type="text" name="qualification" class="form-control" placeholder="e.g. TITI Certified Senior Counselor | M.A.">
+                                            </div>
+                                            <div class="col-12 col-md-6 form-group">
+                                                <label class="form-label fw-semibold small">Specialization Focus</label>
+                                                <input type="text" name="specialization" class="form-control" placeholder="e.g. MBBS, Engineering, Nursing">
+                                            </div>
+                                            <div class="col-12 col-md-6 form-group">
+                                                <label class="form-label fw-semibold small">Email Address</label>
+                                                <input type="email" name="email" class="form-control" placeholder="counselor@visionpoint.edu.np">
+                                            </div>
+                                            <div class="col-12 col-md-6 form-group">
+                                                <label class="form-label fw-semibold small">Phone / Mobile</label>
+                                                <input type="text" name="phone" class="form-control" placeholder="+977-9807765812">
+                                            </div>
+                                            <div class="col-12 col-md-6 form-group">
+                                                <label class="form-label fw-semibold small">Photo URL</label>
+                                                <input type="text" name="photo" class="form-control" placeholder="https://example.com/photo.jpg">
+                                            </div>
+                                            <div class="col-12 col-md-6 form-group">
+                                                <label class="form-label fw-semibold small">Or Upload Photo</label>
+                                                <input type="file" name="photo_file" class="form-control" accept="image/*">
+                                            </div>
+                                            <div class="col-12 form-group">
+                                                <label class="form-label fw-semibold small">Short Bio / Background</label>
+                                                <textarea name="bio" class="form-control" rows="3" placeholder="Write counselor summary and background..."></textarea>
+                                            </div>
+                                            <div class="col-12 form-group">
+                                                <div class="form-check form-switch mt-2">
+                                                    <input class="form-check-input" type="checkbox" name="is_active" id="add_active" checked>
+                                                    <label class="form-check-label fw-semibold small" for="add_active">Active (Visible on Website)</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer bg-light">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4">Add Staff Member</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                     <div class="tab-pane fade" id="universities-panel" role="tabpanel">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="fw-bold text-primary mb-0">Partner Institutions</h5>

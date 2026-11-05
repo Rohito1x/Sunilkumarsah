@@ -4,6 +4,146 @@ if (file_exists(__DIR__ . '/includes/seo.php')) { require_once __DIR__ . '/inclu
 
 $pageSeo = getSeoData('static', null, 'about');
 require_once __DIR__ . '/includes/header.php';
+
+// Fetch Team Members & Approved Reviews
+$teamMembers = [];
+$aboutReviews = [];
+
+if (isset($pdo)) {
+    try {
+        $stmtTm = $pdo->query("SELECT * FROM team_members WHERE is_active = 1 ORDER BY display_order ASC, id ASC");
+        $teamMembers = $stmtTm->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {}
+
+    try {
+        $stmtRev = $pdo->query("SELECT * FROM reviews WHERE status = 'Approved' ORDER BY created_at DESC, id DESC LIMIT 6");
+        $aboutReviews = $stmtRev->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {}
+}
+
+if (empty($teamMembers)) {
+    $teamMembers = [
+        [
+            'id' => 1,
+            'name' => 'Roshni Bhattarai',
+            'role' => 'Chief Counseling Officer & Senior Advisor',
+            'department' => 'Study in India',
+            'qualification' => 'TITI Certified Senior Counselor (CTEVT) | M.A. Counseling Psychology',
+            'specialization' => 'MBBS, BDS, B.Sc Nursing, B.Tech CSE, Scholarship Allocations',
+            'bio' => '10+ years of dedicated academic counseling helping over 1,200 Nepali students secure direct admissions and up to 100% scholarships across premier Indian universities.',
+            'experience_years' => 10,
+            'email' => 'roshni@visionpoint.edu.np',
+            'phone' => '+977-9807765812',
+            'photo' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80',
+            'display_order' => 1
+        ],
+        [
+            'id' => 2,
+            'name' => 'Suresh K. Nepal',
+            'role' => 'Head of Study Abroad & Visa Compliance',
+            'department' => 'Study Abroad',
+            'qualification' => 'Certified Qualified Education Agent Counselor (QEAC) | MBA',
+            'specialization' => 'Australia (Subclass 500), UK CAS, USA F-1, Canada SDS',
+            'bio' => 'Licensed overseas counselor with 8+ years specializing in Genuine Student (GS) compliance, Statement of Purpose (SOP) auditing, and complex visa applications.',
+            'experience_years' => 8,
+            'email' => 'suresh@visionpoint.edu.np',
+            'phone' => '+977-9807765812',
+            'photo' => 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=500&auto=format&fit=crop&q=80',
+            'display_order' => 2
+        ],
+        [
+            'id' => 3,
+            'name' => 'Pooja Regmi',
+            'role' => 'Director of Healthcare & Allied Science Admissions',
+            'department' => 'Study in India',
+            'qualification' => 'TITI Certified Education Counselor | B.Sc Nursing, M.Sc Health Admin',
+            'specialization' => 'B.Sc Nursing, Post Basic Nursing, B.Pharm, Paramedical & Equivalence',
+            'bio' => '7+ years guiding prospective nurses and allied medical students through INC/NMC council recognitions, hospital tie-ups, and clinical internship setups.',
+            'experience_years' => 7,
+            'email' => 'pooja@visionpoint.edu.np',
+            'phone' => '+977-9807765812',
+            'photo' => 'https://images.unsplash.com/photo-1594824813511-193e819b1388?w=500&auto=format&fit=crop&q=80',
+            'display_order' => 3
+        ],
+        [
+            'id' => 4,
+            'name' => 'Amit Shrestha',
+            'role' => 'Head of Test Preparation & English Department',
+            'department' => 'Test Preparation',
+            'qualification' => 'British Council & Pearson Certified Master Trainer | M.A. English Literature',
+            'specialization' => 'IELTS Academic (Band 7.5+), PTE Academic (Score 65+), SAT, Duolingo',
+            'bio' => '9+ years helping hundreds of Nepali students attain high test scores with tailored mock tests, band score diagnostic rubrics, and modern computer-based lab training.',
+            'experience_years' => 9,
+            'email' => 'amit@visionpoint.edu.np',
+            'phone' => '+977-9807765812',
+            'photo' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80',
+            'display_order' => 4
+        ],
+        [
+            'id' => 5,
+            'name' => 'Anil Kumar Jha',
+            'role' => 'Senior Admissions & University Liaison Officer',
+            'department' => 'Admissions & Scholarships',
+            'qualification' => 'TITI Certified Education Counselor | BBA, PGD Educational Management',
+            'specialization' => 'Engineering (AI, Data Science, Mechanical), Management (MBA, BBA)',
+            'bio' => 'Direct liaison with 80+ partner institutions in Delhi NCR, Punjab, Bangalore, and Pune. Expert in negotiating institutional fee concessions for Nepali students.',
+            'experience_years' => 6,
+            'email' => 'anil@visionpoint.edu.np',
+            'phone' => '+977-9807765812',
+            'photo' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=80',
+            'display_order' => 5
+        ],
+        [
+            'id' => 6,
+            'name' => 'Sunita Thapa',
+            'role' => 'Student Welfare & Pre-Departure Coordinator',
+            'department' => 'Student Care',
+            'qualification' => 'B.A. Social Work & Student Welfare Specialist',
+            'specialization' => 'Hostel Inspection, Border & Airport Transit, Medical Insurance, Nepal Embassy Registration',
+            'bio' => 'Ensures seamless transitions for students relocating from Nepal to college campuses, providing continuous emergency assistance and guardian coordination.',
+            'experience_years' => 5,
+            'email' => 'sunita@visionpoint.edu.np',
+            'phone' => '+977-9807765812',
+            'photo' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
+            'display_order' => 6
+        ]
+    ];
+}
+
+if (empty($aboutReviews)) {
+    $aboutReviews = [
+        [
+            'id' => 1,
+            'name' => 'Yugandhar Yadav',
+            'course_college' => 'B.Tech CSE (SRM University)',
+            'rating' => 5,
+            'title' => 'Exceptional Guidance & Support!',
+            'comment' => 'Vision Point Educational Service guided me through every step of my admission process to SRM University. They helped me secure a scholarship and made the documentation smooth and hassle-free!',
+            'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+            'created_at' => '2026-05-10 10:00:00'
+        ],
+        [
+            'id' => 2,
+            'name' => 'Aayush Shrestha',
+            'course_college' => 'B.Sc Nursing (Chandigarh University)',
+            'rating' => 5,
+            'title' => 'Best Consultancy for India',
+            'comment' => 'I am currently studying Nursing in India thanks to Vision Point. Their admission advisors were available 24/7 to clear all my doubts about fees, hostel facilities, and visas.',
+            'avatar' => 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
+            'created_at' => '2026-04-18 14:30:00'
+        ],
+        [
+            'id' => 3,
+            'name' => 'Pooja Karki',
+            'course_college' => 'BBA (Lovely Professional University)',
+            'rating' => 5,
+            'title' => 'Transparent & Very Helpful Team',
+            'comment' => 'Transparent advice without any hidden charges. Vision Point Educational Service made my dream of pursuing higher education in India a reality.',
+            'avatar' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+            'created_at' => '2026-03-22 11:15:00'
+        ]
+    ];
+}
 ?>
 
 <!-- Hero Banner Section -->
@@ -303,74 +443,100 @@ require_once __DIR__ . '/includes/header.php';
 </section>
 
 <!-- Our Dedicated Advisory Team -->
-<section class="py-5 bg-white">
+<section class="py-5 bg-white" id="counselors-team">
     <div class="container py-3">
-        <div class="text-center max-w-700 mx-auto mb-5">
-            <span class="text-danger fw-bold small text-uppercase">Counseling Excellence</span>
-            <h2 class="fw-bold text-primary display-6">Meet Our Expert Advisory Team</h2>
-            <p class="text-muted small">Experienced educationists, certified visa specialists, and student mentors dedicated to your academic success.</p>
+        <div class="d-flex align-items-end justify-content-between mb-5 flex-wrap gap-3">
+            <div>
+                <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-bold extra-small text-uppercase mb-2">
+                    <i class="fa-solid fa-award me-1"></i> TITI & Global Certified Mentors
+                </span>
+                <h2 class="fw-bold text-primary display-6 mb-1">Meet Our Expert Advisory Team</h2>
+                <p class="text-muted small mb-0" style="max-width: 650px;">
+                    Experienced educationists, certified visa compliance specialists, and subject-matter mentors formally accredited by TITI (CTEVT) to ensure ethical and result-oriented academic counseling.
+                </p>
+            </div>
+            <button class="btn btn-primary rounded-pill px-4 fw-bold hover-scale" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">
+                <i class="fa-solid fa-user-plus me-1"></i> Book 1-on-1 Consultation
+            </button>
         </div>
 
         <div class="row g-4">
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden text-center p-3 team-card">
-                    <div class="rounded-4 overflow-hidden mb-3 mx-auto" style="width: 140px; height: 140px;">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80" alt="Senior Admissions Counselor" class="w-100 h-100 object-fit-cover">
+            <?php foreach ($teamMembers as $member): 
+                $mPhoto = !empty($member['photo']) ? $member['photo'] : 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80';
+                $isTiti = stripos($member['qualification'] ?? '', 'TITI') !== false;
+                $isQeac = stripos($member['qualification'] ?? '', 'QEAC') !== false;
+                $isBritishCouncil = stripos($member['qualification'] ?? '', 'British Council') !== false;
+                $firstName = explode(' ', $member['name'])[0];
+            ?>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden counselor-card-premium bg-white d-flex flex-column justify-content-between">
+                    <!-- Card Top Header -->
+                    <div class="d-flex justify-content-between align-items-center px-4 py-2.5 bg-light border-bottom">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 extra-small fw-semibold">
+                            <i class="fa-solid fa-briefcase me-1"></i><?= h($member['department']) ?>
+                        </span>
+                        <span class="badge bg-warning-subtle text-dark border border-warning-subtle rounded-pill px-2.5 py-1 extra-small fw-bold">
+                            <i class="fa-solid fa-clock-rotate-left me-1 text-primary"></i><?= (int)$member['experience_years'] ?>+ Years Exp
+                        </span>
                     </div>
-                    <h5 class="fw-bold text-primary fs-6 mb-1">Roshni Bhattarai</h5>
-                    <span class="badge bg-primary-subtle text-primary rounded-pill mb-2 px-3 py-1 small">Head of Career Counseling</span>
-                    <p class="text-muted extra-small mb-3">8+ years of expertise in medical, engineering, and nursing admissions in India. Specialist in scholarship matching.</p>
-                    <div class="d-flex justify-content-center gap-2 mt-auto">
-                        <a href="tel:+9779807765812" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"><i class="fa-solid fa-phone"></i></a>
-                        <a href="mailto:info@visionpoint.edu.np" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"><i class="fa-solid fa-envelope"></i></a>
-                    </div>
-                </div>
-            </div>
 
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden text-center p-3 team-card">
-                    <div class="rounded-4 overflow-hidden mb-3 mx-auto" style="width: 140px; height: 140px;">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80" alt="Study Abroad Director" class="w-100 h-100 object-fit-cover">
-                    </div>
-                    <h5 class="fw-bold text-primary fs-6 mb-1">Suresh K. Nepal</h5>
-                    <span class="badge bg-warning-subtle text-dark rounded-pill mb-2 px-3 py-1 small">Overseas Visa Specialist</span>
-                    <p class="text-muted extra-small mb-3">Certified Australian & UK Education Agent. Expert in Genuine Student (GS) compliance, GIC filing, and visa documentation.</p>
-                    <div class="d-flex justify-content-center gap-2 mt-auto">
-                        <a href="tel:+9779807765812" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"><i class="fa-solid fa-phone"></i></a>
-                        <a href="mailto:info@visionpoint.edu.np" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"><i class="fa-solid fa-envelope"></i></a>
-                    </div>
-                </div>
-            </div>
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <div class="position-relative flex-shrink-0" style="width: 76px; height: 76px;">
+                                <img src="<?= h($mPhoto) ?>" alt="<?= h($member['name']) ?>" class="w-100 h-100 rounded-circle object-fit-cover shadow-sm border border-2 border-primary">
+                                <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle pulse-dot" style="width: 14px; height: 14px;" title="Online / Available"></span>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-1 flex-wrap mb-1">
+                                    <?php if ($isTiti): ?>
+                                        <span class="badge bg-danger text-white rounded-pill extra-small px-2 py-0.5">
+                                            <i class="fa-solid fa-certificate me-1"></i>TITI Certified
+                                        </span>
+                                    <?php elseif ($isQeac): ?>
+                                        <span class="badge bg-success text-white rounded-pill extra-small px-2 py-0.5">
+                                            <i class="fa-solid fa-stamp me-1"></i>QEAC Certified
+                                        </span>
+                                    <?php elseif ($isBritishCouncil): ?>
+                                        <span class="badge bg-info text-dark rounded-pill extra-small px-2 py-0.5">
+                                            <i class="fa-solid fa-chalkboard-user me-1"></i>Master Trainer
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-0 fs-6"><?= h($member['name']) ?></h5>
+                                <div class="text-primary small fw-semibold"><?= h($member['role']) ?></div>
+                            </div>
+                        </div>
 
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden text-center p-3 team-card">
-                    <div class="rounded-4 overflow-hidden mb-3 mx-auto" style="width: 140px; height: 140px;">
-                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&auto=format&fit=crop&q=80" alt="Healthcare Admissions Lead" class="w-100 h-100 object-fit-cover">
-                    </div>
-                    <h5 class="fw-bold text-primary fs-6 mb-1">Pooja Regmi</h5>
-                    <span class="badge bg-success-subtle text-success rounded-pill mb-2 px-3 py-1 small">Medical & Health Sciences Lead</span>
-                    <p class="text-muted extra-small mb-3">Specialist in B.Sc Nursing, B.Pharm, and MBBS placements with INC/NMC council equivalence auditing.</p>
-                    <div class="d-flex justify-content-center gap-2 mt-auto">
-                        <a href="tel:+9779807765812" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"><i class="fa-solid fa-phone"></i></a>
-                        <a href="mailto:info@visionpoint.edu.np" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"><i class="fa-solid fa-envelope"></i></a>
-                    </div>
-                </div>
-            </div>
+                        <!-- Qualification Pill Box -->
+                        <div class="bg-light rounded-3 p-2.5 mb-3 extra-small">
+                            <div class="text-secondary mb-1">
+                                <i class="fa-solid fa-graduation-cap text-danger me-1"></i><strong>Credentials:</strong> <?= h($member['qualification']) ?>
+                            </div>
+                            <div class="text-muted">
+                                <i class="fa-solid fa-tags text-primary me-1"></i><strong>Core Focus:</strong> <?= h($member['specialization']) ?>
+                            </div>
+                        </div>
 
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden text-center p-3 team-card">
-                    <div class="rounded-4 overflow-hidden mb-3 mx-auto" style="width: 140px; height: 140px;">
-                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80" alt="Test Prep Coordinator" class="w-100 h-100 object-fit-cover">
-                    </div>
-                    <h5 class="fw-bold text-primary fs-6 mb-1">Amit Shrestha</h5>
-                    <span class="badge bg-info-subtle text-info rounded-pill mb-2 px-3 py-1 small">Test Prep & Language Mentor</span>
-                    <p class="text-muted extra-small mb-3">Certified British Council and Pearson trainer with 7+ years of experience helping students achieve 7.5+ in IELTS and 65+ in PTE.</p>
-                    <div class="d-flex justify-content-center gap-2 mt-auto">
-                        <a href="tel:+9779807765812" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"><i class="fa-solid fa-phone"></i></a>
-                        <a href="mailto:info@visionpoint.edu.np" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"><i class="fa-solid fa-envelope"></i></a>
+                        <p class="text-muted small mb-4 flex-grow-1" style="line-height: 1.55;">
+                            <?= h($member['bio']) ?>
+                        </p>
+
+                        <!-- Card Action Buttons -->
+                        <div class="pt-3 border-top mt-auto d-flex align-items-center justify-content-between gap-2">
+                            <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-semibold w-100 hover-scale" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">
+                                <i class="fa-solid fa-user-plus me-1"></i> Consult <?= h($firstName) ?>
+                            </button>
+                            <a href="tel:<?= h($member['phone'] ?? '+9779807765812') ?>" class="btn btn-light btn-sm rounded-circle border shadow-2xs text-primary flex-shrink-0 d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Call Counselor">
+                                <i class="fa-solid fa-phone"></i>
+                            </a>
+                            <a href="mailto:<?= h($member['email'] ?? 'info@visionpoint.edu.np') ?>" class="btn btn-light btn-sm rounded-circle border shadow-2xs text-secondary flex-shrink-0 d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Email Counselor">
+                                <i class="fa-solid fa-envelope"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
@@ -440,6 +606,72 @@ require_once __DIR__ . '/includes/header.php';
                     </p>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- Student & Parent Testimonials Section -->
+<section class="py-5 bg-white border-top" id="testimonials">
+    <div class="container py-3">
+        <div class="d-flex align-items-end justify-content-between mb-5 flex-wrap gap-3">
+            <div>
+                <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-bold extra-small text-uppercase mb-2">
+                    <i class="fa-solid fa-star text-warning me-1"></i> Student Experiences
+                </span>
+                <h2 class="fw-bold text-primary display-6 mb-1">Hear From Students We Have Guided</h2>
+                <p class="text-muted small mb-0" style="max-width: 650px;">
+                    Read how our TITI-certified counselors assisted Nepali students in finding legitimate courses, obtaining merit scholarships, and settling into their colleges.
+                </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="<?= h($basePath) ?>reviews.php" class="btn btn-outline-danger btn-sm rounded-pill px-4 fw-bold hover-scale" style="border-color: #D91F23; color: #D91F23;">
+                    <i class="fa-solid fa-comments me-1"></i> View All Reviews
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <?php foreach ($aboutReviews as $rev): 
+                $revName = h($rev['name']);
+                $revCourse = !empty($rev['course_college']) ? h($rev['course_college']) : 'Student';
+                $revTitle = !empty($rev['title']) ? h($rev['title']) : 'Outstanding Support';
+                $revComment = h($rev['comment']);
+                $revRating = !empty($rev['rating']) ? (int)$rev['rating'] : 5;
+                $revDate = !empty($rev['created_at']) ? date('M d, Y', strtotime($rev['created_at'])) : 'Recent';
+                $revAvatar = !empty($rev['avatar']) ? $rev['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+            ?>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 d-flex flex-column justify-content-between testimonial-card-custom hover-scale bg-white">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex text-warning small gap-1">
+                                <?php for ($s = 1; $s <= 5; $s++): ?>
+                                    <i class="fa-solid fa-star <?= $s <= $revRating ? 'text-warning' : 'text-black-50' ?>"></i>
+                                <?php endfor; ?>
+                            </div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill extra-small px-2 py-0.5">
+                                <i class="fa-solid fa-circle-check me-1"></i>Verified Student
+                            </span>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-2"><?= $revTitle ?></h6>
+                        <p class="text-secondary small mb-4" style="line-height: 1.6; font-size: 0.92rem;">
+                            &ldquo;<?= $revComment ?>&rdquo;
+                        </p>
+                    </div>
+
+                    <div class="pt-3 border-top mt-auto d-flex align-items-center justify-content-between gap-3">
+                        <div class="d-flex align-items-center gap-2.5">
+                            <img src="<?= $revAvatar ?>" alt="<?= $revName ?>" class="rounded-circle object-fit-cover shadow-2xs border" style="width: 44px; height: 44px;">
+                            <div>
+                                <div class="fw-bold text-dark mb-0 small"><?= $revName ?></div>
+                                <div class="text-muted extra-small text-truncate" style="max-width: 170px;" title="<?= $revCourse ?>"><?= $revCourse ?></div>
+                            </div>
+                        </div>
+                        <span class="text-muted extra-small flex-shrink-0"><?= $revDate ?></span>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
