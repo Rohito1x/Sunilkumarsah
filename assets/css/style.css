@@ -3635,3 +3635,64 @@ img {
         line-height: 1.25 !important;
     }
 }
+
+/* ============================================================
+   ZERO HEADER GAP FIX - Flush Hero & Banner Alignment
+   ============================================================ */
+.site-header-spacer {
+    display: none !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.hero-section {
+    padding: 85px 0 50px !important;
+}
+
+@media (min-width: 1400px) {
+    .hero-section {
+        padding: 95px 0 60px !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .hero-section {
+        padding: 75px 0 40px !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .hero-section {
+        padding: 68px 0 30px !important;
+    }
+}
+
+/* Page Hero Banners (About, Contact, Scholarships, etc.) */
+.page-hero-banner,
+section[style*="linear-gradient(135deg, #0458A0"],
+section[style*="linear-gradient(135deg, #102e48"],
+section[style*="linear-gradient(135deg, #021a30"],
+section[style*="linear-gradient(135deg, #03447c"],
+.study-in-india-hero {
+    padding-top: 85px !important;
+}
+
+@media (max-width: 991.98px) {
+    .page-hero-banner,
+    section[style*="linear-gradient(135deg, #0458A0"],
+    section[style*="linear-gradient(135deg, #102e48"],
+    section[style*="linear-gradient(135deg, #021a30"],
+    section[style*="linear-gradient(135deg, #03447c"],
+    .study-in-india-hero {
+        padding-top: 75px !important;
+    }
+}
+
+/* Breadcrumb sections and direct container pages */
+.breadcrumb-section:first-of-type {
+    padding-top: 75px !important;
+}
+body > .container:first-of-type {
+    padding-top: 85px !important;
+}

@@ -345,7 +345,7 @@ if (empty($topMenu)) {
     </nav>
 </header>
 
-<div class="site-header-spacer"></div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

@@ -99,8 +99,8 @@ if (empty($homeReviews)) {
 ?>
 
 <!-- Hero Banner Section -->
-<section class="hero-section py-5 d-flex align-items-center">
-    <div class="container py-5">
+<section class="hero-section d-flex align-items-center">
+    <div class="container py-3">
         <div class="row align-items-center g-5">
             <div class="col-12 col-lg-7 text-start">
                 <!-- 1. Small Live Badge -->
