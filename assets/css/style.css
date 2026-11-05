@@ -3474,3 +3474,82 @@ img {
 /* ============================================================
    END RESPONSIVE OVERHAUL
    ============================================================ */
+
+
+/* ============================================================
+   VIDEO INTEGRATION STYLES — Hero Video & Spotlight Theater
+   ============================================================ */
+.backdrop-blur {
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+}
+
+.hero-video-container {
+    position: relative;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(4, 88, 160, 0.22), 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.hero-video-container video {
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-video-container:hover video {
+    transform: scale(1.02);
+}
+
+.hero-video-controls button {
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.hero-video-controls button:hover {
+    background-color: rgba(217, 31, 35, 0.9) !important;
+    transform: scale(1.08);
+}
+
+.hover-translate {
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.hover-translate:hover {
+    transform: translateX(6px);
+    background-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.shadow-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Mobile Responsiveness for Video Elements */
+@media (max-width: 767.98px) {
+    .hero-video-container video {
+        min-height: 260px !important;
+        max-height: 360px !important;
+    }
+    
+    .hero-video-container .float-card-1 {
+        display: none !important; /* Hide floating card on small phones to keep video clean */
+    }
+
+    .hero-video-controls {
+        top: 10px !important;
+        left: 10px !important;
+    }
+
+    .hero-video-controls button {
+        padding: 4px 10px !important;
+        font-size: 11px !important;
+    }
+
+    #spotlightVideo {
+        min-height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-video-container video {
+        min-height: 220px !important;
+    }
+}

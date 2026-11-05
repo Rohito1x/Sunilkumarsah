@@ -204,24 +204,53 @@ if (empty($homeReviews)) {
                             $heroImgUrl .= (strpos($heroImgUrl, '?') === false ? '?' : '&') . 'v=' . filemtime($localHeroPath);
                         }
                     ?>
-                    <!-- Premium Framed Image with Hover Scale -->
-                    <div class="hero-card-frame position-relative">
-                        <img src="<?= h($heroImgUrl) ?>" class="img-fluid w-100 object-fit-cover transition-smooth hero-banner-image rounded-4 shadow" alt="Study in India Banner" style="max-height: 500px; min-height: 380px; object-position: center 20%;">
-                        
-                        <!-- Premium Float Cards -->
-                        <div class="position-absolute bottom-3 start-3 bg-white p-3 rounded-3 shadow border border-light-subtle d-flex align-items-center gap-3 float-card-1 anim-float">
-                            <div class="bg-success text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                <i class="fa-solid fa-check fs-5"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold text-dark" style="font-size: 14px;">Scholarship Secured</h6>
-                                <p class="mb-0 text-muted small" style="font-size: 11px;">Over 80% Success Rate</p>
-                            </div>
-                        </div>
+                    <!-- Premium Framed Video Showcase with Interactive Overlay -->
+                    <div class="hero-card-frame position-relative rounded-4 overflow-hidden shadow-lg border border-white border-opacity-75">
+                        <div class="hero-video-container position-relative overflow-hidden rounded-4" style="background: #031b33;">
+                            <video id="heroIntroVideo" class="w-100 object-fit-cover d-block rounded-4" autoplay muted loop playsinline preload="auto" style="max-height: 500px; min-height: 380px; object-position: center;">
+                                <source src="<?= h($basePath) ?>assets/videos/vision_point_intro.mp4" type="video/mp4">
+                                <img src="<?= h($heroImgUrl) ?>" class="img-fluid w-100 object-fit-cover rounded-4" alt="Vision Point Education">
+                            </video>
+                            
+                            <!-- Subtle dark gradient overlay for text readability -->
+                            <div class="hero-video-overlay position-absolute top-0 start-0 w-100 h-100 pointer-events-none" style="background: linear-gradient(180deg, rgba(4, 27, 49, 0.15) 0%, rgba(4, 27, 49, 0.45) 100%);"></div>
 
-                        <div class="position-absolute top-3 end-3 bg-white px-3 py-2 rounded-pill shadow border border-light-subtle d-flex align-items-center gap-2 float-card-2 anim-float" style="animation-delay: 1.5s;">
-                            <i class="fa-solid fa-fire text-danger pulse"></i>
-                            <span class="fw-bold text-dark" style="font-size: 12px;">Admissions open for 2026!</span>
+                            <!-- Video Control Pills (Top-Left) -->
+                            <div class="hero-video-controls position-absolute top-3 start-3 d-flex align-items-center gap-2 z-3">
+                                <button type="button" id="heroVideoSoundToggle" class="btn btn-sm btn-dark bg-opacity-75 text-white border-0 rounded-pill px-3 py-1.5 d-flex align-items-center gap-2 backdrop-blur shadow-sm transition-smooth" style="font-size: 12px;" title="Toggle Sound">
+                                    <i class="fa-solid fa-volume-xmark" id="heroSoundIcon"></i>
+                                    <span id="heroSoundText">Unmute</span>
+                                </button>
+                                <button type="button" id="heroVideoPlayPause" class="btn btn-sm btn-dark bg-opacity-75 text-white border-0 rounded-circle d-flex align-items-center justify-content-center backdrop-blur shadow-sm transition-smooth" style="width: 32px; height: 32px;" title="Play/Pause">
+                                    <i class="fa-solid fa-pause" id="heroPlayPauseIcon"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-dark bg-opacity-75 text-white border-0 rounded-circle d-flex align-items-center justify-content-center backdrop-blur shadow-sm transition-smooth" style="width: 32px; height: 32px;" data-bs-toggle="modal" data-bs-target="#videoTourModal" title="Watch in Theater Lightbox">
+                                    <i class="fa-solid fa-expand"></i>
+                                </button>
+                            </div>
+
+                            <!-- Live Tour Badge (Top-Right) -->
+                            <div class="position-absolute top-3 end-3 bg-white bg-opacity-95 backdrop-blur px-3 py-1.5 rounded-pill shadow border border-light-subtle d-flex align-items-center gap-2 z-3">
+                                <span class="d-inline-block bg-danger rounded-circle pulse-dot" style="width: 8px; height: 8px;"></span>
+                                <span class="fw-bold text-dark" style="font-size: 11px;">Campus Spotlight</span>
+                            </div>
+
+                            <!-- Float Badge (Bottom-Left) -->
+                            <div class="position-absolute bottom-3 start-3 bg-white bg-opacity-95 backdrop-blur p-2.5 rounded-3 shadow border border-light-subtle d-flex align-items-center gap-2 z-3 float-card-1 anim-float" style="max-width: 240px;">
+                                <div class="bg-success text-white rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 34px; height: 34px;">
+                                    <i class="fa-solid fa-check fs-6"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-dark" style="font-size: 12px;">Scholarship Secured</h6>
+                                    <p class="mb-0 text-muted extra-small" style="font-size: 10px;">Over 80% Success Rate</p>
+                                </div>
+                            </div>
+
+                            <!-- Admissions open badge (Bottom-Right) -->
+                            <div class="position-absolute bottom-3 end-3 bg-primary bg-opacity-95 text-white backdrop-blur px-3 py-1.5 rounded-pill shadow d-flex align-items-center gap-1.5 z-3">
+                                <i class="fa-solid fa-fire text-warning small"></i>
+                                <span class="fw-bold" style="font-size: 11px;">2026 Admissions Open</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -670,6 +699,121 @@ document.addEventListener('DOMContentLoaded', function() {
 </section>
 
 
+
+<!-- Dedicated Video Spotlight Section: Campus Life & Student Experience -->
+<section class="py-5 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #021a30 0%, #043866 50%, #064c8a 100%);">
+    <!-- Ambient Glow Orbs -->
+    <div class="position-absolute rounded-circle opacity-10" style="width: 500px; height: 500px; top: -100px; left: -100px; background: radial-gradient(circle, #D91F23 0%, transparent 70%); filter: blur(60px); pointer-events: none;"></div>
+    <div class="position-absolute rounded-circle opacity-15" style="width: 500px; height: 500px; bottom: -100px; right: -100px; background: radial-gradient(circle, #0458A0 0%, transparent 70%); filter: blur(60px); pointer-events: none;"></div>
+
+    <div class="container py-4 position-relative z-2">
+        <div class="text-center max-w-800 mx-auto mb-5">
+            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold text-uppercase mb-3 shadow-sm">
+                <i class="fa-solid fa-play-circle me-1.5 text-danger"></i> Campus Life & Student Experience
+            </span>
+            <h2 class="display-6 fw-extrabold text-white mb-3">Your Gateway to Top-Tier Universities in India & Abroad</h2>
+            <p class="text-white-50 lead fs-6 mb-0" style="line-height: 1.8;">
+                From high-tech lecture halls and NABH teaching hospitals to safe on-campus residential hostels with authentic dining—discover what life looks like when you study through Vision Point.
+            </p>
+        </div>
+
+        <div class="row align-items-center g-5">
+            <!-- Left: Cinematic Video Player Frame -->
+            <div class="col-lg-7">
+                <div class="position-relative rounded-4 overflow-hidden shadow-lg border border-white border-opacity-20" style="background: #000000;">
+                    <!-- Theater Video Element -->
+                    <video id="spotlightVideo" class="w-100 d-block" playsinline loop muted autoplay preload="auto" style="border-radius: 16px; aspect-ratio: 16/9; object-fit: cover;">
+                        <source src="<?= h($basePath) ?>assets/videos/vision_point_intro.mp4" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+
+                    <!-- Theater Overlay Controls -->
+                    <div class="position-absolute bottom-0 start-0 w-100 p-3 p-md-4 d-flex align-items-center justify-content-between text-white" style="background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);">
+                        <div class="d-flex align-items-center gap-3">
+                            <button type="button" id="spotlightPlayBtn" class="btn btn-warning text-dark rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 44px; height: 44px;" title="Play/Pause">
+                                <i class="fa-solid fa-pause fs-6" id="spotlightPlayIcon"></i>
+                            </button>
+                            <button type="button" id="spotlightMuteBtn" class="btn btn-outline-light rounded-pill px-3 py-1.5 d-flex align-items-center gap-2 small" title="Toggle Sound">
+                                <i class="fa-solid fa-volume-xmark" id="spotlightMuteIcon"></i>
+                                <span id="spotlightMuteText">Unmute</span>
+                            </button>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1.5 small fw-normal">
+                                <i class="fa-solid fa-clock me-1 text-warning"></i> 0:10 HD
+                            </span>
+                            <button type="button" class="btn btn-outline-light rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" data-bs-toggle="modal" data-bs-target="#videoTourModal" title="Fullscreen Theater Lightbox">
+                                <i class="fa-solid fa-expand"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: 4 Value Pillars -->
+            <div class="col-lg-5">
+                <div class="d-flex flex-column gap-3">
+                    <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-15 backdrop-blur transition-smooth">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2.5 bg-warning text-dark rounded-3 flex-shrink-0">
+                                <i class="fa-solid fa-building-columns fs-5"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-white fs-6 mb-1">Direct University Affiliations</h5>
+                                <p class="text-white-50 extra-small mb-0" style="line-height: 1.6;">Official provisional offer letters from university admissions directorates with zero middlemen.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-15 backdrop-blur transition-smooth">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2.5 bg-success text-white rounded-3 flex-shrink-0">
+                                <i class="fa-solid fa-award fs-5"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-white fs-6 mb-1">Up to 100% Merit Scholarships</h5>
+                                <p class="text-white-50 extra-small mb-0" style="line-height: 1.6;">Fee waivers and institutional concessions clearly documented on your official offer letter.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-15 backdrop-blur transition-smooth">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2.5 bg-info text-white rounded-3 flex-shrink-0">
+                                <i class="fa-solid fa-bed fs-5"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-white fs-6 mb-1">Safe Hostels & Food Assurance</h5>
+                                <p class="text-white-50 extra-small mb-0" style="line-height: 1.6;">Verified campus hostels with biometric security and separate dining for boys and girls.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-15 backdrop-blur transition-smooth">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2.5 bg-danger text-white rounded-3 flex-shrink-0">
+                                <i class="fa-solid fa-shield-halved fs-5"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-white fs-6 mb-1">100% Council Verified Degrees</h5>
+                                <p class="text-white-50 extra-small mb-0" style="line-height: 1.6;">Adherence to Nepal Medical (NMC), Nursing (NNC), and Engineering (NEC) Council standards.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 pt-2">
+                        <button class="btn btn-warning text-dark fw-bold px-4 py-2.5 rounded-pill shadow flex-grow-1" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">
+                            <i class="fa-solid fa-paper-plane me-2"></i>Apply for Free Counseling
+                        </button>
+                        <a href="cities.php" class="btn btn-outline-light px-4 py-2.5 rounded-pill fw-semibold">
+                            <i class="fa-solid fa-compass me-1"></i>Explore Colleges
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Destinations Section -->
 <section class="py-5 bg-white">
@@ -1449,6 +1593,128 @@ require_once __DIR__ . '/includes/payment_section.php';
 <script>
     var showEnrollModalOnLoad = true;
 </script>
+<!-- Video Tour Cinema Lightbox Modal -->
+<div class="modal fade" id="videoTourModal" tabindex="-1" aria-labelledby="videoTourModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-xl">
+        <div class="modal-content bg-dark border-0 rounded-4 overflow-hidden shadow-2xl">
+            <div class="modal-header border-0 bg-dark text-white py-2 px-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-play-circle text-warning fs-5"></i>
+                    <h6 class="modal-title fw-bold text-white mb-0" id="videoTourModalLabel">Vision Point Educational Service — Campus Spotlight</h6>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 bg-black position-relative text-center">
+                <video id="modalTourVideo" class="w-100 d-block" controls playsinline preload="metadata" style="max-height: 80vh; aspect-ratio: 16/9; object-fit: contain;">
+                    <source src="<?= h($basePath) ?>assets/videos/vision_point_intro.mp4" type="video/mp4">
+                    Your browser does not support HTML5 video.
+                </video>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video Playback & Sound Control Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Hero Video Controls
+    const heroVideo = document.getElementById('heroIntroVideo');
+    const heroSoundBtn = document.getElementById('heroVideoSoundToggle');
+    const heroSoundIcon = document.getElementById('heroSoundIcon');
+    const heroSoundText = document.getElementById('heroSoundText');
+    const heroPlayPauseBtn = document.getElementById('heroVideoPlayPause');
+    const heroPlayPauseIcon = document.getElementById('heroPlayPauseIcon');
+
+    if (heroVideo && heroSoundBtn) {
+        heroSoundBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (heroVideo.muted) {
+                heroVideo.muted = false;
+                heroSoundIcon.className = 'fa-solid fa-volume-high';
+                heroSoundText.textContent = 'Mute';
+            } else {
+                heroVideo.muted = true;
+                heroSoundIcon.className = 'fa-solid fa-volume-xmark';
+                heroSoundText.textContent = 'Unmute';
+            }
+        });
+    }
+
+    if (heroVideo && heroPlayPauseBtn) {
+        heroPlayPauseBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (heroVideo.paused) {
+                heroVideo.play();
+                heroPlayPauseIcon.className = 'fa-solid fa-pause';
+            } else {
+                heroVideo.pause();
+                heroPlayPauseIcon.className = 'fa-solid fa-play';
+            }
+        });
+    }
+
+    // 2. Spotlight Video Controls
+    const spotVideo = document.getElementById('spotlightVideo');
+    const spotPlayBtn = document.getElementById('spotlightPlayBtn');
+    const spotPlayIcon = document.getElementById('spotlightPlayIcon');
+    const spotMuteBtn = document.getElementById('spotlightMuteBtn');
+    const spotMuteIcon = document.getElementById('spotlightMuteIcon');
+    const spotMuteText = document.getElementById('spotlightMuteText');
+
+    if (spotVideo && spotPlayBtn) {
+        spotPlayBtn.addEventListener('click', function() {
+            if (spotVideo.paused) {
+                spotVideo.play();
+                spotPlayIcon.className = 'fa-solid fa-pause fs-6';
+            } else {
+                spotVideo.pause();
+                spotPlayIcon.className = 'fa-solid fa-play fs-6';
+            }
+        });
+    }
+
+    if (spotVideo && spotMuteBtn) {
+        spotMuteBtn.addEventListener('click', function() {
+            if (spotVideo.muted) {
+                spotVideo.muted = false;
+                spotMuteIcon.className = 'fa-solid fa-volume-high';
+                spotMuteText.textContent = 'Mute';
+            } else {
+                spotVideo.muted = true;
+                spotMuteIcon.className = 'fa-solid fa-volume-xmark';
+                spotMuteText.textContent = 'Unmute';
+            }
+        });
+    }
+
+    // 3. Modal Video Handling (Auto-play with sound on modal open, pause on close)
+    const tourModal = document.getElementById('videoTourModal');
+    const modalVideo = document.getElementById('modalTourVideo');
+
+    if (tourModal && modalVideo) {
+        tourModal.addEventListener('shown.bs.modal', function() {
+            modalVideo.currentTime = 0;
+            modalVideo.muted = false;
+            modalVideo.play().catch(function() {
+                // Autoplay with sound may be blocked by browser policy without user gesture
+                modalVideo.muted = true;
+                modalVideo.play();
+            });
+            // Pause background videos while modal is open
+            if (heroVideo && !heroVideo.paused) heroVideo.pause();
+            if (spotVideo && !spotVideo.paused) spotVideo.pause();
+        });
+
+        tourModal.addEventListener('hidden.bs.modal', function() {
+            modalVideo.pause();
+            // Resume background videos
+            if (heroVideo) heroVideo.play();
+            if (spotVideo) spotVideo.play();
+        });
+    }
+});
+</script>
+
 <?php
 require_once __DIR__ . '/includes/footer.php';
 ?>
