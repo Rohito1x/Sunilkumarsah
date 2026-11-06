@@ -5980,19 +5980,19 @@ require_once __DIR__ . '/includes/header.php';
                             <div class="row g-3">
                                 <div class="col-12 col-md-6 form-group">
                                     <label class="fw-semibold">Bank Name <span class="text-danger">*</span></label>
-                                    <input type="text" name="bank_name" class="form-control" placeholder="e.g. Siddhartha Bank Limited" required>
+                                    <input type="text" name="bank_name" class="form-control" placeholder="e.g. Citizens Bank International Ltd." required>
                                 </div>
                                 <div class="col-12 col-md-6 form-group">
                                     <label class="fw-semibold">Account Holder Name <span class="text-danger">*</span></label>
-                                    <input type="text" name="account_name" class="form-control" placeholder="e.g. VISION POINT EDUCATIONAL SERVICE PVT. LTD." required>
+                                    <input type="text" name="account_name" class="form-control" placeholder="e.g. VISION POINT EDUCATION SERVICE PVT.LTD" required>
                                 </div>
                                 <div class="col-12 col-md-6 form-group">
                                     <label class="fw-semibold">Account Number <span class="text-danger">*</span></label>
-                                    <input type="text" name="account_number" class="form-control font-monospace" placeholder="e.g. 55509839020" required>
+                                    <input type="text" name="account_number" class="form-control font-monospace" placeholder="e.g. 0960100004966201" required>
                                 </div>
                                 <div class="col-12 col-md-6 form-group">
                                     <label class="fw-semibold">Branch Name</label>
-                                    <input type="text" name="branch" class="form-control" placeholder="e.g. Putalisadak Branch">
+                                    <input type="text" name="branch" class="form-control" placeholder="e.g. Vidhyapati Chowk, Janakpur">
                                 </div>
                                 <div class="col-12 col-md-4 form-group">
                                     <label class="fw-semibold">Account Type</label>

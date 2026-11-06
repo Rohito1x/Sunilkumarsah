@@ -157,15 +157,36 @@ if ($qrEnabled !== '1' && empty($bankAccounts)) {
                         </div>
 
                         <!-- QR Direct Account Info Details Card -->
+                        <?php
+                        $primaryAcc = null;
+                        if (!empty($bankAccounts)) {
+                            foreach ($bankAccounts as $bItem) {
+                                if (!empty($bItem['is_default'])) {
+                                    $primaryAcc = $bItem;
+                                    break;
+                                }
+                            }
+                            if (!$primaryAcc) {
+                                $primaryAcc = $bankAccounts[0];
+                            }
+                        }
+                        $qrBankName = $primaryAcc['bank_name'] ?? 'Citizens Bank International Ltd.';
+                        $qrAccHolder = $primaryAcc['account_name'] ?? 'VISION POINT EDUCATION SERVICE PVT.LTD';
+                        $qrAccNum = $primaryAcc['account_number'] ?? '0960100004966201';
+                        $qrBranch = $primaryAcc['branch'] ?? 'Vidhyapati Chowk, Janakpur';
+                        ?>
                         <div class="bg-light p-3 rounded-3 border border-light-subtle my-3 text-start small" style="font-size: 12px;">
                             <div class="d-flex align-items-center justify-content-between mb-1">
-                                <span class="fw-bold text-primary"><i class="fa-solid fa-building-columns me-1"></i> Siddhartha Bank Limited</span>
+                                <span class="fw-bold text-primary"><i class="fa-solid fa-building-columns me-1"></i> <?= h($qrBankName) ?></span>
                                 <span class="badge bg-danger text-white" style="font-size: 9.5px;">Fonepay QR</span>
                             </div>
-                            <div class="text-dark mb-1"><span class="text-muted">A/C Holder:</span> <strong>VISION POINT EDUCATIONAL SERVICE PVT LTD</strong></div>
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="text-dark"><span class="text-muted">Account No:</span> <code class="fw-extrabold text-primary font-monospace" style="font-size: 13.5px;">55509839020</code></div>
-                                <button class="btn btn-sm btn-outline-secondary py-0 px-2 btn-copy-acc" data-acc-num="55509839020" style="font-size: 10.5px;" type="button">
+                            <div class="text-dark mb-1"><span class="text-muted">A/C Holder:</span> <strong><?= h($qrAccHolder) ?></strong></div>
+                            <?php if (!empty($qrBranch)): ?>
+                                <div class="text-muted mb-1" style="font-size: 11px;"><i class="fa-solid fa-location-dot me-1 text-danger"></i> <?= h($qrBranch) ?></div>
+                            <?php endif; ?>
+                            <div class="d-flex align-items-center justify-content-between mt-1">
+                                <div class="text-dark"><span class="text-muted">Account No:</span> <code class="fw-extrabold text-primary font-monospace" style="font-size: 13.5px;"><?= h($qrAccNum) ?></code></div>
+                                <button class="btn btn-sm btn-outline-secondary py-0 px-2 btn-copy-acc" data-acc-num="<?= h($qrAccNum) ?>" style="font-size: 10.5px;" type="button">
                                     <i class="fa-regular fa-copy"></i> Copy
                                 </button>
                             </div>
