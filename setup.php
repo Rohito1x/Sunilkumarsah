@@ -18,7 +18,7 @@ $host = defined('DB_HOST') ? DB_HOST : (getenv('DB_HOST') ?: 'localhost');
 $port = defined('DB_PORT') ? DB_PORT : (getenv('DB_PORT') ?: '3306');
 $username = defined('DB_USER') ? DB_USER : (getenv('DB_USER') ?: 'zptvncco_visionpoint');
 $password = defined('DB_PASS') ? DB_PASS : (getenv('DB_PASS') !== false ? getenv('DB_PASS') : 'Visionpoint98185@#');
-$dbname = defined('DB_NAME') ? DB_NAME : (getenv('DB_NAME') ?: 'zptvncco_Visionpoint');
+$dbname = defined('DB_NAME') ? DB_NAME : (getenv('DB_NAME') ?: 'zptvncco_visionpoint');
 
 try {
     // Try connecting directly with database name first (supported in all cPanel shared hosting)
