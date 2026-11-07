@@ -20,8 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // CSRF Validation
-$csrfToken = isset($_POST['csrf_token']) ? trim((string)$_POST['csrf_token']) : '';
-if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
+if (!Csrf::validateRequest()) {
     jsonResponse(false, 'Security check failed. Please refresh the page and try again.', [], 403);
 }
 
@@ -149,52 +148,20 @@ if ($action === 'enroll') {
     $faculty = isset($coursesMap[$facultyId]) ? $coursesMap[$facultyId] : $facultyId;
     $highestEdu = isset($levelsMap[$highestEduId]) ? $levelsMap[$highestEduId] : $highestEduId;
     
-    // File upload handling for student photo
+    // File upload handling for student photo using SecureUploader
     $photoPath = null;
     if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE) {
-        if ($_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
-            jsonResponse(false, 'Photo upload failed. Please try again.');
+        $uploadResult = SecureUploader::process(
+            $_FILES['photo'],
+            __DIR__ . '/uploads/',
+            'student_',
+            ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp']
+        );
+
+        if (!$uploadResult['success']) {
+            jsonResponse(false, $uploadResult['error']);
         }
-        
-        $fileName = $_FILES['photo']['name'];
-        $fileTmpName = $_FILES['photo']['tmp_name'];
-        $fileSize = $_FILES['photo']['size'];
-        
-        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        // Strict allowlist: SVG and TIFF excluded to prevent Stored XSS / file abuse
-        $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        
-        if (!in_array($fileExt, $allowedExts, true)) {
-            jsonResponse(false, 'Invalid file type. Only JPG, JPEG, PNG, GIF, and WEBP image files are allowed.');
-        }
-        
-        // Extra MIME type verification
-        if (function_exists('mime_content_type')) {
-            $mime = mime_content_type($fileTmpName);
-            $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (!in_array($mime, $allowedMimes, true)) {
-                jsonResponse(false, 'Uploaded file is not a valid image.');
-            }
-        }
-        
-        // Limit photo size to 5MB
-        if ($fileSize > 5 * 1024 * 1024) {
-            jsonResponse(false, 'Image size exceeds the 5MB limit.');
-        }
-        
-        $uploadDir = __DIR__ . '/uploads/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
-        
-        $newFileName = uniqid('student_', true) . '.' . $fileExt;
-        $destPath = $uploadDir . $newFileName;
-        
-        if (is_uploaded_file($fileTmpName) && move_uploaded_file($fileTmpName, $destPath)) {
-            $photoPath = 'uploads/' . $newFileName;
-        } else {
-            jsonResponse(false, 'Failed to save uploaded photo.');
-        }
+        $photoPath = 'uploads/' . $uploadResult['filename'];
     }
     
     try {
@@ -233,23 +200,16 @@ if ($action === 'submit_review' || $action === 'review') {
         $title = $rating >= 4 ? 'Great Experience' : 'Student Feedback';
     }
 
-    // Handle photo upload if provided
-    if (isset($_FILES['avatar_file']) && $_FILES['avatar_file']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = __DIR__ . '/uploads/';
-        if (!file_exists($uploadDir)) {
-            @mkdir($uploadDir, 0755, true);
-        }
-        $fileTmpName = $_FILES['avatar_file']['tmp_name'];
-        $fileName = $_FILES['avatar_file']['name'];
-        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
-        
-        if (in_array($fileExt, $allowedExts, true)) {
-            $newFileName = uniqid('rev_avatar_', true) . '.' . $fileExt;
-            $destPath = $uploadDir . $newFileName;
-            if (move_uploaded_file($fileTmpName, $destPath)) {
-                $avatar = 'uploads/' . $newFileName;
-            }
+    // Handle photo upload if provided via SecureUploader
+    if (isset($_FILES['avatar_file']) && $_FILES['avatar_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $uploadResult = SecureUploader::process(
+            $_FILES['avatar_file'],
+            __DIR__ . '/uploads/',
+            'rev_avatar_',
+            ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp']
+        );
+        if ($uploadResult['success']) {
+            $avatar = 'uploads/' . $uploadResult['filename'];
         }
     }
 

@@ -1,11 +1,15 @@
 <?php
 /**
  * Admin Password Reset Tool
- * Upload this file to Hostinger public_html, visit it in the browser once to update your password,
- * then delete it for security.
+ * Security Protected: Execution disabled in production environments.
  */
-
 require_once __DIR__ . '/includes/db.php';
+
+// Security Guard: Prevent unauthorized web execution in production
+if (php_sapi_name() !== 'cli' && (!defined('DEV_MODE') || !DEV_MODE)) {
+    http_response_code(403);
+    exit('403 Forbidden: reset_admin.php is disabled for public production access.');
+}
 
 // 👇 SET YOUR DESIRED ADMIN EMAIL & NEW PASSWORD HERE
 $adminEmail = 'admin@visionpoint.edu.np';

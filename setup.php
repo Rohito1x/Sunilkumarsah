@@ -1,10 +1,17 @@
 <?php
 /**
  * Setup script for Vision Point Educational Service Website Database
+ * Security Protected: Execution disabled in production environments.
  */
 
 if (file_exists(__DIR__ . '/config.php')) {
     require_once __DIR__ . '/config.php';
+}
+
+// Security Guard: Prevent unauthorized web execution in production
+if (php_sapi_name() !== 'cli' && (!defined('DEV_MODE') || !DEV_MODE)) {
+    http_response_code(403);
+    exit('403 Forbidden: setup.php is disabled for public production access.');
 }
 
 $host = defined('DB_HOST') ? DB_HOST : (getenv('DB_HOST') ?: 'localhost');

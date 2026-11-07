@@ -1,16 +1,6 @@
 <?php
 // Database connection (PDO) & Security Configuration
-
-// Global Security Headers
-if (!headers_sent()) {
-    header('X-Content-Type-Options: nosniff');
-    header('X-Frame-Options: SAMEORIGIN');
-    header('Referrer-Policy: strict-origin-when-cross-origin');
-    header('Permissions-Policy: geolocation=(), camera=(), microphone=()');
-    if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] === '1')) {
-        header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
-    }
-}
+require_once __DIR__ . '/security.php';
 
 // Load configuration if available
 $configPaths = [
@@ -491,6 +481,9 @@ try {
 // Helper: Secure Client IP resolution
 if (!function_exists('getClientIp')) {
     function getClientIp(): string {
+        if (class_exists('RateLimiter')) {
+            return RateLimiter::getClientIp();
+        }
         return $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
     }
 }

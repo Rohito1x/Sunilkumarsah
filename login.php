@@ -42,12 +42,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         recordFailedAttempt($pdo, $email);
                         $alert = ['type' => 'danger', 'msg' => 'Invalid email or password.'];
                     } else {
-                        // Successful login - reset rate limit counter & regenerate session ID
+                        // Successful login - reset rate limit counter & regenerate session ID with anti-fixation fingerprinting
                         resetRateLimit($pdo, $email);
-                        session_regenerate_id(true);
-
-                        $_SESSION['admin_id'] = (int)$user['id'];
-                        $_SESSION['admin_email'] = $user['email'];
+                        if (class_exists('SessionManager')) {
+                            SessionManager::regenerateOnAuth((int)$user['id'], $user['email']);
+                        } else {
+                            session_regenerate_id(true);
+                            $_SESSION['admin_id'] = (int)$user['id'];
+                            $_SESSION['admin_email'] = $user['email'];
+                        }
 
                         header('Location: jaiswal/dashboard.php');
                         exit;

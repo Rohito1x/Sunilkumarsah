@@ -3,8 +3,18 @@
  * Vision Point Educational Service - Server Diagnostic & Health Check Tool
  * Access via: https://visionpoint.edu.np/check_status.php
  */
+if (file_exists(__DIR__ . '/config.php')) {
+    require_once __DIR__ . '/config.php';
+}
+
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
+}
+
+// Security Guard: Restrict diagnostic tools to authenticated administrators or local development
+if (!isset($_SESSION['admin_id']) && (!defined('DEV_MODE') || !DEV_MODE) && php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    exit('403 Forbidden: Administrator authentication is required to access server diagnostics.');
 }
 
 $checks = [];

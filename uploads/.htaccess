@@ -1,15 +1,45 @@
-# Security directives for uploaded media directory
-<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phps|cgi|pl|exe|sh)$">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
+# ==============================================================================
+# Vision Point Educational Service - Secure Uploads Directory Configuration
+# Neutralizes remote code execution by disabling all script execution engines.
+# ==============================================================================
 
-<IfModule mod_php7.c>
-    php_flag engine off
-</IfModule>
+# 1. Disable Directory Listing and CGI Execution
+Options -Indexes -ExecCGI
+SetHandler default-handler
+
+# 2. Prevent script handler execution (for PHP-FPM / FastCGI / mod_php)
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .phar .phps .cgi .pl .py .sh
+RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .phar .phps .cgi .pl .py .sh
+
+# 3. Disable mod_php engine if running in prefork mode
 <IfModule mod_php.c>
     php_flag engine off
 </IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
 
-Options -Indexes -ExecCGI
-SetHandler default-handler
+# 4. Strict Block on Executable or Interpreted File Extensions
+<FilesMatch "(?i)\.(php[0-9]?|phtml|phar|phps|cgi|pl|py|sh|bash|exe|bat|cmd|dll|bin|vbs|wsf|scr|msi|jsp|asp|aspx|shtml|htaccess|htpasswd)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# 5. Restrict HTTP Methods in Uploads Directory to GET and HEAD only
+<LimitExcept GET HEAD>
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</LimitExcept>
