@@ -40,9 +40,9 @@ if ($devMode) {
 
 $host = defined('DB_HOST') ? DB_HOST : (getenv('DB_HOST') ?: 'localhost');
 $port = defined('DB_PORT') ? DB_PORT : (getenv('DB_PORT') ?: '3306');
-$dbname = defined('DB_NAME') ? DB_NAME : (getenv('DB_NAME') ?: 'sajilo_db');
-$username = defined('DB_USER') ? DB_USER : (getenv('DB_USER') ?: 'root');
-$password = defined('DB_PASS') ? DB_PASS : (getenv('DB_PASS') !== false ? getenv('DB_PASS') : '');
+$dbname = defined('DB_NAME') ? DB_NAME : (getenv('DB_NAME') ?: 'zptvncco_Visionpoint');
+$username = defined('DB_USER') ? DB_USER : (getenv('DB_USER') ?: 'zptvncco_visionpoint');
+$password = defined('DB_PASS') ? DB_PASS : (getenv('DB_PASS') !== false ? getenv('DB_PASS') : 'Visionpoint98185@#');
 $charset = defined('DB_CHARSET') ? DB_CHARSET : 'utf8mb4';
 
 $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
@@ -399,6 +399,84 @@ try {
             foreach ($defaultSeoPages as $p) {
                 $stmtInsertSeo->execute($p);
             }
+        }
+
+        // Auto-ensure pages table exists & seeded
+        $pdo->exec("CREATE TABLE IF NOT EXISTS `pages` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `slug` VARCHAR(50) NOT NULL UNIQUE,
+            `title` VARCHAR(255) NOT NULL,
+            `hero_title` VARCHAR(255) DEFAULT NULL,
+            `hero_subtitle` TEXT DEFAULT NULL,
+            `content` LONGTEXT DEFAULT NULL,
+            `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        $pagesCount = (int)$pdo->query("SELECT COUNT(*) FROM `pages`")->fetchColumn();
+        if ($pagesCount === 0) {
+            $studyInIndiaContent = json_encode([
+                'why_cards' => [
+                    ['title' => 'Recognized Degrees', 'icon' => 'fa-certificate', 'text' => 'Degrees from Indian universities are globally recognized, and directly approved by major councils in Nepal (NMC, NEC, NNC, NPC).'],
+                    ['title' => 'Affordable Costs', 'icon' => 'fa-sack-dollar', 'text' => 'Get quality global education at a fraction of the cost of Western countries, with budget-friendly tuition fees and cost of living.'],
+                    ['title' => 'Cultural Proximity', 'icon' => 'fa-handshake', 'text' => 'Familiar culture, climate, and language make it incredibly easy for Nepalese students to adapt and settle in.'],
+                    ['title' => 'Scholarship Options', 'icon' => 'fa-graduation-cap', 'text' => 'Vast scholarships matching up to 50%-100% tuition coverage for students with strong academic scores.']
+                ],
+                'process_steps' => [
+                    ['title' => 'Free Counselling', 'text' => 'Consult with our counselors to select the right course, university, and state.'],
+                    ['title' => 'Eligibility Check', 'text' => 'Submit your transcripts (+2/Diploma/Bachelor) for grade verification.'],
+                    ['title' => 'Scholarship Allocation', 'text' => 'Apply for available consultancy and university merit scholarships.'],
+                    ['title' => 'Visa & Travel Guidance', 'text' => 'Receive help with travel arrangements, border protocols, and hostel allocation.']
+                ]
+            ]);
+
+            $studyAbroadContent = json_encode([
+                'benefits' => [
+                    ['title' => 'Academic Excellence', 'icon' => 'fa-graduation-cap', 'text' => 'Gain access to advanced curriculums, cutting-edge labs, and highly distinguished faculty members driving innovation.'],
+                    ['title' => 'Global Employability', 'icon' => 'fa-briefcase', 'text' => 'Foreign degrees hold massive weight with multinational corporations, equipping you for top salaries and career paths.'],
+                    ['title' => 'Cross-Cultural Exposure', 'icon' => 'fa-globe', 'text' => 'Build lifelong connections with peers from all continents, developing a truly global outlook and independent life skills.'],
+                    ['title' => 'Language & Growth', 'icon' => 'fa-language', 'text' => 'Polish your language fluency while gaining standard adaptability traits highly sought in competitive industries.']
+                ],
+                'destinations' => [
+                    ['country' => 'United States of America', 'code' => 'USA', 'flag' => 'fa-flag-usa', 'img' => 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=600&auto=format&fit=crop&q=60', 'desc' => 'Home to Ivy League universities and world-renowned research facilities offering top-tier STEM and business majors.', 'benefits' => 'OPT work opportunities, top-ranked institutions, diverse cultural landscape.'],
+                    ['country' => 'United Kingdom', 'code' => 'UK', 'flag' => 'fa-flag-uk', 'img' => 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&auto=format&fit=crop&q=60', 'desc' => 'Home to ancient academic heritage, short 1-year Master degrees, and 2-year post-study Graduate Route visas.', 'benefits' => '2-year graduate visa, short duration Master degrees, Russell Group universities.'],
+                    ['country' => 'Australia', 'code' => 'AUS', 'flag' => 'fa-flag', 'img' => 'https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=600&auto=format&fit=crop&q=60', 'desc' => 'Renowned for world-class universities, high minimum wages, and vibrant multicultural student lifestyle.', 'benefits' => 'Post-study work rights, generous work hour limits, group of eight research leaders.'],
+                    ['country' => 'Canada', 'code' => 'CAN', 'flag' => 'fa-flag', 'img' => 'https://images.unsplash.com/photo-1517935703635-27c946dfbfaf?w=600&auto=format&fit=crop&q=60', 'desc' => 'Leading global destination for quality education, student safety, and clear permanent residency pathways.', 'benefits' => 'Up to 3-year PGWP work permit, fast SDS visa processing, welcoming immigrant culture.']
+                ]
+            ]);
+
+            $testPrepContent = json_encode([
+                'courses' => [
+                    ['name' => 'IELTS Academic & General', 'desc' => 'International English Language Testing System accepted across 140+ countries.', 'duration' => '6 Weeks (Daily 1.5 Hrs)', 'score_target' => 'Band 7.0+', 'modules' => 'Listening, Reading, Writing, Speaking with weekly mock tests'],
+                    ['name' => 'PTE Academic', 'desc' => 'Pearson Test of English – Fast AI-scored computer test popular for Australia & UK.', 'duration' => '4-6 Weeks (Daily 1.5 Hrs)', 'score_target' => '65+ Score', 'modules' => 'Speaking & Writing, Reading, Listening on live computer simulator']
+                ]
+            ]);
+
+            $stmtSeedPage = $pdo->prepare("INSERT INTO `pages` (`slug`, `title`, `hero_title`, `hero_subtitle`, `content`) VALUES (?, ?, ?, ?, ?)");
+            $stmtSeedPage->execute(['study-in-india', 'Study in India', 'Study in India', 'Explore all the premium universities and colleges in India where we facilitate direct admission and scholarships.', $studyInIndiaContent]);
+            $stmtSeedPage->execute(['study-abroad', 'Study Abroad', 'Study Abroad', 'Launch your global career by securing admissions in top universities and colleges across the world.', $studyAbroadContent]);
+            $stmtSeedPage->execute(['test-preparation', 'Test Preparation', 'Test Preparation', 'Our expert teachers, interactive mock tests, and smart study materials ensure you achieve your target scores in IELTS, PTE, and TOEFL.', $testPrepContent]);
+        }
+
+        // Auto-ensure bank_accounts table exists & seeded
+        $pdo->exec("CREATE TABLE IF NOT EXISTS `bank_accounts` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `bank_name` VARCHAR(150) NOT NULL,
+            `account_name` VARCHAR(150) NOT NULL,
+            `account_number` VARCHAR(100) NOT NULL,
+            `branch` VARCHAR(150) NOT NULL,
+            `account_type` VARCHAR(50) DEFAULT 'Current Account',
+            `swift_code` VARCHAR(50) DEFAULT 'CTZNNEPK',
+            `payment_instructions` TEXT DEFAULT NULL,
+            `notes` TEXT DEFAULT NULL,
+            `display_order` INT DEFAULT 0,
+            `is_active` TINYINT DEFAULT 1,
+            `is_primary` TINYINT DEFAULT 1,
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        $bankCount = (int)$pdo->query("SELECT COUNT(*) FROM `bank_accounts`")->fetchColumn();
+        if ($bankCount === 0) {
+            $pdo->exec("INSERT INTO `bank_accounts` (`bank_name`, `account_name`, `account_number`, `branch`, `account_type`, `swift_code`, `payment_instructions`, `notes`, `display_order`, `is_active`, `is_primary`) VALUES ('Citizens Bank International Ltd.', 'VISION POINT EDUCATION SERVICE PVT.LTD', '0960100004966201', 'Vidhyapati Chowk, Janakpur', 'Current Account', 'CTZNNEPK', 'Please mention Student Full Name & Course in transaction remarks when depositing fees.', 'Primary Official Account', 0, 1, 1)");
         }
     } catch (PDOException $e) {
         // Safe to ignore if DB user lacks create table privileges

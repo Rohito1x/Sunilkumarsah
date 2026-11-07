@@ -52,10 +52,10 @@ $tableCounts = [];
 
 if (isset($pdo) && $pdo) {
     $dbStatus = 'pass';
-    $dbMessage = "Successfully connected to database `" . (defined('DB_NAME') ? DB_NAME : 'sajilo_db') . "` on `" . (defined('DB_HOST') ? DB_HOST : 'localhost') . "`";
+    $dbMessage = "Successfully connected to database `" . (defined('DB_NAME') ? DB_NAME : 'zptvncco_Visionpoint') . "` on `" . (defined('DB_HOST') ? DB_HOST : 'localhost') . "`";
     
     // Check tables
-    $expectedTables = ['admin_users', 'institutions', 'course_streams', 'destinations', 'inquiries', 'enrollments', 'reviews', 'site_settings', 'navigation_menu', 'guides'];
+    $expectedTables = ['admin_users', 'institutions', 'course_streams', 'destinations', 'inquiries', 'enrollments', 'reviews', 'site_settings', 'navigation_menu', 'guides', 'pages', 'bank_accounts', 'team_members'];
     foreach ($expectedTables as $tbl) {
         try {
             $cnt = $pdo->query("SELECT COUNT(*) FROM `$tbl`")->fetchColumn();

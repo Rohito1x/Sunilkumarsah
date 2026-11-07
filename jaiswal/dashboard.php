@@ -1467,20 +1467,111 @@ if (!isset($pdo) || !$pdo) {
         } catch (\Throwable $e) {
             $dbTeamMembers = [];
         }
-        $dbInstitutions = $pdo->query('SELECT * FROM institutions ORDER BY created_at DESC')->fetchAll() ?: [];
-        $dbDestinations = $pdo->query('SELECT * FROM destinations ORDER BY display_order ASC, name ASC')->fetchAll() ?: [];
-        $dbStreams = $pdo->query('SELECT * FROM course_streams ORDER BY display_order ASC, name ASC')->fetchAll() ?: [];
-        $dbGuides = $pdo->query('SELECT * FROM guides ORDER BY publish_date DESC, id DESC')->fetchAll() ?: [];
-        $dbPages = $pdo->query('SELECT * FROM pages ORDER BY slug ASC')->fetchAll() ?: [];
-        $dbMenus = $pdo->query('SELECT * FROM navigation_menu ORDER BY display_order ASC')->fetchAll() ?: [];
-        $dbCountries = $pdo->query('SELECT * FROM countries ORDER BY display_order ASC, name ASC')->fetchAll() ?: [];
-        $dbSocials = $pdo->query('SELECT * FROM social_links ORDER BY display_order ASC')->fetchAll() ?: [];
-        $dbFacts = $pdo->query('SELECT * FROM fun_facts ORDER BY display_order ASC')->fetchAll() ?: [];
-        $dbAdmins = $pdo->query('SELECT * FROM admin_users ORDER BY id ASC')->fetchAll() ?: [];
-        $dbLogs = $pdo->query('SELECT * FROM activity_log ORDER BY created_at DESC LIMIT 100')->fetchAll() ?: [];
-        $dbPrograms = $pdo->query('SELECT * FROM programs ORDER BY created_at DESC')->fetchAll() ?: [];
-        $dbBankAccounts = $pdo->query('SELECT * FROM bank_accounts ORDER BY display_order ASC, bank_name ASC')->fetchAll() ?: [];
-        $dbInstitutionPdfs = $pdo->query('SELECT ip.*, i.name as institution_name FROM institution_pdfs ip JOIN institutions i ON ip.institution_id = i.id ORDER BY ip.display_order ASC, ip.title ASC')->fetchAll() ?: [];
+        $dbInstitutions = [];
+        try {
+            $dbInstitutions = $pdo->query('SELECT * FROM institutions ORDER BY created_at DESC')->fetchAll() ?: [];
+        } catch (\Throwable $e) { $dbInstitutions = []; }
+
+        $dbDestinations = [];
+        try {
+            $dbDestinations = $pdo->query('SELECT * FROM destinations ORDER BY display_order ASC, name ASC')->fetchAll() ?: [];
+        } catch (\Throwable $e) { $dbDestinations = []; }
+
+        $dbStreams = [];
+        try {
+            $dbStreams = $pdo->query('SELECT * FROM course_streams ORDER BY display_order ASC, name ASC')->fetchAll() ?: [];
+        } catch (\Throwable $e) { $dbStreams = []; }
+
+        $dbGuides = [];
+        try {
+            $dbGuides = $pdo->query('SELECT * FROM guides ORDER BY publish_date DESC, id DESC')->fetchAll() ?: [];
+        } catch (\Throwable $e) { $dbGuides = []; }
+
+        $dbPages = [];
+        try {
+            $dbPages = $pdo->query('SELECT * FROM pages ORDER BY slug ASC')->fetchAll() ?: [];
+        } catch (\Throwable $e) {
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS `pages` (
+                    `id` INT AUTO_INCREMENT PRIMARY KEY,
+                    `slug` VARCHAR(50) NOT NULL UNIQUE,
+                    `title` VARCHAR(255) NOT NULL,
+                    `hero_title` VARCHAR(255) DEFAULT NULL,
+                    `hero_subtitle` TEXT DEFAULT NULL,
+                    `content` LONGTEXT DEFAULT NULL,
+                    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+                $dbPages = $pdo->query('SELECT * FROM pages ORDER BY slug ASC')->fetchAll() ?: [];
+            } catch (\Throwable $e2) {
+                $dbPages = [];
+            }
+        }
+
+        $dbMenus = [];
+        try {
+            $dbMenus = $pdo->query('SELECT * FROM navigation_menu ORDER BY display_order ASC')->fetchAll() ?: [];
+        } catch (\Throwable $e) { $dbMenus = []; }
+
+        $dbCountries = [];
+        try {
+            $dbCountries = $pdo->query('SELECT * FROM countries ORDER BY display_order ASC, name ASC')->fetchAll() ?: [];
+        } catch (\Throwable $e) { $dbCountries = []; }
+
+        $dbSocials = [];
+        try {
+            $dbSocials = $pdo->query('SELECT * FROM social_links ORDER BY display_order ASC')->fetchAll() ?: [];
+        } catch (\Throwable $e) { $dbSocials = []; }
+
+        $dbFacts = [];
+        try {
+            $dbFacts = $pdo->query('SELECT * FROM fun_facts ORDER BY display_order ASC')->fetchAll() ?: [];
+        } catch (\Throwable $e) { $dbFacts = []; }
+
+        $dbAdmins = [];
+        try {
+            $dbAdmins = $pdo->query('SELECT * FROM admin_users ORDER BY id ASC')->fetchAll() ?: [];
+        } catch (\Throwable $e) { $dbAdmins = []; }
+
+        $dbLogs = [];
+        try {
+            $dbLogs = $pdo->query('SELECT * FROM activity_log ORDER BY created_at DESC LIMIT 100')->fetchAll() ?: [];
+        } catch (\Throwable $e) { $dbLogs = []; }
+
+        $dbPrograms = [];
+        try {
+            $dbPrograms = $pdo->query('SELECT * FROM programs ORDER BY created_at DESC')->fetchAll() ?: [];
+        } catch (\Throwable $e) { $dbPrograms = []; }
+
+        $dbBankAccounts = [];
+        try {
+            $dbBankAccounts = $pdo->query('SELECT * FROM bank_accounts ORDER BY display_order ASC, bank_name ASC')->fetchAll() ?: [];
+        } catch (\Throwable $e) {
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS `bank_accounts` (
+                    `id` INT AUTO_INCREMENT PRIMARY KEY,
+                    `bank_name` VARCHAR(150) NOT NULL,
+                    `account_name` VARCHAR(150) NOT NULL,
+                    `account_number` VARCHAR(100) NOT NULL,
+                    `branch` VARCHAR(150) NOT NULL,
+                    `account_type` VARCHAR(50) DEFAULT 'Current Account',
+                    `swift_code` VARCHAR(50) DEFAULT 'CTZNNEPK',
+                    `payment_instructions` TEXT DEFAULT NULL,
+                    `notes` TEXT DEFAULT NULL,
+                    `display_order` INT DEFAULT 0,
+                    `is_active` TINYINT DEFAULT 1,
+                    `is_primary` TINYINT DEFAULT 1,
+                    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+                $dbBankAccounts = $pdo->query('SELECT * FROM bank_accounts ORDER BY display_order ASC, bank_name ASC')->fetchAll() ?: [];
+            } catch (\Throwable $e2) {
+                $dbBankAccounts = [];
+            }
+        }
+
+        $dbInstitutionPdfs = [];
+        try {
+            $dbInstitutionPdfs = $pdo->query('SELECT ip.*, i.name as institution_name FROM institution_pdfs ip JOIN institutions i ON ip.institution_id = i.id ORDER BY ip.display_order ASC, ip.title ASC')->fetchAll() ?: [];
+        } catch (\Throwable $e) { $dbInstitutionPdfs = []; }
         
         // Accreditations auto-table & fetch
         try {
