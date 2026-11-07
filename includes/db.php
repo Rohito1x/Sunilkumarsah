@@ -46,8 +46,34 @@ try {
         PDO::ATTR_EMULATE_PREPARES => false,
         PDO::ATTR_TIMEOUT => 5
     ]);
+} catch (PDOException $e) {
+    // If unknown database error, attempt lowercase database name (common on Linux/cPanel)
+    if ($dbname !== strtolower($dbname)) {
+        try {
+            $dbnameLower = strtolower($dbname);
+            $dsnLower = "mysql:host={$host};port={$port};dbname={$dbnameLower};charset={$charset}";
+            $pdo = new PDO($dsnLower, $username, $password, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_TIMEOUT => 5
+            ]);
+            $dbname = $dbnameLower;
+        } catch (PDOException $e2) {
+            $pdo = null;
+            $dbError = $e2->getMessage();
+            error_log("Database connection failure: " . $dbError);
+        }
+    } else {
+        $pdo = null;
+        $dbError = $e->getMessage();
+        error_log("Database connection failure: " . $dbError);
+    }
+}
 
-    // Auto-repair missing columns on tables if DB is connected
+if ($pdo) {
+    try {
+        // Auto-repair missing columns on tables if DB is connected
     $columnsToEnsure = [
         'enrollments' => [
             'interested_country' => "VARCHAR(80) DEFAULT NULL"
@@ -473,9 +499,8 @@ try {
     }
 
 } catch (PDOException $e) {
-    $pdo = null;
-    $dbError = $e->getMessage();
-    error_log("Database connection failure: " . $dbError);
+    error_log("Database initialization error: " . $e->getMessage());
+}
 }
 
 // Helper: Secure Client IP resolution
@@ -490,7 +515,10 @@ if (!function_exists('getClientIp')) {
 
 // Helper: Rate limiting check (F-06)
 if (!function_exists('checkRateLimit')) {
-    function checkRateLimit(PDO $pdo, string $email): array {
+    function checkRateLimit(?PDO $pdo, string $email): array {
+        if (!$pdo) {
+            return ['allowed' => true, 'remaining' => 0, 'msg' => ''];
+        }
         $ip = getClientIp();
         $emailNorm = strtolower(trim($email));
 
@@ -518,7 +546,10 @@ if (!function_exists('checkRateLimit')) {
 
 // Helper: Record failed login attempt
 if (!function_exists('recordFailedAttempt')) {
-    function recordFailedAttempt(PDO $pdo, string $email): void {
+    function recordFailedAttempt(?PDO $pdo, string $email): void {
+        if (!$pdo) {
+            return;
+        }
         $ip = getClientIp();
         $emailNorm = strtolower(trim($email));
         $now = date('Y-m-d H:i:s');
@@ -558,7 +589,10 @@ if (!function_exists('recordFailedAttempt')) {
 
 // Helper: Reset rate limiting on successful login
 if (!function_exists('resetRateLimit')) {
-    function resetRateLimit(PDO $pdo, string $email): void {
+    function resetRateLimit(?PDO $pdo, string $email): void {
+        if (!$pdo) {
+            return;
+        }
         $ip = getClientIp();
         $emailNorm = strtolower(trim($email));
         try {

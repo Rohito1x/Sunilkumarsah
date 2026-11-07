@@ -92,7 +92,9 @@ final class RateLimiter
 
         $timestamps = is_array($data) ? $data : [];
         $cutoff = $now - $decaySeconds;
-        $timestamps = array_values(array_filter($timestamps, fn($ts) => $ts > $cutoff));
+        $timestamps = array_values(array_filter($timestamps, function($ts) use ($cutoff) {
+            return $ts > $cutoff;
+        }));
 
         if (count($timestamps) >= $maxAttempts) {
             $oldest = reset($timestamps);
@@ -132,7 +134,9 @@ final class RateLimiter
         }
 
         $cutoff = $now - $decaySeconds;
-        $timestamps = array_values(array_filter($timestamps, fn($ts) => $ts > $cutoff));
+        $timestamps = array_values(array_filter($timestamps, function($ts) use ($cutoff) {
+            return $ts > $cutoff;
+        }));
 
         if (count($timestamps) >= $maxAttempts) {
             $oldest = reset($timestamps);

@@ -30,7 +30,7 @@ final class Escaper
      * Context 3: Encodes PHP arrays/objects safely for inline <script> tags.
      * Prevents </script> breakouts and string injection vulnerabilities.
      */
-    public static function jsJson(mixed $data): string
+    public static function jsJson($data): string
     {
         $flags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES;
         $json = json_encode($data, $flags);
@@ -158,7 +158,7 @@ if (!function_exists('e_attr')) {
 }
 
 if (!function_exists('e_json')) {
-    function e_json(mixed $data): string {
+    function e_json($data): string {
         return Escaper::jsJson($data);
     }
 }

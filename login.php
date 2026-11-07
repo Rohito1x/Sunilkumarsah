@@ -27,6 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($email === '' || $password === '') {
             $alert = ['type' => 'danger', 'msg' => 'Email and password are required.'];
+        } elseif (!isset($pdo) || !$pdo) {
+            $alert = ['type' => 'danger', 'msg' => 'Database connection failed. Please check MySQL database user permissions and credentials in cPanel config.php.'];
         } else {
             // Check server-side rate limit (F-06)
             $rateLimit = checkRateLimit($pdo, $email);
