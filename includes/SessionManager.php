@@ -28,6 +28,18 @@ final class SessionManager
             || (!empty($_SERVER['HTTP_CF_VISITOR']) && strpos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false)
         );
 
+        // Ensure session save path is valid and writable (fixes session loss on restricted hosts/CageFS)
+        $currentSavePath = @session_save_path();
+        if (empty($currentSavePath) || !@is_dir($currentSavePath) || !@is_writable($currentSavePath)) {
+            $localSessionDir = dirname(__DIR__) . '/sessions';
+            if (!is_dir($localSessionDir)) {
+                @mkdir($localSessionDir, 0700, true);
+            }
+            if (is_dir($localSessionDir) && is_writable($localSessionDir)) {
+                @session_save_path($localSessionDir);
+            }
+        }
+
         // Enforce hardened cookie configuration
         session_set_cookie_params([
             'lifetime' => 0,              // Valid until browser is closed

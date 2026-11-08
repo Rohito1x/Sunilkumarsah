@@ -159,6 +159,7 @@ if (empty($topMenu)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <?= class_exists('Csrf') ? Csrf::meta() : '<meta name="csrf-token" content="' . h($_SESSION['csrf_token'] ?? '') . '">' ?>
     <meta name="theme-color" content="#0458A0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">

@@ -11,6 +11,7 @@ ServerSignature Off
 DirectoryIndex index.php index.html
 
 # 3. Block Direct Access to Sensitive Files, Backups, Shells & Configs
+RedirectMatch 403 ^/sessions(/.*)?$
 <FilesMatch "(?i)(^\.|\.(env|git|sql|sqlite|bak|config|conf|log|ini|sh|yaml|yml|md|twig|blade\.php)$|composer\.(json|lock)|package(-lock)?\.json|\.cpanel\.yml|setup\.php|reset_admin\.php)$">
     <IfModule mod_authz_core.c>
         Require all denied
@@ -23,6 +24,13 @@ DirectoryIndex index.php index.html
 
 # 4. HTTP Security Headers
 <IfModule mod_headers.c>
+    # Disable caching for dynamic PHP scripts and AJAX requests
+    <FilesMatch "\.(php)$">
+        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+
     # Prevent MIME type sniffing
     Header always set X-Content-Type-Options "nosniff"
 

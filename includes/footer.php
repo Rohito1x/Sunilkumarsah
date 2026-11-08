@@ -345,6 +345,13 @@ $(document).ready(function() {
     });
 
     // Contact Form Submission
+    // Setup automatic CSRF header for all AJAX requests
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || $('input[name="csrf_token"]').val()
+        }
+    });
+
     $('#contact-form').on('submit', function(e) {
         e.preventDefault();
         var $form = $(this);
@@ -368,9 +375,18 @@ $(document).ready(function() {
                     alert('Error: ' + response.message);
                 }
             },
-            error: function() {
+            error: function(xhr) {
                 $btn.prop('disabled', false).text(originalText);
-                alert('An error occurred. Please try again.');
+                var msg = 'An error occurred. Please try again.';
+                try {
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        var parsed = JSON.parse(xhr.responseText);
+                        if (parsed && parsed.message) msg = parsed.message;
+                    }
+                } catch(e) {}
+                alert(msg);
             }
         });
     });
@@ -407,9 +423,18 @@ $(document).ready(function() {
                     alert('Error: ' + response.message);
                 }
             },
-            error: function() {
+            error: function(xhr) {
                 $btn.prop('disabled', false).text(originalText);
-                alert('An error occurred. Please try again.');
+                var msg = 'An error occurred. Please try again.';
+                try {
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        var parsed = JSON.parse(xhr.responseText);
+                        if (parsed && parsed.message) msg = parsed.message;
+                    }
+                } catch(e) {}
+                alert(msg);
             }
         });
     });
@@ -438,9 +463,18 @@ $(document).ready(function() {
                     alert('Error: ' + response.message);
                 }
             },
-            error: function() {
+            error: function(xhr) {
                 $btn.prop('disabled', false).text(originalText);
-                alert('An error occurred. Please try again.');
+                var msg = 'An error occurred. Please try again.';
+                try {
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        var parsed = JSON.parse(xhr.responseText);
+                        if (parsed && parsed.message) msg = parsed.message;
+                    }
+                } catch(e) {}
+                alert(msg);
             }
         });
     });

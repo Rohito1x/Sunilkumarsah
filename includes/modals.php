@@ -71,7 +71,7 @@ if (isset($pdo)) {
                     <h4 class="split-modal-right-title">Enrollment <span>Form</span> 🎓</h4>
                     
                     <form id="enroll_form">
-                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                        <input type="hidden" name="csrf_token" value="<?= h(class_exists('Csrf') ? Csrf::getToken() : ($_SESSION['csrf_token'] ?? '')) ?>">
                         <div class="row g-3">
                             <div class="col-12 col-sm-6 form-group">
                                 <label>Fullname <span class="text-danger">*</span></label>
@@ -305,7 +305,7 @@ if (isset($pdo)) {
             <div class="modal-body p-4 p-md-5 bg-white">
                 <div id="modal-review-alert-container"></div>
                 <form id="modal-review-form" method="POST" action="<?= h($basePath ?? '/') ?>submit_form.php">
-                    <input type="hidden" name="csrf_token" value="<?= h($_SESSION['csrf_token'] ?? '') ?>">
+                    <input type="hidden" name="csrf_token" value="<?= h(class_exists('Csrf') ? Csrf::getToken() : ($_SESSION['csrf_token'] ?? '')) ?>">
                     <input type="hidden" name="action" value="submit_review">
                     <input type="hidden" name="rating" id="modal-selected-rating-val" value="5">
 
