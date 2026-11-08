@@ -1415,7 +1415,8 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- Counselor Grid -->
         <div class="row g-4">
             <?php foreach ($teamMembers as $member): 
-                $mPhoto = !empty($member['photo']) ? $member['photo'] : 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80';
+                $mRawPhoto = !empty($member['photo']) ? $member['photo'] : 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80';
+                $mPhoto = (strpos($mRawPhoto, 'http') === 0 || strpos($mRawPhoto, '/') === 0) ? $mRawPhoto : ($basePath . $mRawPhoto);
                 $isTiti = stripos($member['qualification'] ?? '', 'TITI') !== false;
                 $isQeac = stripos($member['qualification'] ?? '', 'QEAC') !== false;
                 $isBritishCouncil = stripos($member['qualification'] ?? '', 'British Council') !== false;
@@ -1587,7 +1588,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 $revComment = h($rev['comment']);
                 $revRating = !empty($rev['rating']) ? (int)$rev['rating'] : 5;
                 $revDate = !empty($rev['created_at']) ? date('M d, Y', strtotime($rev['created_at'])) : 'Recent';
-                $revAvatar = !empty($rev['avatar']) ? $rev['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+                $rawAvatar = !empty($rev['avatar']) ? $rev['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+                $revAvatar = (strpos($rawAvatar, 'http') === 0 || strpos($rawAvatar, '/') === 0) ? $rawAvatar : ($basePath . $rawAvatar);
             ?>
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="card border-0 rounded-4 shadow-sm bg-white h-100 overflow-hidden position-relative d-flex flex-column justify-content-between testimonial-card-custom hover-scale p-4">
@@ -1636,7 +1638,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     $revComment = h($rev['comment']);
                     $revRating = !empty($rev['rating']) ? (int)$rev['rating'] : 5;
                     $revDate = !empty($rev['created_at']) ? date('M d, Y', strtotime($rev['created_at'])) : 'Recent';
-                    $revAvatar = !empty($rev['avatar']) ? $rev['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+                    $rawAvatar = !empty($rev['avatar']) ? $rev['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+                    $revAvatar = (strpos($rawAvatar, 'http') === 0 || strpos($rawAvatar, '/') === 0) ? $rawAvatar : ($basePath . $rawAvatar);
                 ?>
                     <div class="col-12 col-md-6 col-lg-4">
                         <div class="card border-0 rounded-4 shadow-sm bg-white h-100 overflow-hidden position-relative d-flex flex-column justify-content-between testimonial-card-custom hover-scale p-4">

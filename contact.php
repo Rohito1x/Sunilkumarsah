@@ -36,6 +36,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
 
 $pageSeo = getSeoData('static', null, 'contact');
 require_once __DIR__ . '/includes/header.php';
+
+$contactPhone = !empty($siteSettings['contact_phone']) ? $siteSettings['contact_phone'] : '+977 9807765812';
+$contactPhoneDigits = preg_replace('/[^0-9]/', '', $contactPhone);
+$contactWhatsapp = !empty($siteSettings['contact_whatsapp']) ? $siteSettings['contact_whatsapp'] : '+977 9807765812';
+$contactWhatsappDigits = preg_replace('/[^0-9]/', '', $contactWhatsapp);
+$contactEmail = !empty($siteSettings['contact_email']) ? $siteSettings['contact_email'] : 'info@visionpoint.edu.np';
+$contactHours = !empty($siteSettings['contact_office_hours']) ? $siteSettings['contact_office_hours'] : "Sun – Fri: 9:00 AM – 6:00 PM\nSaturday: Closed / On Appointment";
+$contactMap = !empty($siteSettings['contact_map_iframe']) ? $siteSettings['contact_map_iframe'] : 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d114227.18956926955!2d87.21051515!3d26.4524744!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39ef744704331a99%3A0x892a01d674251f28!2sBiratnagar!5e0!3m2!1sen!2snp!4v1700000000000!5m2!1sen!2snp';
+
+$mapSrc = $contactMap;
+if (preg_match('/src="([^"]+)"/', $contactMap, $m)) {
+    $mapSrc = $m[1];
+}
 ?>
 
 <!-- Hero Banner Section -->
@@ -52,10 +65,13 @@ require_once __DIR__ . '/includes/header.php';
                     Have questions about courses, university admissions, scholarships, or visa procedures? Visit our office in Biratnagar or reach out to our counselors directly.
                 </p>
                 <div class="d-flex gap-3 flex-wrap">
-                    <a href="tel:+9779807765812" class="btn btn-warning text-dark fw-bold px-4 py-2 rounded-pill shadow-sm">
-                        <i class="fa-solid fa-phone me-2"></i>+977 9807765812
+                    <a href="tel:+<?= h($contactPhoneDigits) ?>" class="btn btn-warning text-dark fw-bold px-4 py-2 rounded-pill shadow-sm">
+                        <i class="fa-solid fa-phone me-2"></i><?= h($contactPhone) ?>
                     </a>
-                    <a href="mailto:info@visionpoint.edu.np" class="btn btn-outline-light px-4 py-2 rounded-pill fw-semibold">
+                    <a href="https://wa.me/<?= h($contactWhatsappDigits) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-success text-white fw-bold px-4 py-2 rounded-pill shadow-sm">
+                        <i class="fa-brands fa-whatsapp me-2"></i>WhatsApp Us
+                    </a>
+                    <a href="mailto:<?= h($contactEmail) ?>" class="btn btn-outline-light px-4 py-2 rounded-pill fw-semibold">
                         <i class="fa-solid fa-envelope me-2"></i>Send Email
                     </a>
                 </div>
@@ -64,7 +80,7 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="p-4 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-25 shadow-lg backdrop-blur">
                     <i class="fa-solid fa-clock text-warning display-4 mb-2"></i>
                     <h5 class="fw-bold text-white mb-1">Office Hours</h5>
-                    <p class="text-white-50 small mb-0">Sun – Fri: 9:00 AM – 6:00 PM<br>Saturday: Closed / On Appointment</p>
+                    <p class="text-white-50 small mb-0"><?= nl2br(h(strip_tags($contactHours, '<br>'))) ?></p>
                 </div>
             </div>
         </div>
@@ -102,7 +118,10 @@ require_once __DIR__ . '/includes/header.php';
                         <div>
                             <h5 class="fw-bold text-dark fs-6 mb-1">Phone & WhatsApp</h5>
                             <p class="text-muted small mb-0">
-                                <a href="tel:+9779807765812" class="text-decoration-none text-muted fw-semibold">+977 9807765812</a>
+                                <a href="tel:+<?= h($contactPhoneDigits) ?>" class="text-decoration-none text-muted fw-semibold"><?= h($contactPhone) ?></a>
+                                <?php if (!empty($contactWhatsapp)): ?>
+                                    <br><a href="https://wa.me/<?= h($contactWhatsappDigits) ?>" target="_blank" rel="noopener noreferrer" class="text-success text-decoration-none extra-small fw-semibold"><i class="fa-brands fa-whatsapp me-1"></i>WhatsApp: <?= h($contactWhatsapp) ?></a>
+                                <?php endif; ?>
                             </p>
                         </div>
                     </div>
@@ -114,7 +133,7 @@ require_once __DIR__ . '/includes/header.php';
                         <div>
                             <h5 class="fw-bold text-dark fs-6 mb-1">Email Inquiries</h5>
                             <p class="text-muted small mb-0">
-                                <a href="mailto:info@visionpoint.edu.np" class="text-decoration-none text-muted">info@visionpoint.edu.np</a>
+                                <a href="mailto:<?= h($contactEmail) ?>" class="text-decoration-none text-muted"><?= h($contactEmail) ?></a>
                             </p>
                         </div>
                     </div>
@@ -125,7 +144,7 @@ require_once __DIR__ . '/includes/header.php';
                         </div>
                         <div>
                             <h5 class="fw-bold text-dark fs-6 mb-1">Counseling Schedule</h5>
-                            <p class="text-muted small mb-0">Sunday to Friday: 9:00 AM – 6:00 PM</p>
+                            <p class="text-muted small mb-0"><?= nl2br(h(strip_tags($contactHours, '<br>'))) ?></p>
                         </div>
                     </div>
                 </div>
@@ -296,7 +315,7 @@ require_once __DIR__ . '/includes/header.php';
 <section class="py-0">
     <div class="container-fluid p-0">
         <div class="ratio ratio-21x9" style="min-height: 380px;">
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d114227.18956926955!2d87.21051515!3d26.4524744!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39ef744704331a99%3A0x892a01d674251f28!2sBiratnagar!5e0!3m2!1sen!2snp!4v1700000000000!5m2!1sen!2snp" 
+            <iframe src="<?= h($mapSrc) ?>" 
                     width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Vision Point Educational Service Biratnagar Office Map">
             </iframe>
         </div>

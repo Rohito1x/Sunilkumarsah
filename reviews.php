@@ -219,9 +219,17 @@ if (empty($reviews)) {
 
                             <!-- Reviewer Details (Footer of Card) -->
                             <div class="pt-3 border-top d-flex align-items-center gap-3">
-                                <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 46px; height: 46px; background-color: <?= $color ?>; font-size: 16px;">
-                                    <?= $initials ?>
-                                </div>
+                                <?php 
+                                $rRawAvatar = !empty($rev['avatar']) ? $rev['avatar'] : '';
+                                if (!empty($rRawAvatar)):
+                                    $rAvatarUrl = (strpos($rRawAvatar, 'http') === 0 || strpos($rRawAvatar, '/') === 0) ? $rRawAvatar : ($basePath . $rRawAvatar);
+                                ?>
+                                    <img src="<?= h($rAvatarUrl) ?>" alt="<?= h($rev['name']) ?>" class="rounded-circle object-fit-cover shadow-sm border flex-shrink-0" style="width: 46px; height: 46px;">
+                                <?php else: ?>
+                                    <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 46px; height: 46px; background-color: <?= $color ?>; font-size: 16px;">
+                                        <?= $initials ?>
+                                    </div>
+                                <?php endif; ?>
                                 <div class="lh-sm overflow-hidden">
                                     <div class="fw-bold text-dark text-truncate fs-6"><?= h($rev['name']) ?></div>
                                     <div class="text-muted small text-truncate">

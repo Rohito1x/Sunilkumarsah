@@ -190,7 +190,7 @@ if (empty($aboutReviews)) {
                     </div>
                     <h3 class="fw-bold text-primary fs-5 mb-2">Our Mission</h3>
                     <p class="text-muted small mb-0" style="line-height: 1.7;">
-                        To provide accurate, unbiased, and comprehensive academic counseling to Nepalese students, ensuring seamless admissions into accredited institutions in India and overseas with maximum scholarship support.
+                        <?= h(!empty($siteSettings['about_mission']) ? $siteSettings['about_mission'] : 'To provide accurate, unbiased, and comprehensive academic counseling to Nepalese students, ensuring seamless admissions into accredited institutions in India and overseas with maximum scholarship support.') ?>
                     </p>
                 </div>
             </div>
@@ -201,7 +201,7 @@ if (empty($aboutReviews)) {
                     </div>
                     <h3 class="fw-bold text-primary fs-5 mb-2">Our Vision</h3>
                     <p class="text-muted small mb-0" style="line-height: 1.7;">
-                        To be recognized as the most reliable, transparent, and student-centric educational advisory bureau in eastern Nepal, setting industry benchmarks for ethical counseling and documentation integrity.
+                        <?= h(!empty($siteSettings['about_vision']) ? $siteSettings['about_vision'] : 'To be recognized as the most reliable, transparent, and student-centric educational advisory bureau in eastern Nepal, setting industry benchmarks for ethical counseling and documentation integrity.') ?>
                     </p>
                 </div>
             </div>
@@ -212,7 +212,7 @@ if (empty($aboutReviews)) {
                     </div>
                     <h3 class="fw-bold text-primary fs-5 mb-2">Our Values</h3>
                     <p class="text-muted small mb-0" style="line-height: 1.7;">
-                        Integrity, transparency, student empathy, and relentless commitment to genuine guidance without commercial bias. We guide based on aptitude, merit, and career suitability.
+                        <?= h(!empty($siteSettings['about_values']) ? $siteSettings['about_values'] : 'Integrity, transparency, student empathy, and relentless commitment to genuine guidance without commercial bias. We guide based on aptitude, merit, and career suitability.') ?>
                     </p>
                 </div>
             </div>
@@ -283,35 +283,65 @@ if (empty($aboutReviews)) {
             <p class="text-muted small">Guiding Nepali students with integrity, MoEST compliance, and TITI-certified professional excellence since 2070 B.S.</p>
         </div>
 
+        <?php
+        $chRawPhoto = !empty($siteSettings['chairman_photo']) ? $siteSettings['chairman_photo'] : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80';
+        $chPhoto = (strpos($chRawPhoto, 'http') === 0 || strpos($chRawPhoto, '/') === 0) ? $chRawPhoto : ($basePath . $chRawPhoto);
+
+        $chName = !empty($siteSettings['chairman_name']) ? $siteSettings['chairman_name'] : "Chairman's Perspective";
+        $chSubtitle = !empty($siteSettings['chairman_subtitle']) ? $siteSettings['chairman_subtitle'] : "Vision Point Educational Service (Est. 2070 B.S.)";
+        $chBadge = !empty($siteSettings['chairman_badge']) ? $siteSettings['chairman_badge'] : "Chairman Say";
+        $chTitle = !empty($siteSettings['chairman_title']) ? $siteSettings['chairman_title'] : "Chairman Say • अध्यक्षको भनाइ";
+        $chHeading = !empty($siteSettings['chairman_heading']) ? $siteSettings['chairman_heading'] : "Fostering Academic Ambitions with Uncompromising Integrity Since 2070 B.S.";
+        $chQuote = !empty($siteSettings['chairman_quote']) ? $siteSettings['chairman_quote'] : 'When we founded Vision Point Educational Service in 2070 B.S. in Biratnagar, our core commitment was simple yet uncompromising: to provide honest, transparent, and student-centered educational guidance without commercial bias. Over the past 13+ years, that founding philosophy has remained our greatest strength.';
+        $chMessage = !empty($siteSettings['chairman_message']) ? $siteSettings['chairman_message'] : null;
+
+        $dirRawPhoto = !empty($siteSettings['director_photo']) ? $siteSettings['director_photo'] : 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&auto=format&fit=crop&q=80';
+        $dirPhoto = (strpos($dirRawPhoto, 'http') === 0 || strpos($dirRawPhoto, '/') === 0) ? $dirRawPhoto : ($basePath . $dirRawPhoto);
+
+        $dirName = !empty($siteSettings['director_name']) ? $siteSettings['director_name'] : "Managing Director";
+        $dirSubtitle = !empty($siteSettings['director_subtitle']) ? $siteSettings['director_subtitle'] : "Vision Point Educational Service (Est. 2070 B.S.)";
+        $dirBadge = !empty($siteSettings['director_badge']) ? $siteSettings['director_badge'] : "Director Message";
+        $dirTitle = !empty($siteSettings['director_title']) ? $siteSettings['director_title'] : "Director Message • निर्देशकको सन्देश";
+        $dirHeading = !empty($siteSettings['director_heading']) ? $siteSettings['director_heading'] : "Empowering Nepalese Scholars on the Global Stage with Professional Excellence";
+        $dirQuote = !empty($siteSettings['director_quote']) ? $siteSettings['director_quote'] : 'Higher education is a life-defining investment. At Vision Point Educational Service, our operational team works tirelessly to bridge the gap between ambitious students in Nepal and accredited, top-tier global universities with 100% transparent fee structures.';
+        $dirMessage = !empty($siteSettings['director_message']) ? $siteSettings['director_message'] : null;
+        ?>
+
         <!-- 1. Chairman Say (अध्यक्षको सन्देश) -->
         <div class="card border-0 rounded-4 shadow-sm bg-light p-4 p-lg-5 mb-5">
             <div class="row align-items-center g-5">
                 <div class="col-lg-4 text-center">
                     <div class="position-relative d-inline-block">
                         <div class="rounded-4 overflow-hidden shadow-md border border-3 border-white mx-auto" style="width: 240px; height: 280px;">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80" alt="Chairman - Vision Point Educational Service" class="w-100 h-100 object-fit-cover">
+                            <img src="<?= h($chPhoto) ?>" alt="<?= h($chName) ?> - Vision Point Educational Service" class="w-100 h-100 object-fit-cover">
                         </div>
                         <div class="position-absolute bottom-0 start-50 translate-middle-x mb-n2 bg-danger text-white py-1.5 px-3 rounded-pill shadow-sm small fw-bold text-nowrap">
-                            <i class="fa-solid fa-crown text-warning me-1"></i> Chairman Say
+                            <i class="fa-solid fa-crown text-warning me-1"></i> <?= h($chBadge) ?>
                         </div>
                     </div>
-                    <h5 class="fw-bold text-dark mt-4 mb-1">Chairman's Perspective</h5>
-                    <p class="text-muted extra-small mb-0">Vision Point Educational Service (Est. 2070 B.S.)</p>
+                    <h5 class="fw-bold text-dark mt-4 mb-1"><?= h($chName) ?></h5>
+                    <p class="text-muted extra-small mb-0"><?= h($chSubtitle) ?></p>
                 </div>
                 <div class="col-lg-8">
-                    <span class="text-danger fw-bold small text-uppercase letter-spacing-1">Chairman Say • अध्यक्षको भनाइ</span>
-                    <h3 class="fw-bold text-primary fs-3 mt-1 mb-3">Fostering Academic Ambitions with Uncompromising Integrity Since 2070 B.S.</h3>
+                    <span class="text-danger fw-bold small text-uppercase letter-spacing-1"><?= h($chTitle) ?></span>
+                    <h3 class="fw-bold text-primary fs-3 mt-1 mb-3"><?= h($chHeading) ?></h3>
                     <div class="p-3 bg-white rounded-3 border-start border-4 border-danger shadow-sm mb-3">
                         <p class="fst-italic text-dark mb-0 small" style="line-height: 1.8;">
-                            "When we founded Vision Point Educational Service in 2070 B.S. in Biratnagar, our core commitment was simple yet uncompromising: to provide honest, transparent, and student-centered educational guidance without commercial bias. Over the past 13+ years, that founding philosophy has remained our greatest strength."
+                            &ldquo;<?= nl2br(h($chQuote)) ?>&rdquo;
                         </p>
                     </div>
-                    <p class="text-muted small" style="line-height: 1.8;">
-                        Every student who steps into our office carries the heartfelt dreams of their family and the aspiration of a transformative career. As Chairman, I guarantee that our advisory is anchored in strict ethical codes, verified approvals from the <strong>Ministry of Education, Science and Technology (MoEST)</strong>, and certified counseling credentials from <strong>TITI (Training Institute for Technical Instruction)</strong>.
-                    </p>
-                    <p class="text-muted small mb-0" style="line-height: 1.8;">
-                        We do not merely process admission forms; we build life-long bridges of trust between Nepalese scholars and world-class universities across India, Australia, the UK, the USA, and Canada. We warmly welcome students and guardians to experience the Vision Point standard of educational advisory.
-                    </p>
+                    <?php if ($chMessage): ?>
+                        <div class="text-muted small" style="line-height: 1.8;">
+                            <?= nl2br(h($chMessage)) ?>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted small" style="line-height: 1.8;">
+                            Every student who steps into our office carries the heartfelt dreams of their family and the aspiration of a transformative career. As Chairman, I guarantee that our advisory is anchored in strict ethical codes, verified approvals from the <strong>Ministry of Education, Science and Technology (MoEST)</strong>, and certified counseling credentials from <strong>TITI (Training Institute for Technical Instruction)</strong>.
+                        </p>
+                        <p class="text-muted small mb-0" style="line-height: 1.8;">
+                            We do not merely process admission forms; we build life-long bridges of trust between Nepalese scholars and world-class universities across India, Australia, the UK, the USA, and Canada. We warmly welcome students and guardians to experience the Vision Point standard of educational advisory.
+                        </p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -322,26 +352,32 @@ if (empty($aboutReviews)) {
                 <div class="col-lg-4 text-center">
                     <div class="position-relative d-inline-block">
                         <div class="rounded-4 overflow-hidden shadow-md border border-3 border-white mx-auto" style="width: 240px; height: 280px;">
-                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&auto=format&fit=crop&q=80" alt="Managing Director - Vision Point Educational Service" class="w-100 h-100 object-fit-cover">
+                            <img src="<?= h($dirPhoto) ?>" alt="<?= h($dirName) ?> - Vision Point Educational Service" class="w-100 h-100 object-fit-cover">
                         </div>
                         <div class="position-absolute bottom-0 start-50 translate-middle-x mb-n2 bg-primary text-white py-1.5 px-3 rounded-pill shadow-sm small fw-bold text-nowrap">
-                            <i class="fa-solid fa-certificate text-warning me-1"></i> Director Message
+                            <i class="fa-solid fa-certificate text-warning me-1"></i> <?= h($dirBadge) ?>
                         </div>
                     </div>
-                    <h5 class="fw-bold text-dark mt-4 mb-1">Managing Director</h5>
-                    <p class="text-muted extra-small mb-0">Vision Point Educational Service (Est. 2070 B.S.)</p>
+                    <h5 class="fw-bold text-dark mt-4 mb-1"><?= h($dirName) ?></h5>
+                    <p class="text-muted extra-small mb-0"><?= h($dirSubtitle) ?></p>
                 </div>
                 <div class="col-lg-8">
-                    <span class="text-primary fw-bold small text-uppercase letter-spacing-1">Director Message • निर्देशकको सन्देश</span>
-                    <h3 class="fw-bold text-primary fs-3 mt-1 mb-3">Empowering Nepalese Scholars on the Global Stage with Professional Excellence</h3>
+                    <span class="text-primary fw-bold small text-uppercase letter-spacing-1"><?= h($dirTitle) ?></span>
+                    <h3 class="fw-bold text-primary fs-3 mt-1 mb-3"><?= h($dirHeading) ?></h3>
                     <div class="p-3 bg-white rounded-3 border-start border-4 border-primary shadow-sm mb-3">
                         <p class="fst-italic text-dark mb-0 small" style="line-height: 1.8;">
-                            "Higher education is a life-defining investment. At Vision Point Educational Service, our operational team works tirelessly to bridge the gap between ambitious students in Nepal and accredited, top-tier global universities with 100% transparent fee structures."
+                            &ldquo;<?= nl2br(h($dirQuote)) ?>&rdquo;
                         </p>
                     </div>
-                    <p class="text-muted small" style="line-height: 1.8;">
-                        Our senior counselors are formally trained and certified by <strong>TITI (Training Institute for Technical Instruction, Sanothimi)</strong>, ensuring that aptitude profiling, course recommendations, and financial documentation adhere to national and international benchmarks. Operating under the official recognition of the <strong>Ministry of Education, Science and Technology (MoEST)</strong>, we hold direct representation agreements with 80+ accredited universities.
-                    </p>
+                    <?php if ($dirMessage): ?>
+                        <div class="text-muted small" style="line-height: 1.8;">
+                            <?= nl2br(h($dirMessage)) ?>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted small" style="line-height: 1.8;">
+                            Our senior counselors are formally trained and certified by <strong>TITI (Training Institute for Technical Instruction, Sanothimi)</strong>, ensuring that aptitude profiling, course recommendations, and financial documentation adhere to national and international benchmarks. Operating under the official recognition of the <strong>Ministry of Education, Science and Technology (MoEST)</strong>, we hold direct representation agreements with 80+ accredited universities.
+                        </p>
+                    <?php endif; ?>
                     <div class="row g-2 pt-2">
                         <div class="col-sm-6">
                             <div class="d-flex align-items-center gap-2">
@@ -462,7 +498,8 @@ if (empty($aboutReviews)) {
 
         <div class="row g-4">
             <?php foreach ($teamMembers as $member): 
-                $mPhoto = !empty($member['photo']) ? $member['photo'] : 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80';
+                $mRawPhoto = !empty($member['photo']) ? $member['photo'] : 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80';
+                $mPhoto = (strpos($mRawPhoto, 'http') === 0 || strpos($mRawPhoto, '/') === 0) ? $mRawPhoto : ($basePath . $mRawPhoto);
                 $isTiti = stripos($member['qualification'] ?? '', 'TITI') !== false;
                 $isQeac = stripos($member['qualification'] ?? '', 'QEAC') !== false;
                 $isBritishCouncil = stripos($member['qualification'] ?? '', 'British Council') !== false;
@@ -638,7 +675,8 @@ if (empty($aboutReviews)) {
                 $revComment = h($rev['comment']);
                 $revRating = !empty($rev['rating']) ? (int)$rev['rating'] : 5;
                 $revDate = !empty($rev['created_at']) ? date('M d, Y', strtotime($rev['created_at'])) : 'Recent';
-                $revAvatar = !empty($rev['avatar']) ? $rev['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+                $revRawAvatar = !empty($rev['avatar']) ? $rev['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+                $revAvatar = (strpos($revRawAvatar, 'http') === 0 || strpos($revRawAvatar, '/') === 0) ? $revRawAvatar : ($basePath . $revRawAvatar);
             ?>
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 border-0 shadow-sm rounded-4 p-4 d-flex flex-column justify-content-between testimonial-card-custom hover-scale bg-white">

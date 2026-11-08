@@ -482,7 +482,14 @@ $(document).ready(function() {
 
 
 <!-- Floating Quick Contact & Scroll-to-Top -->
-<a href="https://wa.me/9779807765812?text=Hello%20Vision%20Point,%20I%20would%20like%20to%20inquire%20about%20university%20admissions." target="_blank" class="floating-whatsapp-btn" title="Chat with Admissions Counselor on WhatsApp" aria-label="WhatsApp Chat">
+<?php
+$floatingWa = !empty($siteSettings['contact_whatsapp']) ? $siteSettings['contact_whatsapp'] : (!empty($siteSettings['contact_phone']) ? $siteSettings['contact_phone'] : '9779807765812');
+$floatingWaDigits = preg_replace('/[^0-9]/', '', $floatingWa);
+if (empty($floatingWaDigits)) {
+    $floatingWaDigits = '9779807765812';
+}
+?>
+<a href="https://wa.me/<?= h($floatingWaDigits) ?>?text=Hello%20Vision%20Point,%20I%20would%20like%20to%20inquire%20about%20university%20admissions." target="_blank" rel="noopener noreferrer" class="floating-whatsapp-btn" title="Chat with Admissions Counselor on WhatsApp" aria-label="WhatsApp Chat">
     <i class="fa-brands fa-whatsapp"></i>
 </a>
 <button type="button" class="floating-back-to-top" id="btnBackToTop" title="Scroll to Top" aria-label="Scroll to Top">

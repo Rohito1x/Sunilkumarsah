@@ -58,13 +58,25 @@ function handleFileUpload($fileKey, $prefix = 'img_') {
         throw new Exception('Invalid file type. Only image files (JPG, PNG, WEBP, GIF, BMP, SVG) are allowed.');
     }
     
-    if ($fileSize > 5 * 1024 * 1024) {
-        throw new Exception('File size exceeds the 5MB limit.');
+    if ($fileSize > 10 * 1024 * 1024) {
+        throw new Exception('File size exceeds the 10MB limit.');
+    }
+
+    // Check genuine MIME type via finfo if available
+    if (class_exists('finfo')) {
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($fileTmp);
+        $allowedMimes = [
+            'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml', 'text/xml', 'text/plain'
+        ];
+        if (!in_array($mime, $allowedMimes)) {
+            throw new Exception('File rejected due to invalid MIME content type: ' . htmlspecialchars($mime));
+        }
     }
     
     $uploadDir = __DIR__ . '/../uploads/';
     if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+        mkdir($uploadDir, 0755, true);
     }
     
     $newFileName = uniqid($prefix, true) . '.' . $ext;
@@ -275,6 +287,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 throw new Exception('Staff Name and Role are required.');
             }
 
+            if (!empty($_POST['remove_photo'])) {
+                $photo = '';
+            }
+
             if (isset($_FILES['photo_file']) && $_FILES['photo_file']['error'] == UPLOAD_ERR_OK) {
                 $uploaded = handleFileUpload('photo_file', 'staff_');
                 if ($uploaded) {
@@ -303,6 +319,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 throw new Exception('Student Name, Email, and Review Comment are required.');
             }
 
+            if (isset($_FILES['avatar_file']) && $_FILES['avatar_file']['error'] == UPLOAD_ERR_OK) {
+                $uploadedAvatar = handleFileUpload('avatar_file', 'rev_');
+                if ($uploadedAvatar) {
+                    $avatar = $uploadedAvatar;
+                }
+            }
+
             try {
                 $pdo->exec("ALTER TABLE reviews ADD COLUMN avatar VARCHAR(255) DEFAULT NULL");
             } catch (\Throwable $e) {}
@@ -328,6 +351,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             if ($name === '' || $email === '' || $comment === '') {
                 throw new Exception('Student Name, Email, and Review Comment are required.');
+            }
+
+            if (!empty($_POST['remove_avatar'])) {
+                $avatar = '';
+            }
+
+            if (isset($_FILES['avatar_file']) && $_FILES['avatar_file']['error'] == UPLOAD_ERR_OK) {
+                $uploadedAvatar = handleFileUpload('avatar_file', 'rev_');
+                if ($uploadedAvatar) {
+                    $avatar = $uploadedAvatar;
+                }
             }
 
             try {
@@ -1205,14 +1239,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 'contact_email', 'contact_location', 'footer_about', 'footer_copyright',
                 'qr_code_title', 'qr_code_description', 'notification_title', 'notification_message',
                 'notification_banner_color', 'notification_link', 'accreditation_title', 'accreditation_subtitle',
-                'gsc_verification_code', 'ga_measurement_id'
+                'gsc_verification_code', 'ga_measurement_id',
+                'contact_whatsapp', 'contact_office_hours', 'contact_map_iframe',
+                'about_mission', 'about_vision', 'about_values', 'about_foundation_intro',
+                'chairman_name', 'chairman_title', 'chairman_subtitle', 'chairman_badge', 'chairman_heading', 'chairman_quote', 'chairman_message', 'chairman_photo',
+                'director_name', 'director_title', 'director_subtitle', 'director_badge', 'director_heading', 'director_quote', 'director_message', 'director_photo'
             ];
             
             $pdo->beginTransaction();
             $stmt = $pdo->prepare('INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)');
             foreach ($settingsToUpdate as $key) {
-                $val = isset($_POST[$key]) ? (string)$_POST[$key] : '';
-                $stmt->execute([$key, $val]);
+                if (isset($_POST[$key])) {
+                    $val = (string)$_POST[$key];
+                    $stmt->execute([$key, $val]);
+                }
             }
             
             // Handle Notification and Auto-Popup enabled checkboxes explicitly
@@ -1247,6 +1287,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $uploadedQR = handleFileUpload('qr_code_image_file', 'qr_');
             if ($uploadedQR) {
                 $stmt->execute(['qr_code_image', $uploadedQR]);
+            }
+
+            // Handle Chairman Photo Upload / Remove
+            if (!empty($_POST['remove_chairman_photo'])) {
+                $stmt->execute(['chairman_photo', '']);
+            } else {
+                $uploadedChairman = handleFileUpload('chairman_photo_file', 'chairman_');
+                if ($uploadedChairman) {
+                    $stmt->execute(['chairman_photo', $uploadedChairman]);
+                }
+            }
+
+            // Handle Director Photo Upload / Remove
+            if (!empty($_POST['remove_director_photo'])) {
+                $stmt->execute(['director_photo', '']);
+            } else {
+                $uploadedDirector = handleFileUpload('director_photo_file', 'director_');
+                if ($uploadedDirector) {
+                    $stmt->execute(['director_photo', $uploadedDirector]);
+                }
             }
             
             $pdo->commit();
@@ -1817,6 +1877,8 @@ require_once __DIR__ . '/includes/header.php';
                         <a class="nav-link dropdown-toggle fw-bold px-3 rounded-pill btn-sm text-dark bg-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Configs & Settings</a>
                         <ul class="dropdown-menu border-0 shadow-lg">
                             <li><button class="dropdown-item" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings-panel" type="button" role="tab">General Site Settings</button></li>
+                            <li><button class="dropdown-item" onclick="switchTab('settings-tab'); setTimeout(function(){ var el = document.getElementById('settings-leadership-section'); if(el) el.scrollIntoView({behavior: 'smooth'}); }, 150);"><i class="fa-solid fa-crown text-danger me-2"></i>Executive Leadership (Chairman & MD)</button></li>
+                            <li><button class="dropdown-item" onclick="switchTab('settings-tab'); setTimeout(function(){ var el = document.getElementById('settings-about-section'); if(el) el.scrollIntoView({behavior: 'smooth'}); }, 150);"><i class="fa-solid fa-compass text-success me-2"></i>About Us (Mission, Vision, Values)</button></li>
                             <li><button class="dropdown-item" id="bank-accounts-tab" data-bs-toggle="tab" data-bs-target="#bank-accounts-panel" type="button" role="tab">Bank Accounts</button></li>
                             <li><button class="dropdown-item" id="social-tab" data-bs-toggle="tab" data-bs-target="#social-panel" type="button" role="tab">Social Media Links</button></li>
                             <li><button class="dropdown-item" id="navigation-tab" data-bs-toggle="tab" data-bs-target="#navigation-panel" type="button" role="tab">Navigation Menu</button></li>
@@ -2455,13 +2517,14 @@ require_once __DIR__ . '/includes/header.php';
                                     <?php else: ?>
                                         <?php foreach ($dbReviews as $rev): 
                                             $avatarImg = !empty($rev['avatar']) ? $rev['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+                                            $avatarImgUrl = (strpos($avatarImg, 'http') === 0 || strpos($avatarImg, '/') === 0) ? $avatarImg : ('../' . ltrim($avatarImg, '/'));
                                             $revDateVal = !empty($rev['created_at']) ? date('Y-m-d', strtotime($rev['created_at'])) : date('Y-m-d');
                                         ?>
                                             <tr>
                                                 <td><strong>#<?= $rev['id'] ?></strong></td>
                                                 <td>
                                                     <div class="d-flex align-items-center gap-2">
-                                                        <img src="<?= htmlspecialchars($avatarImg) ?>" alt="<?= htmlspecialchars($rev['name']) ?>" class="rounded-circle object-fit-cover shadow-sm flex-shrink-0" style="width: 40px; height: 40px; border: 1px solid #ddd;">
+                                                        <img src="<?= htmlspecialchars($avatarImgUrl) ?>" alt="<?= htmlspecialchars($rev['name']) ?>" class="rounded-circle object-fit-cover shadow-sm flex-shrink-0" style="width: 40px; height: 40px; border: 1px solid #ddd;">
                                                         <div>
                                                             <div class="fw-bold text-dark"><?= htmlspecialchars($rev['name']) ?></div>
                                                             <div class="text-muted small"><i class="fa-solid fa-envelope me-1"></i><?= htmlspecialchars($rev['email']) ?></div>
@@ -2541,7 +2604,7 @@ require_once __DIR__ . '/includes/header.php';
                                             <div class="modal fade" id="editReviewModal<?= $rev['id'] ?>" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered modal-lg">
                                                     <div class="modal-content border-0 rounded-4">
-                                                        <form method="POST">
+                                                        <form method="POST" enctype="multipart/form-data">
                                                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                             <input type="hidden" name="action" value="edit_review">
                                                             <input type="hidden" name="id" value="<?= $rev['id'] ?>">
@@ -2559,13 +2622,29 @@ require_once __DIR__ . '/includes/header.php';
                                                                         <label class="form-label fw-semibold small">Email Address *</label>
                                                                         <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($rev['email']) ?>" required>
                                                                     </div>
-                                                                    <div class="col-12 col-md-6 form-group">
+                                                                    <div class="col-12 form-group">
                                                                         <label class="form-label fw-semibold small">Course / College (Subtitle)</label>
                                                                         <input type="text" name="course_college" class="form-control" placeholder="e.g. B.Tech CSE(SRM College)" value="<?= htmlspecialchars($rev['course_college'] ?? '') ?>">
                                                                     </div>
-                                                                    <div class="col-12 col-md-6 form-group">
-                                                                        <label class="form-label fw-semibold small">Student Avatar / Profile Photo URL</label>
-                                                                        <input type="text" name="avatar" class="form-control" placeholder="e.g. https://images.unsplash.com/... or assets/images/user1.jpg" value="<?= htmlspecialchars($rev['avatar'] ?? '') ?>">
+                                                                    <div class="col-12 col-md-4 text-center">
+                                                                        <label class="form-label fw-semibold small d-block">Avatar Preview</label>
+                                                                        <div class="position-relative d-inline-block">
+                                                                            <img id="rev_preview_img_<?= $rev['id'] ?>" src="<?= htmlspecialchars($avatarImgUrl) ?>" alt="<?= htmlspecialchars($rev['name']) ?>" class="rounded-circle object-fit-cover shadow-sm border" style="width: 70px; height: 70px;">
+                                                                        </div>
+                                                                        <div class="form-check mt-1 text-center">
+                                                                            <input class="form-check-input" type="checkbox" name="remove_avatar" value="1" id="remove_avatar_<?= $rev['id'] ?>" onchange="var img = document.getElementById('rev_preview_img_<?= $rev['id'] ?>'); if(this.checked){ img.style.opacity = '0.25'; }else{ img.style.opacity = '1'; }">
+                                                                            <label class="form-check-label extra-small text-danger fw-semibold" for="remove_avatar_<?= $rev['id'] ?>">Remove photo</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-8">
+                                                                        <div class="form-group mb-2">
+                                                                            <label class="form-label fw-semibold small">Upload Photo (JPG, PNG, WEBP)</label>
+                                                                            <input type="file" name="avatar_file" class="form-control" accept="image/*" onchange="previewStaffPhoto(this, 'rev_preview_img_<?= $rev['id'] ?>', 'remove_avatar_<?= $rev['id'] ?>')">
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label class="form-label fw-semibold small">Or Photo URL</label>
+                                                                            <input type="text" name="avatar" class="form-control" placeholder="https://..." value="<?= htmlspecialchars($rev['avatar'] ?? '') ?>" oninput="if(this.value){ document.getElementById('rev_preview_img_<?= $rev['id'] ?>').src = this.value; }">
+                                                                        </div>
                                                                     </div>
                                                                     <div class="col-12 col-md-4 form-group">
                                                                         <label class="form-label fw-semibold small">Review Date *</label>
@@ -2617,7 +2696,7 @@ require_once __DIR__ . '/includes/header.php';
                     <div class="modal fade" id="addReviewModal" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered modal-lg">
                             <div class="modal-content border-0 rounded-4">
-                                <form method="POST">
+                                <form method="POST" enctype="multipart/form-data">
                                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                     <input type="hidden" name="action" value="add_review">
                                     <div class="modal-header bg-primary text-white py-3">
@@ -2634,13 +2713,23 @@ require_once __DIR__ . '/includes/header.php';
                                                 <label class="form-label fw-semibold small">Email Address *</label>
                                                 <input type="email" name="email" class="form-control" placeholder="e.g. yugandhar@example.com" required>
                                             </div>
-                                            <div class="col-12 col-md-6 form-group">
+                                            <div class="col-12 form-group">
                                                 <label class="form-label fw-semibold small">Course / College (Subtitle)</label>
-                                                <input type="text" name="course_college" class="form-control" placeholder="e.g. B.Tech CSE(SRM College)">
+                                                <input type="text" name="course_college" class="form-control" placeholder="e.g. B.Tech CSE (SRM University)">
                                             </div>
-                                            <div class="col-12 col-md-6 form-group">
-                                                <label class="form-label fw-semibold small">Student Avatar / Profile Photo URL</label>
-                                                <input type="text" name="avatar" class="form-control" placeholder="e.g. https://images.unsplash.com/... or assets/images/user1.jpg">
+                                            <div class="col-12 col-md-4 text-center">
+                                                <label class="form-label fw-semibold small d-block">Avatar Preview</label>
+                                                <img id="add_rev_preview_img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Preview" class="rounded-circle object-fit-cover shadow-sm border" style="width: 70px; height: 70px;">
+                                            </div>
+                                            <div class="col-12 col-md-8">
+                                                <div class="form-group mb-2">
+                                                    <label class="form-label fw-semibold small">Upload Photo (JPG, PNG, WEBP)</label>
+                                                    <input type="file" name="avatar_file" class="form-control" accept="image/*" onchange="previewStaffPhoto(this, 'add_rev_preview_img')">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label fw-semibold small">Or Photo URL</label>
+                                                    <input type="text" name="avatar" class="form-control" placeholder="https://example.com/photo.jpg" oninput="if(this.value){ document.getElementById('add_rev_preview_img').src = this.value; }">
+                                                </div>
                                             </div>
                                             <div class="col-12 col-md-4 form-group">
                                                 <label class="form-label fw-semibold small">Review Date *</label>
@@ -3684,6 +3773,200 @@ require_once __DIR__ . '/includes/header.php';
                                                 <label class="form-label fw-semibold">Google Analytics 4 Measurement ID</label>
                                                 <input type="text" name="ga_measurement_id" class="form-control font-monospace" placeholder="e.g. G-XXXXXXXXXX" value="<?= htmlspecialchars($siteSettings['ga_measurement_id'] ?? '') ?>">
                                                 <div class="form-text text-muted">Automatically loads the async Google tag (gtag.js) on all pages.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <?php
+                                $chPhotoVal = $siteSettings['chairman_photo'] ?? '';
+                                $chPhotoUrl = !empty($chPhotoVal) ? ((strpos($chPhotoVal, 'http') === 0 || strpos($chPhotoVal, '/') === 0) ? $chPhotoVal : ('../' . ltrim($chPhotoVal, '/'))) : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80';
+
+                                $dirPhotoVal = $siteSettings['director_photo'] ?? '';
+                                $dirPhotoUrl = !empty($dirPhotoVal) ? ((strpos($dirPhotoVal, 'http') === 0 || strpos($dirPhotoVal, '/') === 0) ? $dirPhotoVal : ('../' . ltrim($dirPhotoVal, '/'))) : 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&auto=format&fit=crop&q=80';
+                                ?>
+
+                                <!-- EXECUTIVE LEADERSHIP SECTION (CHAIRMAN SAY & DIRECTOR MESSAGE) -->
+                                <div class="col-12" id="settings-leadership-section">
+                                    <div class="card p-4 border border-light shadow-sm">
+                                        <div class="d-flex align-items-center gap-2 border-bottom pb-2 mb-4">
+                                            <div class="p-2 bg-danger-subtle text-danger rounded-3"><i class="fa-solid fa-crown fs-5"></i></div>
+                                            <div>
+                                                <h6 class="fw-bold text-primary mb-0">Executive Leadership: Chairman Say & Managing Director Messages</h6>
+                                                <small class="text-muted">Manage full quotes, personal messages, titles, badges, and official portrait photographs displayed on the About Us page.</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-4">
+                                            <!-- 1. Chairman Say Card -->
+                                            <div class="col-12 col-lg-6">
+                                                <div class="p-3 bg-light rounded-4 border h-100">
+                                                    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                                                        <span class="badge bg-danger px-3 py-1.5 rounded-pill fw-bold"><i class="fa-solid fa-crown me-1"></i> Chairman Say</span>
+                                                        <span class="text-muted extra-small">अध्यक्षको भनाइ</span>
+                                                    </div>
+
+                                                    <div class="row g-3 mb-3">
+                                                        <div class="col-12 col-sm-4 text-center">
+                                                            <label class="form-label fw-semibold small d-block">Portrait Photo</label>
+                                                            <div class="position-relative d-inline-block">
+                                                                <img id="chairman_preview_img" src="<?= htmlspecialchars($chPhotoUrl) ?>" alt="Chairman Preview" class="rounded-4 object-fit-cover shadow-sm border border-2 border-white" style="width: 105px; height: 125px;">
+                                                            </div>
+                                                            <div class="form-check mt-1 text-center">
+                                                                <input class="form-check-input" type="checkbox" name="remove_chairman_photo" value="1" id="remove_chairman_photo" onchange="var img = document.getElementById('chairman_preview_img'); if(this.checked){ img.style.opacity = '0.25'; }else{ img.style.opacity = '1'; }">
+                                                                <label class="form-check-label extra-small text-danger fw-semibold" for="remove_chairman_photo">Reset photo</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 col-sm-8">
+                                                            <div class="form-group mb-2">
+                                                                <label class="form-label fw-semibold small">Upload Photo (JPG, PNG, WEBP)</label>
+                                                                <input type="file" name="chairman_photo_file" class="form-control form-control-sm" accept="image/*" onchange="previewStaffPhoto(this, 'chairman_preview_img', 'remove_chairman_photo')">
+                                                            </div>
+                                                            <div class="form-group mb-2">
+                                                                <label class="form-label fw-semibold small">Or Image URL</label>
+                                                                <input type="text" name="chairman_photo" class="form-control form-control-sm" placeholder="https://..." value="<?= htmlspecialchars($siteSettings['chairman_photo'] ?? '') ?>" oninput="if(this.value){ document.getElementById('chairman_preview_img').src = this.value; }">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="form-label fw-semibold small">Chairman Name / Identity</label>
+                                                                <input type="text" name="chairman_name" class="form-control form-control-sm" value="<?= htmlspecialchars($siteSettings['chairman_name'] ?? "Chairman's Perspective") ?>" placeholder="e.g. Chairman's Perspective or Name">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row g-2 mb-2">
+                                                        <div class="col-6 form-group">
+                                                            <label class="form-label fw-semibold extra-small">Badge Text</label>
+                                                            <input type="text" name="chairman_badge" class="form-control form-control-sm" value="<?= htmlspecialchars($siteSettings['chairman_badge'] ?? 'Chairman Say') ?>" placeholder="e.g. Chairman Say">
+                                                        </div>
+                                                        <div class="col-6 form-group">
+                                                            <label class="form-label fw-semibold extra-small">Sub-heading Label</label>
+                                                            <input type="text" name="chairman_title" class="form-control form-control-sm" value="<?= htmlspecialchars($siteSettings['chairman_title'] ?? 'Chairman Say • अध्यक्षको भनाइ') ?>" placeholder="e.g. Chairman Say • अध्यक्षको भनाइ">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label fw-semibold extra-small">Organization Subtitle Tag</label>
+                                                        <input type="text" name="chairman_subtitle" class="form-control form-control-sm" value="<?= htmlspecialchars($siteSettings['chairman_subtitle'] ?? 'Vision Point Educational Service (Est. 2070 B.S.)') ?>">
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label fw-semibold small">Main Speech Headline</label>
+                                                        <input type="text" name="chairman_heading" class="form-control form-control-sm" value="<?= htmlspecialchars($siteSettings['chairman_heading'] ?? 'Fostering Academic Ambitions with Uncompromising Integrity Since 2070 B.S.') ?>">
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label fw-semibold small">Highlighted Opening Quote</label>
+                                                        <textarea name="chairman_quote" class="form-control form-control-sm" rows="3"><?= htmlspecialchars($siteSettings['chairman_quote'] ?? 'When we founded Vision Point Educational Service in 2070 B.S. in Biratnagar, our core commitment was simple yet uncompromising: to provide honest, transparent, and student-centered educational guidance without commercial bias. Over the past 13+ years, that founding philosophy has remained our greatest strength.') ?></textarea>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="form-label fw-semibold small">Detailed Speech Message (Paragraphs)</label>
+                                                        <textarea name="chairman_message" class="form-control form-control-sm" rows="4" placeholder="Enter custom speech paragraphs or leave blank to use the official statutory statement..."><?= htmlspecialchars($siteSettings['chairman_message'] ?? '') ?></textarea>
+                                                        <div class="form-text text-muted extra-small">Leave blank to retain default certified institutional statements.</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 2. Managing Director Message Card -->
+                                            <div class="col-12 col-lg-6">
+                                                <div class="p-3 bg-light rounded-4 border h-100">
+                                                    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                                                        <span class="badge bg-primary px-3 py-1.5 rounded-pill fw-bold"><i class="fa-solid fa-certificate me-1"></i> Director Message</span>
+                                                        <span class="text-muted extra-small">निर्देशकको सन्देश</span>
+                                                    </div>
+
+                                                    <div class="row g-3 mb-3">
+                                                        <div class="col-12 col-sm-4 text-center">
+                                                            <label class="form-label fw-semibold small d-block">Portrait Photo</label>
+                                                            <div class="position-relative d-inline-block">
+                                                                <img id="director_preview_img" src="<?= htmlspecialchars($dirPhotoUrl) ?>" alt="Director Preview" class="rounded-4 object-fit-cover shadow-sm border border-2 border-white" style="width: 105px; height: 125px;">
+                                                            </div>
+                                                            <div class="form-check mt-1 text-center">
+                                                                <input class="form-check-input" type="checkbox" name="remove_director_photo" value="1" id="remove_director_photo" onchange="var img = document.getElementById('director_preview_img'); if(this.checked){ img.style.opacity = '0.25'; }else{ img.style.opacity = '1'; }">
+                                                                <label class="form-check-label extra-small text-danger fw-semibold" for="remove_director_photo">Reset photo</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 col-sm-8">
+                                                            <div class="form-group mb-2">
+                                                                <label class="form-label fw-semibold small">Upload Photo (JPG, PNG, WEBP)</label>
+                                                                <input type="file" name="director_photo_file" class="form-control form-control-sm" accept="image/*" onchange="previewStaffPhoto(this, 'director_preview_img', 'remove_director_photo')">
+                                                            </div>
+                                                            <div class="form-group mb-2">
+                                                                <label class="form-label fw-semibold small">Or Image URL</label>
+                                                                <input type="text" name="director_photo" class="form-control form-control-sm" placeholder="https://..." value="<?= htmlspecialchars($siteSettings['director_photo'] ?? '') ?>" oninput="if(this.value){ document.getElementById('director_preview_img').src = this.value; }">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="form-label fw-semibold small">Director Name / Identity</label>
+                                                                <input type="text" name="director_name" class="form-control form-control-sm" value="<?= htmlspecialchars($siteSettings['director_name'] ?? 'Managing Director') ?>" placeholder="e.g. Managing Director or Name">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row g-2 mb-2">
+                                                        <div class="col-6 form-group">
+                                                            <label class="form-label fw-semibold extra-small">Badge Text</label>
+                                                            <input type="text" name="director_badge" class="form-control form-control-sm" value="<?= htmlspecialchars($siteSettings['director_badge'] ?? 'Director Message') ?>" placeholder="e.g. Director Message">
+                                                        </div>
+                                                        <div class="col-6 form-group">
+                                                            <label class="form-label fw-semibold extra-small">Sub-heading Label</label>
+                                                            <input type="text" name="director_title" class="form-control form-control-sm" value="<?= htmlspecialchars($siteSettings['director_title'] ?? 'Director Message • निर्देशकको सन्देश') ?>" placeholder="e.g. Director Message • निर्देशकको सन्देश">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label fw-semibold extra-small">Organization Subtitle Tag</label>
+                                                        <input type="text" name="director_subtitle" class="form-control form-control-sm" value="<?= htmlspecialchars($siteSettings['director_subtitle'] ?? 'Vision Point Educational Service (Est. 2070 B.S.)') ?>">
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label fw-semibold small">Main Speech Headline</label>
+                                                        <input type="text" name="director_heading" class="form-control form-control-sm" value="<?= htmlspecialchars($siteSettings['director_heading'] ?? 'Empowering Nepalese Scholars on the Global Stage with Professional Excellence') ?>">
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label fw-semibold small">Highlighted Opening Quote</label>
+                                                        <textarea name="director_quote" class="form-control form-control-sm" rows="3"><?= htmlspecialchars($siteSettings['director_quote'] ?? 'Higher education is a life-defining investment. At Vision Point Educational Service, our operational team works tirelessly to bridge the gap between ambitious students in Nepal and accredited, top-tier global universities with 100% transparent fee structures.') ?></textarea>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="form-label fw-semibold small">Detailed Speech Message (Paragraphs)</label>
+                                                        <textarea name="director_message" class="form-control form-control-sm" rows="4" placeholder="Enter custom speech paragraphs or leave blank to use the official statutory statement..."><?= htmlspecialchars($siteSettings['director_message'] ?? '') ?></textarea>
+                                                        <div class="form-text text-muted extra-small">Leave blank to retain default certified institutional statements.</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ABOUT US STATEMENTS (MISSION, VISION & CORE VALUES) -->
+                                <div class="col-12" id="settings-about-section">
+                                    <div class="card p-4 border border-light shadow-sm">
+                                        <div class="d-flex align-items-center gap-2 border-bottom pb-2 mb-4">
+                                            <div class="p-2 bg-success-subtle text-success rounded-3"><i class="fa-solid fa-compass fs-5"></i></div>
+                                            <div>
+                                                <h6 class="fw-bold text-primary mb-0">About Us Page: Mission, Vision, Core Values & Foundation Overview</h6>
+                                                <small class="text-muted">Direct CMS controls for the foundational statements displayed on About Us and throughout the portal.</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group p-3 bg-light rounded-3 border h-100">
+                                                    <label class="form-label fw-bold text-primary"><i class="fa-solid fa-compass text-primary me-1"></i> Our Mission</label>
+                                                    <textarea name="about_mission" class="form-control" rows="4" placeholder="Enter mission statement..."><?= htmlspecialchars($siteSettings['about_mission'] ?? 'To provide accurate, unbiased, and comprehensive academic counseling to Nepalese students, ensuring seamless admissions into accredited institutions in India and overseas with maximum scholarship support.') ?></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group p-3 bg-light rounded-3 border h-100">
+                                                    <label class="form-label fw-bold text-warning"><i class="fa-solid fa-eye text-warning me-1"></i> Our Vision</label>
+                                                    <textarea name="about_vision" class="form-control" rows="4" placeholder="Enter vision statement..."><?= htmlspecialchars($siteSettings['about_vision'] ?? 'To be recognized as the most reliable, transparent, and student-centric educational advisory bureau in eastern Nepal, setting industry benchmarks for ethical counseling and documentation integrity.') ?></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group p-3 bg-light rounded-3 border h-100">
+                                                    <label class="form-label fw-bold text-success"><i class="fa-solid fa-handshake-angle text-success me-1"></i> Our Values</label>
+                                                    <textarea name="about_values" class="form-control" rows="4" placeholder="Enter core values..."><?= htmlspecialchars($siteSettings['about_values'] ?? 'Integrity, transparency, student empathy, and relentless commitment to genuine guidance without commercial bias. We guide based on aptitude, merit, and career suitability.') ?></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="form-group p-3 bg-light rounded-3 border">
+                                                    <label class="form-label fw-bold text-primary"><i class="fa-solid fa-landmark text-danger me-1"></i> Foundation Overview (Who We Are Introduction)</label>
+                                                    <textarea name="about_foundation_intro" class="form-control" rows="3" placeholder="Optional custom foundation introduction text..."><?= htmlspecialchars($siteSettings['about_foundation_intro'] ?? '') ?></textarea>
+                                                    <div class="form-text text-muted extra-small">Leave blank to keep the default MoEST & TITI Biratnagar foundation text.</div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -6848,6 +7131,25 @@ require_once __DIR__ . '/includes/header.php';
                     }
                 });
             });
+
+            // Instant image preview for file uploads (staff, reviews, chairman, director)
+            function previewStaffPhoto(input, imgId, removeCheckId) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var img = document.getElementById(imgId);
+                        if (img) {
+                            img.src = e.target.result;
+                            img.style.opacity = '1';
+                        }
+                        if (removeCheckId) {
+                            var chk = document.getElementById(removeCheckId);
+                            if (chk) chk.checked = false;
+                        }
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
         </script>
 
 <?php
