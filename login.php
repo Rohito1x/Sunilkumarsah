@@ -1,8 +1,4 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 require_once __DIR__ . '/includes/db.php';
 
 // Redirect to dashboard if already logged in
@@ -11,15 +7,18 @@ if (isset($_SESSION['admin_id'])) {
     exit;
 }
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 $alert = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $csrfToken = isset($_POST['csrf_token']) ? trim((string)$_POST['csrf_token']) : '';
-    if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
+    $submittedToken = isset($_POST['csrf_token']) ? trim((string)$_POST['csrf_token']) : ($_POST['_csrf_token'] ?? '');
+    $sessionToken = $_SESSION['csrf_token'] ?? ($_SESSION[Csrf::TOKEN_KEY] ?? '');
+
+    $csrfValid = false;
+    if (!empty($sessionToken) && !empty($submittedToken) && hash_equals($sessionToken, $submittedToken)) {
+        $csrfValid = true;
+    }
+
+    if (!$csrfValid) {
         $alert = ['type' => 'danger', 'msg' => 'Security check failed. Please refresh the page and try again.'];
     } else {
         $email = isset($_POST['email']) ? trim((string)$_POST['email']) : '';
@@ -44,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         recordFailedAttempt($pdo, $email);
                         $alert = ['type' => 'danger', 'msg' => 'Invalid email or password.'];
                     } else {
-                        // Successful login - reset rate limit counter & regenerate session ID with anti-fixation fingerprinting
+                        // Successful login - reset rate limit counter & regenerate session ID with anti-fixation protection
                         resetRateLimit($pdo, $email);
                         if (class_exists('SessionManager')) {
                             SessionManager::regenerateOnAuth((int)$user['id'], $user['email']);
@@ -64,6 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+}
+
+// Ensure active CSRF token is available for the form
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = Csrf::getToken();
 }
 
 require_once __DIR__ . '/includes/header.php';
@@ -90,14 +94,14 @@ require_once __DIR__ . '/includes/header.php';
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="">
+                <form method="POST" action="login.php">
                     <input type="hidden" name="csrf_token" value="<?= h($_SESSION['csrf_token']) ?>">
                     
                     <div class="form-group mb-3">
                         <label class="form-label fw-semibold text-dark small">Admin Email</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-regular fa-envelope"></i></span>
-                            <input type="email" name="email" class="form-control bg-light border-start-0" placeholder="admin@visionpoint.edu.np" required autocomplete="email">
+                            <input type="email" name="email" class="form-control bg-light border-start-0" placeholder="admin@visionpoint.edu.np" required autocomplete="email" value="<?= isset($_POST['email']) ? h($_POST['email']) : '' ?>">
                         </div>
                     </div>
                     

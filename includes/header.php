@@ -1,6 +1,21 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    $isSecure = isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] === '1');
+// Safely load database and security configuration if available
+if (!isset($pdo)) {
+    $dbPath = __DIR__ . '/db.php';
+    if (file_exists($dbPath)) {
+        require_once $dbPath;
+    }
+}
+
+if (class_exists('SessionManager')) {
+    SessionManager::start();
+} elseif (session_status() !== PHP_SESSION_ACTIVE) {
+    $isSecure = (
+        (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string)$_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower((string)$_SERVER['HTTP_X_FORWARDED_SSL']) === 'on')
+    );
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',

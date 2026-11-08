@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /**
  * Vision Point Educational Service - Enterprise Session Manager
- * Enforces hardened session cookies, strict mode, fixation protection, and hijacking defense.
+ * Enforces hardened session cookies, fixation protection, and hijacking defense.
  */
 final class SessionManager
 {
@@ -21,22 +21,23 @@ final class SessionManager
         }
 
         $isHttps = (
-            (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off')
             || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
-            || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+            || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string)$_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+            || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower((string)$_SERVER['HTTP_X_FORWARDED_SSL']) === 'on')
+            || (!empty($_SERVER['HTTP_CF_VISITOR']) && strpos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false)
         );
 
         // Enforce hardened cookie configuration
         session_set_cookie_params([
             'lifetime' => 0,              // Valid until browser is closed
             'path'     => '/',
-            'domain'   => '',             // Default to host
-            'secure'   => $isHttps,       // Strict HTTPS transmission
+            'domain'   => '',             // Default to current host
+            'secure'   => $isHttps,       // Strict HTTPS transmission when running under HTTPS
             'httponly' => true,           // Deny JavaScript document.cookie access
             'samesite' => 'Lax'           // Cross-site request forgery defense
         ]);
 
-        ini_set('session.use_strict_mode', '1');
         ini_set('session.use_only_cookies', '1');
         ini_set('session.use_trans_sid', '0');
 
@@ -98,45 +99,41 @@ final class SessionManager
     }
 
     /**
-     * Computes a privacy-respecting client fingerprint based on User-Agent and Class-C IP subnet.
+     * Computes a client browser fingerprint based on User-Agent.
+     * Note: Per OWASP guidelines, client IP is excluded to avoid breaking legitimate
+     * sessions on mobile networks, IPv6 privacy extensions, and CDN reverse proxies.
      */
     private static function generateFingerprint(): string
     {
-        $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown_ua';
-        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-        
-        // IPv4 subnet mask /24 to tolerate mobile IP carrier hopping
-        $subnet = preg_replace('/(\d+)\.(\d+)\.(\d+)\.\d+/', '$1.$2.$3.0', $ip);
-
-        return hash('sha256', $ua . '|' . $subnet);
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'standard_browser';
+        return hash('sha256', $ua);
     }
 
     /**
-     * Checks session activity timestamp and fingerprint consistency.
+     * Checks session activity timestamp and fingerprint consistency for authenticated users.
      */
     private static function validateIntegrity(): void
     {
         $now = time();
 
-        // Check inactivity timeout
-        if (isset($_SESSION[self::LAST_ACTIVITY_KEY]) && is_int($_SESSION[self::LAST_ACTIVITY_KEY])) {
-            if (($now - $_SESSION[self::LAST_ACTIVITY_KEY]) > self::MAX_INACTIVITY_SECONDS) {
+        // Only enforce strict fingerprinting and inactivity timeout on active authenticated administrator sessions
+        if (isset($_SESSION['admin_id'])) {
+            if (isset($_SESSION[self::LAST_ACTIVITY_KEY]) && is_int($_SESSION[self::LAST_ACTIVITY_KEY])) {
+                if (($now - $_SESSION[self::LAST_ACTIVITY_KEY]) > self::MAX_INACTIVITY_SECONDS) {
+                    self::destroy();
+                    return;
+                }
+            }
+
+            $currentFingerprint = self::generateFingerprint();
+            if (!isset($_SESSION[self::FINGERPRINT_KEY])) {
+                $_SESSION[self::FINGERPRINT_KEY] = $currentFingerprint;
+            } elseif (!hash_equals($_SESSION[self::FINGERPRINT_KEY], $currentFingerprint)) {
                 self::destroy();
                 return;
             }
         }
+
         $_SESSION[self::LAST_ACTIVITY_KEY] = $now;
-
-        // Verify fingerprint
-        $currentFingerprint = self::generateFingerprint();
-        if (!isset($_SESSION[self::FINGERPRINT_KEY])) {
-            $_SESSION[self::FINGERPRINT_KEY] = $currentFingerprint;
-            return;
-        }
-
-        if (!hash_equals($_SESSION[self::FINGERPRINT_KEY], $currentFingerprint)) {
-            // Mismatch indicates possible hijacked session
-            self::destroy();
-        }
     }
 }

@@ -54,6 +54,12 @@ DirectoryIndex index.php index.html
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Force HTTPS across the entire website (compatible with Apache, Cloudflare & LiteSpeed)
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteCond %{HTTP:CF-Visitor} !https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
     # Sitemap and Robots routes
     RewriteRule ^sitemap\.xml$ sitemap.php [L]
     RewriteRule ^robots\.txt$ robots.txt [L]
