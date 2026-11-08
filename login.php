@@ -7,7 +7,7 @@ require_once __DIR__ . '/includes/db.php';
 
 // Redirect to dashboard if already logged in
 if (isset($_SESSION['admin_id'])) {
-    header('Location: jaiswal/dashboard.php');
+    header('Location: vision/dashboard.php');
     exit;
 }
 
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $_SESSION['admin_email'] = $user['email'];
                         }
 
-                        header('Location: jaiswal/dashboard.php');
+                        header('Location: vision/dashboard.php');
                         exit;
                     }
                 } catch (PDOException $e) {

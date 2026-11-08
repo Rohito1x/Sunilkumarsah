@@ -92,6 +92,9 @@ DirectoryIndex index.php index.html
     RewriteRule ^student-success-stories/?$ reviews.php [L,QSA]
     RewriteRule ^reviews/?$ reviews.php [L,QSA]
     RewriteRule ^login/?$ login.php [L,QSA]
+    RewriteRule ^vision/?$ vision/dashboard.php [L,QSA]
+    RewriteRule ^jaiswal/(.*)$ vision/$1 [R=301,L]
+    RewriteRule ^jaiswal/?$ vision/dashboard.php [R=301,L]
 </IfModule>
 
 # 6. Custom Error Pages

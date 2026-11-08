@@ -336,7 +336,7 @@ if (empty($topMenu)) {
                     </button>
                     
                     <?php if ($isAdmin): ?>
-                        <a href="<?= h($basePath) ?>jaiswal/dashboard.php" class="btn btn-success fw-semibold px-2.5 py-1.5 rounded-pill btn-sm text-white text-nowrap" style="font-size: 12px;"><i class="fa-solid fa-gauge me-1"></i>Admin</a>
+                        <a href="<?= h($basePath) ?>vision/dashboard.php" class="btn btn-success fw-semibold px-2.5 py-1.5 rounded-pill btn-sm text-white text-nowrap" style="font-size: 12px;"><i class="fa-solid fa-gauge me-1"></i>Admin</a>
                         <a href="<?= h($basePath) ?>logout.php" class="btn btn-outline-danger fw-semibold px-2.5 py-1.5 rounded-pill btn-sm text-nowrap" style="font-size: 12px;"><i class="fa-solid fa-sign-out"></i></a>
                     <?php endif; ?>
                 </div>

@@ -3,8 +3,8 @@ User-agent: *
 Allow: /
 
 # Disallow admin panel and private management endpoints
-Disallow: /jaiswal/
-Disallow: /jaiswal@krishna.php
+Disallow: /vision/
+Disallow: /vision.php
 Disallow: /login.php
 Disallow: /check_status.php
 Disallow: /setup.php
