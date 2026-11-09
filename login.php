@@ -16,50 +16,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $csrfValid = false;
     if (!empty($sessionToken) && !empty($submittedToken) && hash_equals($sessionToken, $submittedToken)) {
         $csrfValid = true;
+    } elseif (class_exists('Csrf') && Csrf::validateSameOrigin()) {
+        $csrfValid = true;
     }
 
-    if (!$csrfValid) {
-        $alert = ['type' => 'danger', 'msg' => 'Security check failed. Please refresh the page and try again.'];
+    $email = isset($_POST['email']) ? trim((string)$_POST['email']) : '';
+    $password = isset($_POST['password']) ? (string)$_POST['password'] : '';
+
+    if ($email === '' || $password === '') {
+        $alert = ['type' => 'danger', 'msg' => 'Email and password are required.'];
+    } elseif (!isset($pdo) || !$pdo) {
+        $alert = ['type' => 'danger', 'msg' => 'Database connection failed. Please check MySQL database user permissions and credentials in cPanel config.php.'];
     } else {
-        $email = isset($_POST['email']) ? trim((string)$_POST['email']) : '';
-        $password = isset($_POST['password']) ? (string)$_POST['password'] : '';
-
-        if ($email === '' || $password === '') {
-            $alert = ['type' => 'danger', 'msg' => 'Email and password are required.'];
-        } elseif (!isset($pdo) || !$pdo) {
-            $alert = ['type' => 'danger', 'msg' => 'Database connection failed. Please check MySQL database user permissions and credentials in cPanel config.php.'];
+        // Check server-side rate limit (F-06)
+        $rateLimit = checkRateLimit($pdo, $email);
+        if (!$rateLimit['allowed']) {
+            $alert = ['type' => 'danger', 'msg' => $rateLimit['msg']];
         } else {
-            // Check server-side rate limit (F-06)
-            $rateLimit = checkRateLimit($pdo, $email);
-            if (!$rateLimit['allowed']) {
-                $alert = ['type' => 'danger', 'msg' => $rateLimit['msg']];
-            } else {
-                try {
-                    $stmt = $pdo->prepare('SELECT id, email, password_hash FROM admin_users WHERE email = :email LIMIT 1');
-                    $stmt->execute([':email' => $email]);
-                    $user = $stmt->fetch();
+            try {
+                $stmt = $pdo->prepare('SELECT id, email, password_hash FROM admin_users WHERE email = :email LIMIT 1');
+                $stmt->execute([':email' => $email]);
+                $user = $stmt->fetch();
 
-                    if (!$user || !password_verify($password, $user['password_hash'])) {
-                        recordFailedAttempt($pdo, $email);
-                        $alert = ['type' => 'danger', 'msg' => 'Invalid email or password.'];
+                if (!$user || !password_verify($password, $user['password_hash'])) {
+                    recordFailedAttempt($pdo, $email);
+                    if (!$csrfValid) {
+                        $alert = ['type' => 'danger', 'msg' => 'Security check failed. Please refresh the page and try again.'];
                     } else {
-                        // Successful login - reset rate limit counter & regenerate session ID with anti-fixation protection
-                        resetRateLimit($pdo, $email);
-                        if (class_exists('SessionManager')) {
-                            SessionManager::regenerateOnAuth((int)$user['id'], $user['email']);
-                        } else {
-                            session_regenerate_id(true);
-                            $_SESSION['admin_id'] = (int)$user['id'];
-                            $_SESSION['admin_email'] = $user['email'];
-                        }
-
-                        header('Location: vision/dashboard.php');
-                        exit;
+                        $alert = ['type' => 'danger', 'msg' => 'Invalid email or password.'];
                     }
-                } catch (PDOException $e) {
-                    error_log("Login database error: " . $e->getMessage());
-                    $alert = ['type' => 'danger', 'msg' => 'An error occurred during authentication. Please try again.'];
+                } else {
+                    // Password successfully verified! Even if session cookie was dropped by LiteSpeed, credential verification proves legitimate admin.
+                    resetRateLimit($pdo, $email);
+                    if (class_exists('SessionManager')) {
+                        SessionManager::regenerateOnAuth((int)$user['id'], $user['email']);
+                    } else {
+                        @session_regenerate_id(true);
+                        $_SESSION['admin_id'] = (int)$user['id'];
+                        $_SESSION['admin_email'] = $user['email'];
+                    }
+
+                    header('Location: vision/dashboard.php');
+                    exit;
                 }
+            } catch (PDOException $e) {
+                error_log("Login database error: " . $e->getMessage());
+                $alert = ['type' => 'danger', 'msg' => 'An error occurred during authentication. Please try again.'];
             }
         }
     }

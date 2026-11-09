@@ -108,6 +108,14 @@ if (preg_match('/src="([^"]+)"/', $contactMap, $m)) {
                                 Main Road (Opposite Traffic Police Office / Roadcess Chowk)<br>
                                 Biratnagar 56613, Morang, Nepal
                             </p>
+                            <?php 
+                                $directMapLink = !empty($siteSettings['google_map_link']) ? $siteSettings['google_map_link'] : 'https://maps.google.com/?q=Vision+Point+Educational+Service+Biratnagar';
+                            ?>
+                            <div class="mt-2">
+                                <a href="<?= h($directMapLink) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold">
+                                    <i class="fa-solid fa-diamond-turn-right me-1 text-danger"></i>Get Directions on Google Maps
+                                </a>
+                            </div>
                         </div>
                     </div>
 

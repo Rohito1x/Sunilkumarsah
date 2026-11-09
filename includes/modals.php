@@ -361,8 +361,6 @@ if (isset($pdo)) {
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
 <!-- Global Payment Receipt Submission Modal -->
 <div class="modal fade" id="paymentReceiptModal" tabindex="-1" aria-labelledby="paymentReceiptModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">

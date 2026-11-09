@@ -20,6 +20,9 @@ final class SessionManager
             return;
         }
 
+        $rawHost = $_SERVER['HTTP_HOST'] ?? '';
+        $cleanHost = strtolower(explode(':', $rawHost)[0]);
+
         $isHttps = (
             (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off')
             || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
@@ -28,32 +31,48 @@ final class SessionManager
             || (!empty($_SERVER['HTTP_CF_VISITOR']) && strpos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false)
         );
 
-        // Ensure session save path is valid and writable (fixes session loss on restricted hosts/CageFS)
+        // Configure session save path defensively
+        // If current path is empty, fallback to system temp dir or local sessions directory
         $currentSavePath = @session_save_path();
-        if (empty($currentSavePath) || !@is_dir($currentSavePath) || !@is_writable($currentSavePath)) {
-            $localSessionDir = dirname(__DIR__) . '/sessions';
-            if (!is_dir($localSessionDir)) {
-                @mkdir($localSessionDir, 0700, true);
-            }
-            if (is_dir($localSessionDir) && is_writable($localSessionDir)) {
-                @session_save_path($localSessionDir);
+        if (empty($currentSavePath)) {
+            $sysTemp = sys_get_temp_dir();
+            if (!empty($sysTemp) && @is_dir($sysTemp) && @is_writable($sysTemp)) {
+                @session_save_path($sysTemp);
+            } else {
+                $localSessionDir = dirname(__DIR__) . '/sessions';
+                if (!is_dir($localSessionDir)) {
+                    @mkdir($localSessionDir, 0777, true);
+                }
+                if (is_dir($localSessionDir) && is_writable($localSessionDir)) {
+                    @session_save_path($localSessionDir);
+                }
             }
         }
 
-        // Enforce hardened cookie configuration
-        session_set_cookie_params([
-            'lifetime' => 0,              // Valid until browser is closed
-            'path'     => '/',
-            'domain'   => '',             // Default to current host
-            'secure'   => $isHttps,       // Strict HTTPS transmission when running under HTTPS
-            'httponly' => true,           // Deny JavaScript document.cookie access
-            'samesite' => 'Lax'           // Cross-site request forgery defense
-        ]);
+        // Host cookie domain: allow sharing between apex and www subdomain in production
+        $cookieDomain = '';
+        if (strpos($cleanHost, 'visionpoint.edu.np') !== false) {
+            $cookieDomain = '.visionpoint.edu.np';
+        }
 
-        ini_set('session.use_only_cookies', '1');
-        ini_set('session.use_trans_sid', '0');
+        if (!headers_sent()) {
+            // Enforce hardened cookie configuration
+            session_set_cookie_params([
+                'lifetime' => 0,              // Valid until browser is closed
+                'path'     => '/',
+                'domain'   => $cookieDomain,  // Unified domain for both www & non-www
+                'secure'   => $isHttps,       // Strict HTTPS transmission when running under HTTPS
+                'httponly' => true,           // Deny JavaScript document.cookie access
+                'samesite' => 'Lax'           // Cross-site request forgery defense
+            ]);
 
-        session_start();
+            @ini_set('session.use_only_cookies', '1');
+            @ini_set('session.use_trans_sid', '0');
+        }
+
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            @session_start();
+        }
 
         // Enforce inactivity timeout & session hijacking defenses
         self::validateIntegrity();

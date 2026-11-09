@@ -119,6 +119,43 @@ function handleDocUpload($fileKey, $prefix = 'doc_') {
         throw new Exception('Failed to save uploaded document.');
     }
 }
+// Helper: Secure video upload
+function handleVideoUpload($fileKey, $prefix = 'video_') {
+    if (!isset($_FILES[$fileKey]) || $_FILES[$fileKey]['error'] == UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+    
+    if ($_FILES[$fileKey]['error'] !== UPLOAD_ERR_OK) {
+        throw new Exception('Video upload error code: ' . $_FILES[$fileKey]['error']);
+    }
+    
+    $fileName = $_FILES[$fileKey]['name'];
+    $fileTmp = $_FILES[$fileKey]['tmp_name'];
+    $fileSize = $_FILES[$fileKey]['size'];
+    $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+    $allowed = ['mp4', 'webm', 'mov', 'm4v'];
+    
+    if (!in_array($ext, $allowed)) {
+        throw new Exception('Invalid video format. Allowed video files: MP4, WebM, MOV.');
+    }
+    
+    if ($fileSize > 100 * 1024 * 1024) { // 100MB limit
+        throw new Exception('Video file size exceeds the 100MB limit.');
+    }
+    
+    $uploadDir = __DIR__ . '/../uploads/videos/';
+    if (!is_dir($uploadDir)) {
+        @mkdir($uploadDir, 0755, true);
+    }
+    
+    $newFileName = uniqid($prefix, true) . '.' . $ext;
+    if (move_uploaded_file($fileTmp, $uploadDir . $newFileName)) {
+        return 'uploads/videos/' . $newFileName;
+    } else {
+        throw new Exception('Failed to save uploaded video file.');
+    }
+}
+
 
 function handlePdfUpload($fileKey, $prefix = 'pdf_') {
     if (!isset($_FILES[$fileKey]) || $_FILES[$fileKey]['error'] == UPLOAD_ERR_NO_FILE) {
@@ -1236,7 +1273,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 'qr_code_title', 'qr_code_description', 'notification_title', 'notification_message',
                 'notification_banner_color', 'notification_link', 'accreditation_title', 'accreditation_subtitle',
                 'gsc_verification_code', 'ga_measurement_id',
-                'contact_whatsapp', 'contact_office_hours', 'contact_map_iframe',
+                'contact_whatsapp', 'contact_office_hours', 'contact_map_iframe', 'google_map_link', 'hero_video_title', 'hero_video_path',
                 'about_mission', 'about_vision', 'about_values', 'about_foundation_intro',
                 'chairman_name', 'chairman_title', 'chairman_subtitle', 'chairman_badge', 'chairman_heading', 'chairman_quote', 'chairman_message', 'chairman_photo',
                 'director_name', 'director_title', 'director_subtitle', 'director_badge', 'director_heading', 'director_quote', 'director_message', 'director_photo'
@@ -1265,6 +1302,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             // Handle Accreditation section enabled checkbox explicitly
             $accred_enabled = isset($_POST['accreditation_enabled']) ? '1' : '0';
             $stmt->execute(['accreditation_enabled', $accred_enabled]);
+
+            // Handle Campus Video Upload & Reset
+            if (!empty($_POST['revert_default_video'])) {
+                $stmt->execute(['hero_video_path', 'assets/videos/vision_point_intro.mp4']);
+            } else {
+                $uploadedVideo = handleVideoUpload('hero_video_file');
+                if ($uploadedVideo) {
+                    $stmt->execute(['hero_video_path', $uploadedVideo]);
+                }
+            }
+
+            // Clean contact_map_iframe if pasted as full iframe tag
+            if (isset($_POST['contact_map_iframe'])) {
+                $rawMap = trim((string)$_POST['contact_map_iframe']);
+                if (preg_match('/src="([^"]+)"/', $rawMap, $mapM)) {
+                    $stmt->execute(['contact_map_iframe', $mapM[1]]);
+                }
+            }
 
             
             // Handle Site Logo Upload override
@@ -1999,6 +2054,8 @@ require_once __DIR__ . '/includes/header.php';
                             <li><button class="dropdown-item" id="bank-accounts-tab" data-bs-toggle="tab" data-bs-target="#bank-accounts-panel" type="button" role="tab"><i class="fa-solid fa-qrcode text-primary me-2"></i>Bank Accounts & Payment QR</button></li>
                             <li><button class="dropdown-item" onclick="switchTab('bank-accounts-tab'); setTimeout(function(){ var el = document.getElementById('payment-qr-management-card'); if(el) el.scrollIntoView({behavior: 'smooth'}); }, 150);"><i class="fa-solid fa-camera text-success me-2"></i>Change Payment QR Code</button></li>
                             <li><button class="dropdown-item" onclick="switchTab('receipts-tab');"><i class="fa-solid fa-receipt text-warning me-2"></i>Payment Receipts (Vouchers)</button></li>
+                            <li><button class="dropdown-item" onclick="switchTab('settings-tab'); setTimeout(function(){ var el = document.getElementById('settings-video-section'); if(el) el.scrollIntoView({behavior: 'smooth'}); }, 150);"><i class="fa-solid fa-video text-danger me-2"></i>Campus Spotlight Video</button></li>
+                            <li><button class="dropdown-item" onclick="switchTab('settings-tab'); setTimeout(function(){ var el = document.getElementById('settings-map-section'); if(el) el.scrollIntoView({behavior: 'smooth'}); }, 150);"><i class="fa-solid fa-map-location-dot text-success me-2"></i>Google Map & Office Location</button></li>
                             <li><button class="dropdown-item" id="social-tab" data-bs-toggle="tab" data-bs-target="#social-panel" type="button" role="tab">Social Media Links</button></li>
                             <li><button class="dropdown-item" id="navigation-tab" data-bs-toggle="tab" data-bs-target="#navigation-panel" type="button" role="tab">Navigation Menu</button></li>
                             <li><button class="dropdown-item" id="countries-tab" data-bs-toggle="tab" data-bs-target="#countries-panel" type="button" role="tab">Countries (Forms)</button></li>
@@ -4421,6 +4478,135 @@ require_once __DIR__ . '/includes/header.php';
                                     </div>
                                 </div>
                             </div>
+                            
+                                <!-- GOOGLE MAPS & OFFICE LOCATION SECTION -->
+                                <div class="col-12" id="settings-map-section">
+                                    <div class="card p-4 border border-light shadow-sm">
+                                        <div class="d-flex align-items-center gap-2 border-bottom pb-2 mb-4">
+                                            <div class="p-2 bg-success-subtle text-success rounded-3"><i class="fa-solid fa-map-location-dot fs-5"></i></div>
+                                            <div>
+                                                <h6 class="fw-bold text-primary mb-0">Office Location & Google Maps Integration</h6>
+                                                <small class="text-muted">Configure the physical office address, interactive Google Map embed iframe, and direct GPS direction link.</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-4">
+                                            <div class="col-12 col-lg-6">
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label fw-semibold">Official Physical Address</label>
+                                                    <textarea name="contact_location" class="form-control" rows="3" placeholder="Enter physical office location..."><?= htmlspecialchars($siteSettings['contact_location'] ?? 'Vision Point Educational Service, Main Road (Opposite Traffic Police Office / Roadcess Chowk), Biratnagar 56613, Morang, Nepal') ?></textarea>
+                                                    <div class="form-text text-muted extra-small">Appears across the website header, contact page, footer, and inquiry modals.</div>
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label fw-semibold">Google Maps Embed Code or Iframe URL</label>
+                                                    <textarea name="contact_map_iframe" class="form-control font-monospace" rows="4" placeholder="Paste full Google Map <iframe> code or embed URL..."><?= htmlspecialchars($siteSettings['contact_map_iframe'] ?? '') ?></textarea>
+                                                    <div class="form-text text-muted extra-small">
+                                                        <strong>How to get:</strong> Open Google Maps &rarr; Search "Vision Point Educational Service Biratnagar" &rarr; Click <strong>Share</strong> &rarr; Select <strong>Embed a map</strong> &rarr; Click <strong>Copy HTML</strong> and paste it here.
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label fw-semibold">Google Maps Direct Share / Directions Link</label>
+                                                    <input type="text" name="google_map_link" class="form-control" placeholder="https://maps.google.com/..." value="<?= htmlspecialchars($siteSettings['google_map_link'] ?? 'https://maps.google.com/?q=Vision+Point+Educational+Service+Biratnagar') ?>">
+                                                    <div class="form-text text-muted extra-small">Used for "Get Directions on Google Maps" buttons on mobile and web.</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 col-lg-6">
+                                                <label class="form-label fw-semibold">Current Map Preview</label>
+                                                <?php
+                                                    $dashMapRaw = !empty($siteSettings['contact_map_iframe']) ? $siteSettings['contact_map_iframe'] : 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d114227.18956926955!2d87.21051515!3d26.4524744!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39ef744704331a99%3A0x892a01d674251f28!2sBiratnagar!5e0!3m2!1sen!2snp!4v1700000000000!5m2!1sen!2snp';
+                                                    $dashMapSrc = $dashMapRaw;
+                                                    if (preg_match('/src="([^"]+)"/', $dashMapRaw, $dashM)) {
+                                                        $dashMapSrc = $dashM[1];
+                                                    }
+                                                ?>
+                                                <div class="ratio ratio-16x9 rounded-3 overflow-hidden border shadow-sm bg-light">
+                                                    <iframe src="<?= htmlspecialchars($dashMapSrc) ?>" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                                                </div>
+                                                <?php if (!empty($siteSettings['google_map_link'])): ?>
+                                                    <div class="mt-2 text-end">
+                                                        <a href="<?= htmlspecialchars($siteSettings['google_map_link']) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                                            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Test Google Maps Link
+                                                        </a>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CAMPUS SHOWCASE VIDEO & SPOTLIGHT SECTION -->
+                                <div class="col-12" id="settings-video-section">
+                                    <div class="card p-4 border border-light shadow-sm">
+                                        <div class="d-flex align-items-center gap-2 border-bottom pb-2 mb-4">
+                                            <div class="p-2 bg-danger-subtle text-danger rounded-3"><i class="fa-solid fa-video fs-5"></i></div>
+                                            <div>
+                                                <h6 class="fw-bold text-primary mb-0">Campus Showcase Video & Spotlight Management</h6>
+                                                <small class="text-muted">Change or update the video featured in the homepage Spotlight section and interactive Video Tour popup modal.</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-4">
+                                            <div class="col-12 col-lg-6">
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label fw-semibold">Video Modal Title</label>
+                                                    <input type="text" name="hero_video_title" class="form-control" placeholder="e.g. Vision Point Campus Tour & University Spotlight" value="<?= htmlspecialchars($siteSettings['hero_video_title'] ?? 'Vision Point Campus Tour & University Spotlight') ?>">
+                                                    <div class="form-text text-muted extra-small">Header title shown when users click "Watch Video" or "Explore Campus Tour".</div>
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label fw-semibold">Option A: Upload New Video File (.mp4, .webm, .mov)</label>
+                                                    <input type="file" name="hero_video_file" class="form-control" accept="video/mp4,video/webm,video/quicktime">
+                                                    <div class="form-text text-muted extra-small">Upload high-resolution video file (max 100MB). Stored securely in <code>uploads/videos/</code>.</div>
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label fw-semibold">Option B: External Video or YouTube URL</label>
+                                                    <input type="text" name="hero_video_path" class="form-control" placeholder="e.g. https://www.youtube.com/watch?v=... or assets/videos/..." value="<?= htmlspecialchars($siteSettings['hero_video_path'] ?? 'assets/videos/vision_point_intro.mp4') ?>">
+                                                    <div class="form-text text-muted extra-small">Supports full YouTube URLs (<code>youtube.com/watch?v=...</code>, <code>youtu.be/...</code>) or direct video file links.</div>
+                                                </div>
+
+                                                <div class="form-check p-3 bg-light rounded-3 border">
+                                                    <input class="form-check-input" type="checkbox" name="revert_default_video" value="1" id="revert_default_video">
+                                                    <label class="form-check-label fw-semibold text-danger small" for="revert_default_video">
+                                                        <i class="fa-solid fa-rotate-left me-1"></i>Revert to default intro video (<code>assets/videos/vision_point_intro.mp4</code>)
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 col-lg-6">
+                                                <label class="form-label fw-semibold">Active Video Preview</label>
+                                                <?php
+                                                    $activeVideo = !empty($siteSettings['hero_video_path']) ? $siteSettings['hero_video_path'] : 'assets/videos/vision_point_intro.mp4';
+                                                    $isYt = (strpos($activeVideo, 'youtube.com') !== false || strpos($activeVideo, 'youtu.be') !== false);
+                                                    $ytEmbedUrl = '';
+                                                    if ($isYt) {
+                                                        if (preg_match('/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/', $activeVideo, $vMatch)) {
+                                                            $ytEmbedUrl = 'https://www.youtube.com/embed/' . $vMatch[1] . '?rel=0';
+                                                        }
+                                                    }
+                                                    $localVideoSrc = (strpos($activeVideo, 'http') === 0 || strpos($activeVideo, '/') === 0) ? $activeVideo : ('../' . ltrim($activeVideo, '/'));
+                                                ?>
+                                                <div class="ratio ratio-16x9 rounded-3 overflow-hidden border shadow-sm bg-black">
+                                                    <?php if ($isYt && !empty($ytEmbedUrl)): ?>
+                                                        <iframe src="<?= htmlspecialchars($ytEmbedUrl) ?>" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border:0;"></iframe>
+                                                    <?php else: ?>
+                                                        <video controls preload="metadata" style="width:100%; height:100%; object-fit:cover;">
+                                                            <source src="<?= htmlspecialchars($localVideoSrc) ?>" type="video/mp4">
+                                                            Your browser does not support HTML5 video.
+                                                        </video>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="mt-2 small text-muted">
+                                                    Current source: <code><?= htmlspecialchars($activeVideo) ?></code>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             <div class="mt-4 text-end">
                                 <button type="submit" class="btn btn-secondary rounded-pill px-5 py-3 fw-bold">Save Settings Configurations</button>
                             </div>

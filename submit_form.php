@@ -18,12 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // CSRF Validation
 if (!Csrf::validateRequest()) {
-    jsonResponse(false, 'Security check failed. Please refresh the page and try again.', [], 403);
+    jsonResponse(false, 'Security check failed. Please refresh the page and try again.', [], 200);
 }
 
 // Ensure database connection is active
 if (!isset($pdo) || !$pdo) {
-    jsonResponse(false, 'Database service is currently undergoing maintenance. Please reach out to us at info@visionpoint.edu.np or +977 9807765812.', [], 503);
+    jsonResponse(false, 'Database service is currently undergoing maintenance. Please reach out to us at info@visionpoint.edu.np or +977 9807765812.', [], 200);
 }
 
 $action = isset($_POST['action']) ? trim((string)$_POST['action']) : '';
@@ -313,7 +313,7 @@ if ($action === 'submit_payment_receipt' || $action === 'payment_receipt') {
         jsonResponse(true, 'Your payment receipt #' . $receiptId . ' has been submitted successfully! Our accounting and admissions team will verify your payment and issue an official receipt.');
     } catch (PDOException $e) {
         error_log("Payment receipt submission DB error: " . $e->getMessage());
-        jsonResponse(false, 'Database error while saving receipt. Please contact our support team.', [], 500);
+        jsonResponse(false, 'Database error while saving receipt. Please contact our support team.', [], 200);
     }
 }
 

@@ -91,6 +91,7 @@ if (empty($dbSocials)) {
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>scholarships.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Scholarships</a></li>
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>reviews.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Reviews & Feedback</a></li>
                     <li class="mb-2"><a href="<?= htmlspecialchars($basePath) ?>contact.php" class="footer-link text-white text-decoration-none"><i class="fa-solid fa-chevron-right me-1 extra-small text-danger"></i> Contact Us</a></li>
+                    <li class="mb-2"><a href="#" data-bs-toggle="modal" data-bs-target="#paymentReceiptModal" class="footer-link text-warning fw-semibold text-decoration-none"><i class="fa-solid fa-receipt me-1 extra-small text-danger"></i> Send Payment Receipt</a></li>
                 </ul>
             </div>
             
@@ -126,7 +127,17 @@ if (empty($dbSocials)) {
                     </li>
                     <li class="mb-2.5 d-flex align-items-start gap-2">
                         <i class="fa-solid fa-location-dot mt-1 text-danger"></i>
-                        <span class="text-white"><?= h($siteSettings['contact_location'] ?? 'Vision Point Educational Service, Main Road (Opposite Traffic Police Office / Roadcess Chowk), Biratnagar 56613, Morang, Nepal') ?></span>
+                        <div>
+                            <span class="text-white"><?= h($siteSettings['contact_location'] ?? 'Vision Point Educational Service, Main Road (Opposite Traffic Police Office / Roadcess Chowk), Biratnagar 56613, Morang, Nepal') ?></span>
+                            <?php 
+                                $footerMapLink = !empty($siteSettings['google_map_link']) ? $siteSettings['google_map_link'] : 'https://maps.google.com/?q=Vision+Point+Educational+Service+Biratnagar';
+                            ?>
+                            <div class="mt-1">
+                                <a href="<?= h($footerMapLink) ?>" target="_blank" rel="noopener noreferrer" class="badge bg-danger text-white text-decoration-none px-2 py-1 small rounded-pill">
+                                    <i class="fa-solid fa-map-location-dot me-1"></i>View on Google Maps
+                                </a>
+                            </div>
+                        </div>
                     </li>
                 </ul>
                 <button class="btn btn-secondary btn-sm rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#scholarshipFormModal">

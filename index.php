@@ -300,31 +300,63 @@ if (empty($teamMembers)) {
                         if (file_exists($localHeroPath)) {
                             $heroImgUrl .= (strpos($heroImgUrl, '?') === false ? '?' : '&') . 'v=' . filemtime($localHeroPath);
                         }
+
+                        // Resolve dynamic video configuration (uploaded file, custom URL, or YouTube embed)
+                        $rawVideo = !empty($siteSettings['hero_video_path']) ? $siteSettings['hero_video_path'] : 'assets/videos/vision_point_intro.mp4';
+                        $videoTitle = !empty($siteSettings['hero_video_title']) ? $siteSettings['hero_video_title'] : 'Vision Point Educational Service — Campus Spotlight';
+
+                        $isYouTube = (
+                            strpos($rawVideo, 'youtube.com') !== false ||
+                            strpos($rawVideo, 'youtu.be') !== false
+                        );
+
+                        $youtubeEmbedUrl = '';
+                        $ytId = '';
+                        if ($isYouTube) {
+                            if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i', $rawVideo, $match)) {
+                                $ytId = $match[1];
+                                $youtubeEmbedUrl = 'https://www.youtube.com/embed/' . $ytId;
+                            } else {
+                                $youtubeEmbedUrl = $rawVideo;
+                            }
+                        }
+
+                        $videoFileUrl = (strpos($rawVideo, 'http') === 0) ? $rawVideo : ($basePath . ltrim($rawVideo, '/'));
+                        $localVideoFile = __DIR__ . '/' . ltrim($rawVideo, '/');
+                        if (file_exists($localVideoFile)) {
+                            $videoFileUrl .= '?v=' . filemtime($localVideoFile);
+                        }
                     ?>
                     <!-- Premium Framed Video Showcase with Interactive Overlay -->
                     <div class="hero-card-frame position-relative rounded-4 overflow-hidden shadow-lg border border-white border-opacity-75">
                         <div class="hero-video-container position-relative overflow-hidden rounded-4" style="background: #031b33;">
-                            <video id="heroIntroVideo" class="w-100 object-fit-cover d-block rounded-4" autoplay muted loop playsinline preload="auto" style="max-height: 500px; min-height: 380px; object-position: center;">
-                                <source src="<?= h($basePath) ?>assets/videos/vision_point_intro.mp4" type="video/mp4">
-                                <img src="<?= h($heroImgUrl) ?>" class="img-fluid w-100 object-fit-cover rounded-4" alt="Vision Point Education">
-                            </video>
-                            
-                            <!-- Subtle dark gradient overlay for text readability -->
-                            <div class="hero-video-overlay position-absolute top-0 start-0 w-100 h-100 pointer-events-none" style="background: linear-gradient(180deg, rgba(4, 27, 49, 0.15) 0%, rgba(4, 27, 49, 0.45) 100%);"></div>
+                            <?php if ($isYouTube): ?>
+                                <div class="ratio ratio-16x9" style="min-height: 380px;">
+                                    <iframe src="<?= h($youtubeEmbedUrl) ?>?autoplay=1&mute=1&loop=1&playlist=<?= h($ytId) ?>" class="w-100 h-100 rounded-4" style="border:0;" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            <?php else: ?>
+                                <video id="heroIntroVideo" class="w-100 object-fit-cover d-block rounded-4" autoplay muted loop playsinline preload="auto" style="max-height: 500px; min-height: 380px; object-position: center;">
+                                    <source src="<?= h($videoFileUrl) ?>" type="video/mp4">
+                                    <img src="<?= h($heroImgUrl) ?>" class="img-fluid w-100 object-fit-cover rounded-4" alt="Vision Point Education">
+                                </video>
+                                
+                                <!-- Subtle dark gradient overlay for text readability -->
+                                <div class="hero-video-overlay position-absolute top-0 start-0 w-100 h-100 pointer-events-none" style="background: linear-gradient(180deg, rgba(4, 27, 49, 0.15) 0%, rgba(4, 27, 49, 0.45) 100%);"></div>
 
-                            <!-- Video Control Pills (Top-Left) -->
-                            <div class="hero-video-controls position-absolute top-3 start-3 d-flex align-items-center gap-2 z-3">
-                                <button type="button" id="heroVideoSoundToggle" class="btn btn-sm btn-dark bg-opacity-75 text-white border-0 rounded-pill px-3 py-1.5 d-flex align-items-center gap-2 backdrop-blur shadow-sm transition-smooth" style="font-size: 12px;" title="Toggle Sound">
-                                    <i class="fa-solid fa-volume-xmark" id="heroSoundIcon"></i>
-                                    <span id="heroSoundText">Unmute</span>
-                                </button>
-                                <button type="button" id="heroVideoPlayPause" class="btn btn-sm btn-dark bg-opacity-75 text-white border-0 rounded-circle d-flex align-items-center justify-content-center backdrop-blur shadow-sm transition-smooth" style="width: 32px; height: 32px;" title="Play/Pause">
-                                    <i class="fa-solid fa-pause" id="heroPlayPauseIcon"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-dark bg-opacity-75 text-white border-0 rounded-circle d-flex align-items-center justify-content-center backdrop-blur shadow-sm transition-smooth" style="width: 32px; height: 32px;" data-bs-toggle="modal" data-bs-target="#videoTourModal" title="Watch in Theater Lightbox">
-                                    <i class="fa-solid fa-expand"></i>
-                                </button>
-                            </div>
+                                <!-- Video Control Pills (Top-Left) -->
+                                <div class="hero-video-controls position-absolute top-3 start-3 d-flex align-items-center gap-2 z-3">
+                                    <button type="button" id="heroVideoSoundToggle" class="btn btn-sm btn-dark bg-opacity-75 text-white border-0 rounded-pill px-3 py-1.5 d-flex align-items-center gap-2 backdrop-blur shadow-sm transition-smooth" style="font-size: 12px;" title="Toggle Sound">
+                                        <i class="fa-solid fa-volume-xmark" id="heroSoundIcon"></i>
+                                        <span id="heroSoundText">Unmute</span>
+                                    </button>
+                                    <button type="button" id="heroVideoPlayPause" class="btn btn-sm btn-dark bg-opacity-75 text-white border-0 rounded-circle d-flex align-items-center justify-content-center backdrop-blur shadow-sm transition-smooth" style="width: 32px; height: 32px;" title="Play/Pause">
+                                        <i class="fa-solid fa-pause" id="heroPlayPauseIcon"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-dark bg-opacity-75 text-white border-0 rounded-circle d-flex align-items-center justify-content-center backdrop-blur shadow-sm transition-smooth" style="width: 32px; height: 32px;" data-bs-toggle="modal" data-bs-target="#videoTourModal" title="Watch in Theater Lightbox">
+                                        <i class="fa-solid fa-expand"></i>
+                                    </button>
+                                </div>
+                            <?php endif; ?>
 
                             <!-- Live Tour Badge (Top-Right) -->
                             <div class="position-absolute top-3 end-3 bg-white bg-opacity-95 backdrop-blur px-3 py-1.5 rounded-pill shadow border border-light-subtle d-flex align-items-center gap-2 z-3">
@@ -839,32 +871,38 @@ document.addEventListener('DOMContentLoaded', function() {
             <!-- Left: Cinematic Video Player Frame -->
             <div class="col-lg-7">
                 <div class="position-relative rounded-4 overflow-hidden shadow-lg border border-white border-opacity-20" style="background: #000000;">
-                    <!-- Theater Video Element -->
-                    <video id="spotlightVideo" class="w-100 d-block" playsinline loop muted autoplay preload="auto" style="border-radius: 16px; aspect-ratio: 16/9; object-fit: cover;">
-                        <source src="<?= h($basePath) ?>assets/videos/vision_point_intro.mp4" type="video/mp4">
-                        Your browser does not support HTML5 video.
-                    </video>
+                    <?php if ($isYouTube): ?>
+                        <div class="ratio ratio-16x9">
+                            <iframe src="<?= h($youtubeEmbedUrl) ?>" class="w-100 h-100" style="border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    <?php else: ?>
+                        <!-- Theater Video Element -->
+                        <video id="spotlightVideo" class="w-100 d-block" playsinline loop muted autoplay preload="auto" style="border-radius: 16px; aspect-ratio: 16/9; object-fit: cover;">
+                            <source src="<?= h($videoFileUrl) ?>" type="video/mp4">
+                            Your browser does not support HTML5 video.
+                        </video>
 
-                    <!-- Theater Overlay Controls -->
-                    <div class="position-absolute bottom-0 start-0 w-100 p-3 p-md-4 d-flex align-items-center justify-content-between text-white" style="background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);">
-                        <div class="d-flex align-items-center gap-3">
-                            <button type="button" id="spotlightPlayBtn" class="btn btn-warning text-dark rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 44px; height: 44px;" title="Play/Pause">
-                                <i class="fa-solid fa-pause fs-6" id="spotlightPlayIcon"></i>
-                            </button>
-                            <button type="button" id="spotlightMuteBtn" class="btn btn-outline-light rounded-pill px-3 py-1.5 d-flex align-items-center gap-2 small" title="Toggle Sound">
-                                <i class="fa-solid fa-volume-xmark" id="spotlightMuteIcon"></i>
-                                <span id="spotlightMuteText">Unmute</span>
-                            </button>
+                        <!-- Theater Overlay Controls -->
+                        <div class="position-absolute bottom-0 start-0 w-100 p-3 p-md-4 d-flex align-items-center justify-content-between text-white" style="background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);">
+                            <div class="d-flex align-items-center gap-3">
+                                <button type="button" id="spotlightPlayBtn" class="btn btn-warning text-dark rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 44px; height: 44px;" title="Play/Pause">
+                                    <i class="fa-solid fa-pause fs-6" id="spotlightPlayIcon"></i>
+                                </button>
+                                <button type="button" id="spotlightMuteBtn" class="btn btn-outline-light rounded-pill px-3 py-1.5 d-flex align-items-center gap-2 small" title="Toggle Sound">
+                                    <i class="fa-solid fa-volume-xmark" id="spotlightMuteIcon"></i>
+                                    <span id="spotlightMuteText">Unmute</span>
+                                </button>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1.5 small fw-normal">
+                                    <i class="fa-solid fa-video me-1 text-warning"></i> HD Video
+                                </span>
+                                <button type="button" class="btn btn-outline-light rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" data-bs-toggle="modal" data-bs-target="#videoTourModal" title="Fullscreen Theater Lightbox">
+                                    <i class="fa-solid fa-expand"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1.5 small fw-normal">
-                                <i class="fa-solid fa-clock me-1 text-warning"></i> 0:10 HD
-                            </span>
-                            <button type="button" class="btn btn-outline-light rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" data-bs-toggle="modal" data-bs-target="#videoTourModal" title="Fullscreen Theater Lightbox">
-                                <i class="fa-solid fa-expand"></i>
-                            </button>
-                        </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -1976,15 +2014,21 @@ require_once __DIR__ . '/includes/payment_section.php';
             <div class="modal-header border-0 bg-dark text-white py-2 px-3 d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
                     <i class="fa-solid fa-play-circle text-warning fs-5"></i>
-                    <h6 class="modal-title fw-bold text-white mb-0" id="videoTourModalLabel">Vision Point Educational Service — Campus Spotlight</h6>
+                    <h6 class="modal-title fw-bold text-white mb-0" id="videoTourModalLabel"><?= h($videoTitle) ?></h6>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-0 bg-black position-relative text-center">
-                <video id="modalTourVideo" class="w-100 d-block" controls playsinline preload="metadata" style="max-height: 80vh; aspect-ratio: 16/9; object-fit: contain;">
-                    <source src="<?= h($basePath) ?>assets/videos/vision_point_intro.mp4" type="video/mp4">
-                    Your browser does not support HTML5 video.
-                </video>
+                <?php if ($isYouTube): ?>
+                    <div class="ratio ratio-16x9">
+                        <iframe id="modalTourIframe" src="<?= h($youtubeEmbedUrl) ?>" class="w-100 h-100" style="border:0;" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                <?php else: ?>
+                    <video id="modalTourVideo" class="w-100 d-block" controls playsinline preload="metadata" style="max-height: 80vh; aspect-ratio: 16/9; object-fit: contain;">
+                        <source src="<?= h($videoFileUrl) ?>" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                <?php endif; ?>
             </div>
         </div>
     </div>
