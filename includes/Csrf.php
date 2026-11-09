@@ -55,19 +55,25 @@ final class Csrf
      */
     public static function validateSameOrigin(): bool
     {
-        $currentHost = $_SERVER['HTTP_HOST'] ?? '';
+        // 0. Check Sec-Fetch-Site (W3C standard header sent by all modern browsers)
+        $fetchSite = strtolower((string)($_SERVER['HTTP_SEC_FETCH_SITE'] ?? ''));
+        if ($fetchSite === 'same-origin' || $fetchSite === 'same-site') {
+            return true;
+        }
+
+        $currentHost = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? '');
         if (empty($currentHost)) {
             return false;
         }
 
-        $cleanCurrent = strtolower(explode(':', $currentHost)[0]);
+        $cleanCurrent = preg_replace('/^www\./', '', strtolower(explode(':', $currentHost)[0]));
 
         // 1. Check HTTP_ORIGIN
         if (!empty($_SERVER['HTTP_ORIGIN'])) {
             $originHost = parse_url((string)$_SERVER['HTTP_ORIGIN'], PHP_URL_HOST);
             if ($originHost) {
-                $cleanOrigin = strtolower($originHost);
-                if ($cleanOrigin === $cleanCurrent || $cleanOrigin === 'www.' . $cleanCurrent || $cleanCurrent === 'www.' . $cleanOrigin) {
+                $cleanOrigin = preg_replace('/^www\./', '', strtolower($originHost));
+                if ($cleanOrigin === $cleanCurrent) {
                     return true;
                 }
             }
@@ -77,8 +83,8 @@ final class Csrf
         if (!empty($_SERVER['HTTP_REFERER'])) {
             $refererHost = parse_url((string)$_SERVER['HTTP_REFERER'], PHP_URL_HOST);
             if ($refererHost) {
-                $cleanReferer = strtolower($refererHost);
-                if ($cleanReferer === $cleanCurrent || $cleanReferer === 'www.' . $cleanCurrent || $cleanCurrent === 'www.' . $cleanReferer) {
+                $cleanReferer = preg_replace('/^www\./', '', strtolower($refererHost));
+                if ($cleanReferer === $cleanCurrent) {
                     return true;
                 }
             }

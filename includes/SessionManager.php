@@ -32,18 +32,20 @@ final class SessionManager
         );
 
         // Configure session save path defensively
-        // If current path is empty, fallback to system temp dir or local sessions directory
+        // If current path is empty or not writable in caged Linux/LiteSpeed, fallback to system temp or local sessions directory
         $currentSavePath = @session_save_path();
-        if (empty($currentSavePath)) {
+        $isPathWritable = !empty($currentSavePath) && @is_dir($currentSavePath) && @is_writable($currentSavePath);
+
+        if (!$isPathWritable) {
             $sysTemp = sys_get_temp_dir();
             if (!empty($sysTemp) && @is_dir($sysTemp) && @is_writable($sysTemp)) {
                 @session_save_path($sysTemp);
             } else {
                 $localSessionDir = dirname(__DIR__) . '/sessions';
                 if (!is_dir($localSessionDir)) {
-                    @mkdir($localSessionDir, 0777, true);
+                    @mkdir($localSessionDir, 0700, true);
                 }
-                if (is_dir($localSessionDir) && is_writable($localSessionDir)) {
+                if (is_dir($localSessionDir) && @is_writable($localSessionDir)) {
                     @session_save_path($localSessionDir);
                 }
             }

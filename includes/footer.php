@@ -355,49 +355,77 @@ $(document).ready(function() {
         }, 350);
     });
 
-    // Contact Form Submission
-    // Setup automatic CSRF header for all AJAX requests
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || $('input[name="csrf_token"]').val()
-        }
-    });
+    // Vision Point - AJAX Form Helper: fetches a fresh CSRF token then POSTs the form
+    // This avoids token mismatch when LiteSpeed caches pages or drops session cookies.
+    function vpAjaxSubmit(opts) {
+        // opts: { url, data, formData, $btn, originalText, onSuccess, onError }
+        var basePath = '<?= htmlspecialchars($basePath) ?>';
+        $.getJSON(basePath + 'csrf_token.php', function(res) {
+            var token = (res && res.token) ? res.token : ($('meta[name="csrf-token"]').attr('content') || '');
+            // Inject fresh token
+            if (opts.data) {
+                opts.data = opts.data.replace(/csrf_token=[^&]*/g, '');
+                opts.data += '&csrf_token=' + encodeURIComponent(token);
+            }
+            if (opts.formData) {
+                opts.formData.set('csrf_token', token);
+            }
+            var ajaxOpts = {
+                url: opts.url,
+                type: 'POST',
+                headers: { 'X-CSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest' },
+                success: function(response) {
+                    if (opts.$btn) opts.$btn.prop('disabled', false).text(opts.originalText);
+                    // Handle both JSON object and raw string
+                    var resp = (typeof response === 'string') ? JSON.parse(response) : response;
+                    if (resp && resp.success) {
+                        opts.onSuccess(resp);
+                    } else {
+                        var errMsg = (resp && resp.message) ? resp.message : 'An error occurred. Please try again.';
+                        if (opts.onError) opts.onError(errMsg); else alert('Error: ' + errMsg);
+                    }
+                },
+                error: function(xhr) {
+                    if (opts.$btn) opts.$btn.prop('disabled', false).text(opts.originalText);
+                    var msg = 'An error occurred. Please try again.';
+                    try {
+                        var r = xhr.responseJSON || JSON.parse(xhr.responseText);
+                        if (r && r.message) msg = r.message;
+                    } catch(e2) {}
+                    if (opts.onError) opts.onError(msg); else alert(msg);
+                }
+            };
+            if (opts.formData) {
+                ajaxOpts.data = opts.formData;
+                ajaxOpts.processData = false;
+                ajaxOpts.contentType = false;
+            } else {
+                ajaxOpts.data = opts.data;
+                ajaxOpts.dataType = 'json';
+            }
+            $.ajax(ajaxOpts);
+        }).fail(function() {
+            // csrf_token.php unreachable — fall back to embedded token
+            if (opts.$btn) opts.$btn.prop('disabled', false).text(opts.originalText);
+            alert('Session expired. Please refresh the page and try again.');
+        });
+    }
 
+    // Contact Form Submission
     $('#contact-form').on('submit', function(e) {
         e.preventDefault();
         var $form = $(this);
         var $btn = $('#submit-contact-form');
         var originalText = $btn.text();
-        
         $btn.prop('disabled', true).text('Submitting...');
-        
-        $.ajax({
+        vpAjaxSubmit({
             url: '<?= htmlspecialchars($basePath) ?>submit_form.php',
-            type: 'POST',
             data: $form.serialize() + '&action=contact',
-            dataType: 'json',
-            success: function(response) {
-                $btn.prop('disabled', false).text(originalText);
-                if (response.success) {
-                    var myModal = new bootstrap.Modal(document.getElementById('successModal'));
-                    myModal.show();
-                    $form[0].reset();
-                } else {
-                    alert('Error: ' + response.message);
-                }
-            },
-            error: function(xhr) {
-                $btn.prop('disabled', false).text(originalText);
-                var msg = 'An error occurred. Please try again.';
-                try {
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        msg = xhr.responseJSON.message;
-                    } else if (xhr.responseText) {
-                        var parsed = JSON.parse(xhr.responseText);
-                        if (parsed && parsed.message) msg = parsed.message;
-                    }
-                } catch(e) {}
-                alert(msg);
+            $btn: $btn, originalText: originalText,
+            onSuccess: function() {
+                var myModal = new bootstrap.Modal(document.getElementById('successModal'));
+                myModal.show();
+                $form[0].reset();
             }
         });
     });
@@ -410,42 +438,24 @@ $(document).ready(function() {
         formData.append('action', 'enroll');
         var $btn = $('#submit_enroll_form');
         var originalText = $btn.text();
-        
         $btn.prop('disabled', true).text('Submitting...');
-        
-        $.ajax({
+        vpAjaxSubmit({
             url: '<?= htmlspecialchars($basePath) ?>submit_form.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function(response) {
-                $btn.prop('disabled', false).text(originalText);
-                if (response.success) {
-                    // Hide the enrollment modal first
-                    bootstrap.Modal.getInstance(document.getElementById('scholarshipFormModal')).hide();
-                    
-                    // Show success modal
-                    var myModal = new bootstrap.Modal(document.getElementById('successModal'));
-                    myModal.show();
-                    form.reset();
-                } else {
-                    alert('Error: ' + response.message);
+            formData: formData,
+            $btn: $btn,
+            originalText: originalText,
+            onSuccess: function() {
+                var enrollModalEl = document.getElementById('scholarshipFormModal');
+                if (enrollModalEl && typeof bootstrap !== 'undefined') {
+                    var inst = bootstrap.Modal.getInstance(enrollModalEl);
+                    if (inst) inst.hide();
                 }
-            },
-            error: function(xhr) {
-                $btn.prop('disabled', false).text(originalText);
-                var msg = 'An error occurred. Please try again.';
-                try {
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        msg = xhr.responseJSON.message;
-                    } else if (xhr.responseText) {
-                        var parsed = JSON.parse(xhr.responseText);
-                        if (parsed && parsed.message) msg = parsed.message;
-                    }
-                } catch(e) {}
-                alert(msg);
+                var successModalEl = document.getElementById('successModal');
+                if (successModalEl && typeof bootstrap !== 'undefined') {
+                    var myModal = new bootstrap.Modal(successModalEl);
+                    myModal.show();
+                }
+                form.reset();
             }
         });
     });
@@ -456,36 +466,15 @@ $(document).ready(function() {
         var $form = $(this);
         var $btn = $('#submit_subscribe_form');
         var originalText = $btn.text();
-        
         $btn.prop('disabled', true).text('Subscribing...');
-        
-        $.ajax({
+        vpAjaxSubmit({
             url: '<?= htmlspecialchars($basePath) ?>submit_form.php',
-            type: 'POST',
             data: $form.serialize() + '&action=subscribe',
-            dataType: 'json',
-            success: function(response) {
-                $btn.prop('disabled', false).text(originalText);
-                if (response.success) {
-                    var myModal = new bootstrap.Modal(document.getElementById('newsletter_success_modal'));
-                    myModal.show();
-                    $form[0].reset();
-                } else {
-                    alert('Error: ' + response.message);
-                }
-            },
-            error: function(xhr) {
-                $btn.prop('disabled', false).text(originalText);
-                var msg = 'An error occurred. Please try again.';
-                try {
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        msg = xhr.responseJSON.message;
-                    } else if (xhr.responseText) {
-                        var parsed = JSON.parse(xhr.responseText);
-                        if (parsed && parsed.message) msg = parsed.message;
-                    }
-                } catch(e) {}
-                alert(msg);
+            $btn: $btn, originalText: originalText,
+            onSuccess: function() {
+                var myModal = new bootstrap.Modal(document.getElementById('newsletter_success_modal'));
+                myModal.show();
+                $form[0].reset();
             }
         });
     });

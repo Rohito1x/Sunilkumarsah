@@ -92,7 +92,8 @@ try {
     $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
-    die("Database error during PDF generation: " . $e->getMessage());
+    error_log("PDF Export DB error: " . $e->getMessage());
+    die("PDF generation failed. Please try again or contact system administrator.");
 }
 ?>
 <!DOCTYPE html>

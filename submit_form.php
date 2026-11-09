@@ -49,7 +49,7 @@ if ($action === 'subscribe') {
         jsonResponse(true, 'Successfully subscribed to the newsletter.');
     } catch (PDOException $e) {
         error_log("Newsletter subscription DB error: " . $e->getMessage());
-        jsonResponse(false, 'Unable to process your request at this time. Please try again later.', [], 500);
+        jsonResponse(false, 'Unable to process your request at this time. Please try again later.', [], 200);
     }
 }
 
@@ -111,7 +111,7 @@ if ($action === 'contact') {
         jsonResponse(true, 'Your inquiry has been submitted successfully.');
     } catch (PDOException $e) {
         error_log("Contact inquiry DB error: " . $e->getMessage());
-        jsonResponse(false, 'Unable to process your request at this time. Please try again later.', [], 500);
+        jsonResponse(false, 'Unable to process your request at this time. Please try again later.', [], 200);
     }
 }
 
@@ -166,8 +166,15 @@ if ($action === 'enroll') {
         $stmt->execute([$fullName, $email, $phone, $address, $interestedCountry, $level, $city, $college, $faculty, $program, $highestEdu, $percentage, $message, $photoPath]);
         jsonResponse(true, 'Your enrollment form has been submitted successfully.');
     } catch (PDOException $e) {
-        error_log("Enrollment form submission DB error: " . $e->getMessage());
-        jsonResponse(false, 'Unable to process your request at this time. Please try again later.', [], 500);
+        // Fallback: If interested_country column doesn't exist yet on older schema
+        try {
+            $stmt = $pdo->prepare("INSERT INTO enrollments (full_name, email, phone_number, address, level, interested_city, interested_college, faculty, interested_program, highest_education, percentage, message, photo_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$fullName, $email, $phone, $address, $level, $city, $college, $faculty, $program, $highestEdu, $percentage, $message, $photoPath]);
+            jsonResponse(true, 'Your enrollment form has been submitted successfully.');
+        } catch (PDOException $e2) {
+            error_log("Enrollment form submission DB error: " . $e2->getMessage());
+            jsonResponse(false, 'Unable to process your enrollment at this time. Please try again later.', [], 200);
+        }
     }
 }
 
@@ -222,7 +229,7 @@ if ($action === 'submit_review' || $action === 'review') {
         jsonResponse(true, 'Thank you! Your review has been submitted successfully and will be published once approved by our admin team.');
     } catch (PDOException $e) {
         error_log("Review submission DB error: " . $e->getMessage());
-        jsonResponse(false, 'Unable to process your request at this time. Please try again later.', [], 500);
+        jsonResponse(false, 'Unable to process your request at this time. Please try again later.', [], 200);
     }
 }
 

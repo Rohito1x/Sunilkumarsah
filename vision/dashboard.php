@@ -48,10 +48,10 @@ function handleFileUpload($fileKey, $prefix = 'img_') {
     $fileTmp = $_FILES[$fileKey]['tmp_name'];
     $fileSize = $_FILES[$fileKey]['size'];
     $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
+    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
     
     if (!in_array($ext, $allowed)) {
-        throw new Exception('Invalid file type. Only image files (JPG, PNG, WEBP, GIF, BMP, SVG) are allowed.');
+        throw new Exception('Invalid file type. Only image files (JPG, PNG, WEBP, GIF, BMP) are allowed.');
     }
     
     if ($fileSize > 10 * 1024 * 1024) {
@@ -63,7 +63,7 @@ function handleFileUpload($fileKey, $prefix = 'img_') {
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mime = $finfo->file($fileTmp);
         $allowedMimes = [
-            'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml', 'text/xml', 'text/plain'
+            'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp'
         ];
         if (!in_array($mime, $allowedMimes)) {
             throw new Exception('File rejected due to invalid MIME content type: ' . htmlspecialchars($mime));
@@ -109,7 +109,7 @@ function handleDocUpload($fileKey, $prefix = 'doc_') {
     
     $uploadDir = __DIR__ . '/../uploads/';
     if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+        mkdir($uploadDir, 0755, true);
     }
     
     $newFileName = uniqid($prefix, true) . '.' . $ext;
@@ -203,15 +203,19 @@ function handlePdfUpload($fileKey, $prefix = 'pdf_') {
 // Handle CRUD and Bulk Operations
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
-    // CSRF Check
+    // CSRF Check (timing-safe with fallback)
     $csrfToken = isset($_POST['csrf_token']) ? trim((string)$_POST['csrf_token']) : '';
-    if ($csrfToken !== $_SESSION['csrf_token']) {
-        die("Security token validation failed. Please refresh the page and try again.");
+    $sessionToken = $_SESSION['csrf_token'] ?? '';
+    $isCsrfValid = (!empty($csrfToken) && !empty($sessionToken) && hash_equals($sessionToken, $csrfToken));
+    if (!$isCsrfValid && class_exists('Csrf') && Csrf::validateRequest()) {
+        $isCsrfValid = true;
     }
     
-    $action = (string)$_POST['action'];
-    
-    try {
+    if (!$isCsrfValid) {
+        $alert = ['type' => 'danger', 'msg' => 'Security token validation failed. Please refresh the page and try again.'];
+    } else {
+        $action = (string)$_POST['action'];
+        try {
         // ENROLLMENTS & INQUIRIES ACTIONS
         if ($action === 'delete_enrollment' && isset($_POST['id'])) {
             $id = (int)$_POST['id'];
@@ -1596,11 +1600,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $alert = ['type' => 'success', 'msg' => "Payment receipt #$id deleted successfully."];
         }
 
-    } catch (Exception $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
+        } catch (Exception $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            $alert = ['type' => 'danger', 'msg' => 'Error: ' . $e->getMessage()];
         }
-        $alert = ['type' => 'danger', 'msg' => 'Error: ' . $e->getMessage()];
     }
 }
 

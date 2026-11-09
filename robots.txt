@@ -8,8 +8,11 @@ Disallow: /vision.php
 Disallow: /login.php
 Disallow: /check_status.php
 Disallow: /setup.php
+Disallow: /reset_admin.php
 Disallow: /submit_form.php
 Disallow: /logout.php
+Disallow: /sessions/
+Disallow: /uploads/receipts/
 
 # Sitemap reference
 Sitemap: https://visionpoint.edu.np/sitemap.xml

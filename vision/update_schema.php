@@ -6,9 +6,11 @@
 
 // Auth check - ensure only logged in admins (or local CLI script) can run this
 if (php_sapi_name() !== 'cli') {
-    session_start();
+    require_once __DIR__ . '/../includes/SessionManager.php';
+    SessionManager::start();
     if (!isset($_SESSION['admin_id'])) {
-        die("Unauthorized access. Please login to run this script.");
+        http_response_code(403);
+        die("403 Forbidden: Unauthorized access. Please login as administrator to run this script.");
     }
 }
 
@@ -643,5 +645,6 @@ try {
     echo "<h3>All Schema and Data Seeding Completed Successfully!</h3>\n";
 
 } catch (PDOException $e) {
-    die("Database upgrade failed: " . $e->getMessage());
+    error_log("Schema update DB error: " . $e->getMessage());
+    die("Database upgrade failed. Please check error logs or contact support.");
 }

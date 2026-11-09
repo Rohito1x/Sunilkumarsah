@@ -1,0 +1,37 @@
+# ==============================================================================
+# Vision Point Educational Service - Git Ignore Rules
+# ==============================================================================
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Environment and Secret Files
+.env
+.env.*
+*.local
+*.log
+php_errors.log
+error_log
+
+# Session Files (Never commit session tokens or data)
+sessions/*
+!sessions/.htaccess
+!sessions/.gitignore
+
+# Private Uploads & Uploaded Content
+uploads/receipts/*
+!uploads/receipts/.htaccess
+!uploads/receipts/.gitkeep
+
+uploads/videos/*
+!uploads/videos/.htaccess
+!uploads/videos/.gitkeep
+
+# Temporary and Scratch Directories
+tmp/
+temp/
+scratch/
+TODO.md

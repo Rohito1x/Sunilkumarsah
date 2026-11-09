@@ -57,6 +57,7 @@ try {
     exit;
 
 } catch (PDOException $e) {
+    error_log("CSV Export DB error: " . $e->getMessage());
     http_response_code(500);
-    die("Database error occurred during export: " . $e->getMessage());
+    die("Export failed. Please try again or contact system administrator.");
 }
