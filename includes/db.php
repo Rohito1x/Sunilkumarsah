@@ -75,6 +75,13 @@ if ($pdo) {
     try {
         // Auto-repair missing columns on tables if DB is connected
     $columnsToEnsure = [
+        'bank_accounts' => [
+            'qr_code' => "VARCHAR(255) DEFAULT NULL",
+            'ifsc_code' => "VARCHAR(50) DEFAULT NULL",
+            'instructions' => "TEXT DEFAULT NULL",
+            'remarks' => "TEXT DEFAULT NULL",
+            'is_default' => "TINYINT DEFAULT 0"
+        ],
         'enrollments' => [
             'interested_country' => "VARCHAR(80) DEFAULT NULL"
         ],

@@ -1310,6 +1310,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $alert = ['type' => 'success', 'msg' => 'Site configurations and layouts saved successfully.'];
         }
 
+        // PAYMENT QR CODE ACTION
+        if ($action === 'update_payment_qr') {
+            $qr_enabled = isset($_POST['qr_code_enabled']) ? '1' : '0';
+            $qr_title = trim((string)($_POST['qr_code_title'] ?? 'Fonepay / Mobile Banking QR'));
+            $qr_description = trim((string)($_POST['qr_code_description'] ?? ''));
+
+            $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)");
+            $stmt->execute(['qr_code_enabled', $qr_enabled]);
+            $stmt->execute(['qr_code_title', $qr_title]);
+            $stmt->execute(['qr_code_description', $qr_description]);
+
+            if (isset($_POST['remove_qr_code']) && $_POST['remove_qr_code'] === '1') {
+                $stmt->execute(['qr_code_image', '']);
+                logActivity("Removed Global Payment QR Code Image");
+            } else {
+                $uploadedQR = handleFileUpload('qr_code_image_file', 'qr_');
+                if ($uploadedQR) {
+                    $stmt->execute(['qr_code_image', $uploadedQR]);
+                    logActivity("Updated Global Payment QR Code Image", $uploadedQR);
+                }
+            }
+
+            $alert = ['type' => 'success', 'msg' => 'Official Payment QR Code settings saved successfully.'];
+        }
+
         // BANK ACCOUNTS ACTIONS
         if ($action === 'add_bank_account') {
             $bank_name = trim((string)$_POST['bank_name']);
@@ -1333,9 +1358,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $pdo->exec("UPDATE bank_accounts SET is_default = 0");
             }
 
-            $stmt = $pdo->prepare('INSERT INTO bank_accounts (bank_name, account_name, account_number, branch, account_type, swift_code, ifsc_code, instructions, remarks, display_order, is_active, is_default) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-            $stmt->execute([$bank_name, $account_name, $account_number, $branch, $account_type, $swift_code, $ifsc_code, $instructions, $remarks, $display_order, $is_active, $is_default]);
+            $bankQr = handleFileUpload('bank_qr_file', 'bank_qr_');
+
+            try {
+                $stmt = $pdo->prepare('INSERT INTO bank_accounts (bank_name, account_name, account_number, branch, account_type, swift_code, ifsc_code, instructions, remarks, display_order, is_active, is_default, qr_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$bank_name, $account_name, $account_number, $branch, $account_type, $swift_code, $ifsc_code, $instructions, $remarks, $display_order, $is_active, $is_default, $bankQr]);
+            } catch (\PDOException $e) {
+                $stmt = $pdo->prepare('INSERT INTO bank_accounts (bank_name, account_name, account_number, branch, account_type, swift_code, ifsc_code, instructions, remarks, display_order, is_active, is_default) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$bank_name, $account_name, $account_number, $branch, $account_type, $swift_code, $ifsc_code, $instructions, $remarks, $display_order, $is_active, $is_default]);
+            }
             $bankId = $pdo->lastInsertId();
+
+            if ($bankQr && !empty($_POST['set_as_global_qr'])) {
+                $stmtSetting = $pdo->prepare("INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)");
+                $stmtSetting->execute(['qr_code_image', $bankQr]);
+                $stmtSetting->execute(['qr_code_enabled', '1']);
+            }
+
             logActivity("Added Bank Account #$bankId", $bank_name);
             $alert = ['type' => 'success', 'msg' => 'Bank account added successfully.'];
         }
@@ -1363,8 +1402,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $pdo->exec("UPDATE bank_accounts SET is_default = 0");
             }
 
-            $stmt = $pdo->prepare('UPDATE bank_accounts SET bank_name = ?, account_name = ?, account_number = ?, branch = ?, account_type = ?, swift_code = ?, ifsc_code = ?, instructions = ?, remarks = ?, display_order = ?, is_active = ?, is_default = ? WHERE id = ?');
-            $stmt->execute([$bank_name, $account_name, $account_number, $branch, $account_type, $swift_code, $ifsc_code, $instructions, $remarks, $display_order, $is_active, $is_default, $id]);
+            $uploadedBankQr = handleFileUpload('bank_qr_file', 'bank_qr_');
+            $removeBankQr = isset($_POST['remove_bank_qr']) && $_POST['remove_bank_qr'] === '1';
+
+            try {
+                if ($uploadedBankQr) {
+                    $stmt = $pdo->prepare('UPDATE bank_accounts SET bank_name = ?, account_name = ?, account_number = ?, branch = ?, account_type = ?, swift_code = ?, ifsc_code = ?, instructions = ?, remarks = ?, display_order = ?, is_active = ?, is_default = ?, qr_code = ? WHERE id = ?');
+                    $stmt->execute([$bank_name, $account_name, $account_number, $branch, $account_type, $swift_code, $ifsc_code, $instructions, $remarks, $display_order, $is_active, $is_default, $uploadedBankQr, $id]);
+
+                    if (!empty($_POST['set_as_global_qr'])) {
+                        $stmtSetting = $pdo->prepare("INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)");
+                        $stmtSetting->execute(['qr_code_image', $uploadedBankQr]);
+                        $stmtSetting->execute(['qr_code_enabled', '1']);
+                    }
+                } elseif ($removeBankQr) {
+                    $stmt = $pdo->prepare('UPDATE bank_accounts SET bank_name = ?, account_name = ?, account_number = ?, branch = ?, account_type = ?, swift_code = ?, ifsc_code = ?, instructions = ?, remarks = ?, display_order = ?, is_active = ?, is_default = ?, qr_code = NULL WHERE id = ?');
+                    $stmt->execute([$bank_name, $account_name, $account_number, $branch, $account_type, $swift_code, $ifsc_code, $instructions, $remarks, $display_order, $is_active, $is_default, $id]);
+                } else {
+                    $stmt = $pdo->prepare('UPDATE bank_accounts SET bank_name = ?, account_name = ?, account_number = ?, branch = ?, account_type = ?, swift_code = ?, ifsc_code = ?, instructions = ?, remarks = ?, display_order = ?, is_active = ?, is_default = ? WHERE id = ?');
+                    $stmt->execute([$bank_name, $account_name, $account_number, $branch, $account_type, $swift_code, $ifsc_code, $instructions, $remarks, $display_order, $is_active, $is_default, $id]);
+                }
+            } catch (\PDOException $e) {
+                $stmt = $pdo->prepare('UPDATE bank_accounts SET bank_name = ?, account_name = ?, account_number = ?, branch = ?, account_type = ?, swift_code = ?, ifsc_code = ?, instructions = ?, remarks = ?, display_order = ?, is_active = ?, is_default = ? WHERE id = ?');
+                $stmt->execute([$bank_name, $account_name, $account_number, $branch, $account_type, $swift_code, $ifsc_code, $instructions, $remarks, $display_order, $is_active, $is_default, $id]);
+            }
+
             logActivity("Updated Bank Account #$id", $bank_name);
             $alert = ['type' => 'success', 'msg' => 'Bank account updated successfully.'];
         }
@@ -1875,7 +1937,8 @@ require_once __DIR__ . '/includes/header.php';
                             <li><button class="dropdown-item" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings-panel" type="button" role="tab">General Site Settings</button></li>
                             <li><button class="dropdown-item" onclick="switchTab('settings-tab'); setTimeout(function(){ var el = document.getElementById('settings-leadership-section'); if(el) el.scrollIntoView({behavior: 'smooth'}); }, 150);"><i class="fa-solid fa-crown text-danger me-2"></i>Executive Leadership (Chairman & MD)</button></li>
                             <li><button class="dropdown-item" onclick="switchTab('settings-tab'); setTimeout(function(){ var el = document.getElementById('settings-about-section'); if(el) el.scrollIntoView({behavior: 'smooth'}); }, 150);"><i class="fa-solid fa-compass text-success me-2"></i>About Us (Mission, Vision, Values)</button></li>
-                            <li><button class="dropdown-item" id="bank-accounts-tab" data-bs-toggle="tab" data-bs-target="#bank-accounts-panel" type="button" role="tab">Bank Accounts</button></li>
+                            <li><button class="dropdown-item" id="bank-accounts-tab" data-bs-toggle="tab" data-bs-target="#bank-accounts-panel" type="button" role="tab"><i class="fa-solid fa-qrcode text-primary me-2"></i>Bank Accounts & Payment QR</button></li>
+                            <li><button class="dropdown-item" onclick="switchTab('bank-accounts-tab'); setTimeout(function(){ var el = document.getElementById('payment-qr-management-card'); if(el) el.scrollIntoView({behavior: 'smooth'}); }, 150);"><i class="fa-solid fa-camera text-success me-2"></i>Change Payment QR Code</button></li>
                             <li><button class="dropdown-item" id="social-tab" data-bs-toggle="tab" data-bs-target="#social-panel" type="button" role="tab">Social Media Links</button></li>
                             <li><button class="dropdown-item" id="navigation-tab" data-bs-toggle="tab" data-bs-target="#navigation-panel" type="button" role="tab">Navigation Menu</button></li>
                             <li><button class="dropdown-item" id="countries-tab" data-bs-toggle="tab" data-bs-target="#countries-panel" type="button" role="tab">Countries (Forms)</button></li>
@@ -4649,10 +4712,120 @@ require_once __DIR__ . '/includes/header.php';
                     <!-- BANK ACCOUNTS PANEL -->
                     <div class="tab-pane fade" id="bank-accounts-panel" role="tabpanel">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="fw-bold text-primary mb-0"><i class="fa-solid fa-bank text-warning me-2"></i>Bank Accounts</h5>
-                            <button class="btn btn-primary btn-sm rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addBankModal">
+                            <h5 class="fw-bold text-primary mb-0"><i class="fa-solid fa-building-columns text-primary me-2"></i>Bank Accounts & Payment QR Management</h5>
+                            <button class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#addBankModal">
                                 <i class="fa-solid fa-plus me-1"></i>Add Bank Account
                             </button>
+                        </div>
+
+                        <!-- DEDICATED PAYMENT QR CODE CARD -->
+                        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" id="payment-qr-management-card">
+                            <div class="card-header bg-gradient-primary text-white py-3 px-4 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0458A0 0%, #022340 100%);">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                        <i class="fa-solid fa-qrcode fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-0 text-white">Main Payment QR Code (Fonepay / Mobile Banking)</h6>
+                                        <small class="text-white-50">This QR code is displayed on the public website for student fees & registrations.</small>
+                                    </div>
+                                </div>
+                                <span class="badge <?= (isset($siteSettings['qr_code_enabled']) && $siteSettings['qr_code_enabled'] === '1') ? 'bg-success' : 'bg-warning text-dark' ?> rounded-pill px-3 py-2">
+                                    <i class="fa-solid fa-circle-dot me-1"></i><?= (isset($siteSettings['qr_code_enabled']) && $siteSettings['qr_code_enabled'] === '1') ? 'Live on Website' : 'Hidden on Website' ?>
+                                </span>
+                            </div>
+                            <div class="card-body p-4 bg-white">
+                                <form method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                    <input type="hidden" name="action" value="update_payment_qr">
+
+                                    <div class="row g-4 align-items-start">
+                                        <!-- Active QR Code Preview -->
+                                        <div class="col-12 col-md-4 text-center">
+                                            <div class="p-3 border rounded-4 bg-light shadow-sm position-relative">
+                                                <div class="fw-semibold text-secondary small mb-2"><i class="fa-solid fa-image me-1"></i>Current Payment QR Code</div>
+                                                
+                                                <?php 
+                                                    $activeQrPath = !empty($siteSettings['qr_code_image']) ? $siteSettings['qr_code_image'] : 'assets/images/siddhartha_qr.png';
+                                                    $activeQrFull = (strpos($activeQrPath, 'http') === 0) ? $activeQrPath : ('../' . ltrim($activeQrPath, '/'));
+                                                    $activeQrFile = __DIR__ . '/../' . ltrim($activeQrPath, '/');
+                                                    if (file_exists($activeQrFile)) {
+                                                        $activeQrFull .= '?v=' . filemtime($activeQrFile);
+                                                    }
+                                                ?>
+                                                
+                                                <div class="bg-white p-2 rounded-3 border d-inline-block shadow-sm mb-2" style="max-width: 200px;">
+                                                    <img id="currentPaymentQrPreview" src="<?= htmlspecialchars($activeQrFull) ?>" alt="Payment QR Code" class="img-fluid rounded" style="max-height: 180px; width: auto; object-fit: contain;">
+                                                </div>
+
+                                                <div class="small text-muted mb-2 font-monospace" style="font-size: 11px; word-break: break-all;">
+                                                    <?= htmlspecialchars($activeQrPath) ?>
+                                                </div>
+
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <a href="<?= htmlspecialchars($activeQrFull) ?>" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                                        <i class="fa-solid fa-up-right-from-square me-1"></i>Open Full Size
+                                                    </a>
+                                                    <?php if (!empty($siteSettings['qr_code_image'])): ?>
+                                                        <div class="form-check mt-1">
+                                                            <input class="form-check-input" type="checkbox" name="remove_qr_code" value="1" id="removeQrCheck">
+                                                            <label class="form-check-label text-danger small fw-semibold" for="removeQrCheck">Revert to Default</label>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- QR Upload and Configuration Settings -->
+                                        <div class="col-12 col-md-8">
+                                            <div class="row g-3">
+                                                <div class="col-12">
+                                                    <div class="form-check form-switch p-3 bg-light rounded-3 border">
+                                                        <input class="form-check-input ms-0 me-3" type="checkbox" name="qr_code_enabled" value="1" id="qrCodeEnabledMainToggle" <?= (isset($siteSettings['qr_code_enabled']) && $siteSettings['qr_code_enabled'] === '1') ? 'checked' : '' ?> style="transform: scale(1.3);">
+                                                        <label class="form-check-label fw-bold text-dark" for="qrCodeEnabledMainToggle">
+                                                            Enable QR Code Payment Section on Website
+                                                        </label>
+                                                        <div class="text-muted small ps-5">When enabled, students and parents can scan and pay fees instantly on the home & payment pages.</div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 col-md-6 form-group">
+                                                    <label class="fw-semibold text-dark small mb-1">Upload New QR Code Image</label>
+                                                    <input type="file" name="qr_code_image_file" class="form-control" accept="image/*" onchange="previewGlobalPaymentQr(this)">
+                                                    <div class="form-text small text-muted">Supports PNG, JPG, WEBP. Square high-resolution images look best.</div>
+                                                </div>
+
+                                                <div class="col-12 col-md-6 form-group">
+                                                    <label class="fw-semibold text-dark small mb-1">QR Title / Header</label>
+                                                    <input type="text" name="qr_code_title" class="form-control" value="<?= htmlspecialchars($siteSettings['qr_code_title'] ?? 'Fonepay / Mobile Banking QR') ?>" placeholder="e.g. Fonepay / Mobile Banking QR">
+                                                </div>
+
+                                                <div class="col-12 form-group">
+                                                    <label class="fw-semibold text-dark small mb-1">Payment Instructions / Notes</label>
+                                                    <textarea name="qr_code_description" class="form-control" rows="2" placeholder="e.g. Scan with any mobile banking app, eSewa, Khalti, or Fonepay to pay directly. Please mention student name in remarks."><?= htmlspecialchars($siteSettings['qr_code_description'] ?? 'Scan with any mobile banking app, eSewa, Khalti, or Fonepay to pay directly.') ?></textarea>
+                                                </div>
+
+                                                <!-- Instant Live Preview when new file is selected -->
+                                                <div class="col-12" id="globalQrLivePreviewContainer" style="display: none;">
+                                                    <div class="alert alert-info py-2 px-3 small d-flex align-items-center gap-3 mb-0 rounded-3">
+                                                        <i class="fa-solid fa-circle-info fs-5"></i>
+                                                        <div class="d-flex align-items-center gap-3">
+                                                            <span><strong>New QR Image Selected:</strong> Ready to save!</span>
+                                                            <img id="globalQrLivePreview" src="" alt="Live Preview" class="rounded border p-1 bg-white" style="height: 60px; width: 60px; object-fit: contain;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 pt-2">
+                                                    <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm hover-scale">
+                                                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>Save & Update Payment QR
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
 
                         <div class="table-responsive">
@@ -4660,6 +4833,7 @@ require_once __DIR__ . '/includes/header.php';
                                 <thead class="table-light">
                                     <tr>
                                         <th>ID</th>
+                                        <th>QR Code</th>
                                         <th>Bank Name</th>
                                         <th>Account Name</th>
                                         <th>Account Number</th>
@@ -4672,12 +4846,23 @@ require_once __DIR__ . '/includes/header.php';
                                 <tbody>
                                     <?php if (empty($dbBankAccounts)): ?>
                                         <tr>
-                                            <td colspan="8" class="text-center text-muted py-4">No bank accounts configured yet.</td>
+                                            <td colspan="9" class="text-center text-muted py-4">No bank accounts configured yet.</td>
                                         </tr>
                                     <?php else: ?>
                                         <?php foreach ($dbBankAccounts as $bank): ?>
                                             <tr>
                                                 <td><?= $bank['id'] ?></td>
+                                                <td>
+                                                    <?php if (!empty($bank['qr_code'])): ?>
+                                                        <a href="../<?= htmlspecialchars($bank['qr_code']) ?>" target="_blank" title="Click to view full size">
+                                                            <img src="../<?= htmlspecialchars($bank['qr_code']) ?>" class="rounded border p-1 bg-white shadow-sm" style="width: 44px; height: 44px; object-fit: contain;">
+                                                        </a>
+                                                    <?php elseif (!empty($bank['is_default'])): ?>
+                                                        <span class="badge bg-primary-subtle text-primary border" title="Uses Website Default QR Code"><i class="fa-solid fa-qrcode me-1"></i>Global QR</span>
+                                                    <?php else: ?>
+                                                        <span class="text-muted small">None</span>
+                                                    <?php endif; ?>
+                                                </td>
                                                 <td><strong class="text-dark"><?= htmlspecialchars($bank['bank_name']) ?></strong></td>
                                                 <td><?= htmlspecialchars($bank['account_name']) ?></td>
                                                 <td><code class="font-monospace text-primary fw-bold" style="font-size: 14px;"><?= htmlspecialchars($bank['account_number']) ?></code></td>
@@ -4707,7 +4892,7 @@ require_once __DIR__ . '/includes/header.php';
                                             <div class="modal fade" id="editBankModal<?= $bank['id'] ?>" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered modal-lg">
                                                     <div class="modal-content border-0 shadow-lg rounded-4">
-                                                        <form method="POST">
+                                                        <form method="POST" enctype="multipart/form-data">
                                                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                             <input type="hidden" name="action" value="edit_bank_account">
                                                             <input type="hidden" name="id" value="<?= $bank['id'] ?>">
@@ -4754,6 +4939,30 @@ require_once __DIR__ . '/includes/header.php';
                                                                         <label class="fw-semibold">Internal Remarks / Notes</label>
                                                                         <input type="text" name="remarks" class="form-control" value="<?= htmlspecialchars($bank['remarks'] ?? '') ?>" placeholder="Optional notes about this account">
                                                                     </div>
+
+                                                                    <!-- QR Code Section for this Account -->
+                                                                    <div class="col-12 form-group border-top pt-3 mt-3">
+                                                                        <label class="fw-semibold text-primary"><i class="fa-solid fa-qrcode me-1"></i>Account Specific Payment QR Code (Optional)</label>
+                                                                        <?php if (!empty($bank['qr_code'])): ?>
+                                                                            <div class="d-flex align-items-center gap-3 p-2 bg-light rounded-3 border mb-2">
+                                                                                <img src="../<?= htmlspecialchars($bank['qr_code']) ?>" class="rounded border p-1 bg-white shadow-sm" style="height: 64px; width: 64px; object-fit: contain;">
+                                                                                <div>
+                                                                                    <div class="small fw-semibold text-dark">Current Account QR: <code><?= htmlspecialchars($bank['qr_code']) ?></code></div>
+                                                                                    <div class="form-check mt-1">
+                                                                                        <input class="form-check-input" type="checkbox" name="remove_bank_qr" value="1" id="remove_bank_qr_<?= $bank['id'] ?>">
+                                                                                        <label class="form-check-label text-danger small fw-semibold" for="remove_bank_qr_<?= $bank['id'] ?>">Remove this account's QR code</label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        <?php endif; ?>
+                                                                        <input type="file" name="bank_qr_file" class="form-control" accept="image/*">
+                                                                        <div class="form-text small text-muted">Upload a dedicated QR code image for this specific bank account (PNG, JPG, WEBP).</div>
+                                                                        <div class="form-check mt-2">
+                                                                            <input class="form-check-input" type="checkbox" name="set_as_global_qr" value="1" id="set_global_qr_<?= $bank['id'] ?>">
+                                                                            <label class="form-check-label small fw-semibold text-secondary" for="set_global_qr_<?= $bank['id'] ?>">Also set this as the main homepage/website payment QR code</label>
+                                                                        </div>
+                                                                    </div>
+
                                                                     <div class="col-12 col-md-6 form-group">
                                                                         <label class="fw-semibold">Display Order</label>
                                                                         <input type="number" name="display_order" class="form-control" value="<?= (int)$bank['display_order'] ?>" min="0">
@@ -6338,7 +6547,7 @@ require_once __DIR__ . '/includes/header.php';
         <div class="modal fade" id="addBankModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content border-0 shadow-lg rounded-4">
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                         <input type="hidden" name="action" value="add_bank_account">
                         
@@ -6384,6 +6593,18 @@ require_once __DIR__ . '/includes/header.php';
                                     <label class="fw-semibold">Internal Remarks / Notes</label>
                                     <input type="text" name="remarks" class="form-control" placeholder="Optional notes for admin panel">
                                 </div>
+
+                                <!-- QR Code Section for this Account -->
+                                <div class="col-12 form-group border-top pt-3 mt-2">
+                                    <label class="fw-semibold text-primary"><i class="fa-solid fa-qrcode me-1"></i>Account Specific Payment QR Code (Optional)</label>
+                                    <input type="file" name="bank_qr_file" class="form-control" accept="image/*">
+                                    <div class="form-text small text-muted">Upload a dedicated QR code image for this specific bank account (PNG, JPG, WEBP).</div>
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="set_as_global_qr" value="1" id="add_bank_set_global_qr">
+                                        <label class="form-check-label small fw-semibold text-secondary" for="add_bank_set_global_qr">Also set this as the main homepage/website payment QR code</label>
+                                    </div>
+                                </div>
+
                                 <div class="col-12 col-md-6 form-group">
                                     <label class="fw-semibold">Display Order</label>
                                     <input type="number" name="display_order" class="form-control" value="0" min="0">
@@ -7141,6 +7362,30 @@ require_once __DIR__ . '/includes/header.php';
                         if (removeCheckId) {
                             var chk = document.getElementById(removeCheckId);
                             if (chk) chk.checked = false;
+                        }
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            // Instant preview for Global Payment QR upload
+            function previewGlobalPaymentQr(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var preview = document.getElementById('globalQrLivePreview');
+                        var container = document.getElementById('globalQrLivePreviewContainer');
+                        if (preview && container) {
+                            preview.src = e.target.result;
+                            container.style.display = 'block';
+                        }
+                        var current = document.getElementById('currentPaymentQrPreview');
+                        if (current) {
+                            current.src = e.target.result;
+                        }
+                        var removeChk = document.getElementById('removeQrCheck');
+                        if (removeChk) {
+                            removeChk.checked = false;
                         }
                     };
                     reader.readAsDataURL(input.files[0]);

@@ -7,18 +7,6 @@ if (!isset($pdo)) {
     }
 }
 
-// Fetch QR Code Settings
-$qrEnabled = '1';
-$qrImage = !empty($siteSettings['qr_code_image']) ? $siteSettings['qr_code_image'] : 'assets/images/siddhartha_qr.png';
-$qrTitle = $siteSettings['qr_code_title'] ?? 'Fonepay / Mobile Banking QR';
-$qrDesc = $siteSettings['qr_code_description'] ?? 'Scan with any mobile banking app, eSewa, Khalti, or Fonepay to pay directly.';
-
-$qrImageUrl = (strpos($qrImage, 'http') === 0) ? $qrImage : ($basePath . ltrim($qrImage, '/'));
-$localQrPath = __DIR__ . '/../' . ltrim($qrImage, '/');
-if (file_exists($localQrPath)) {
-    $qrImageUrl .= '?v=' . filemtime($localQrPath);
-}
-
 // Fetch Active Bank Accounts
 $bankAccounts = [];
 if (isset($pdo)) {
@@ -28,6 +16,41 @@ if (isset($pdo)) {
     } catch (PDOException $e) {
         // Fallback
     }
+}
+
+// Fetch QR Code Settings
+$qrEnabled = $siteSettings['qr_code_enabled'] ?? '1';
+$qrImage = !empty($siteSettings['qr_code_image']) ? $siteSettings['qr_code_image'] : '';
+
+// Prefer specific bank QR if primary bank account has an uploaded QR code
+if (!empty($bankAccounts)) {
+    foreach ($bankAccounts as $bItem) {
+        if (!empty($bItem['is_default']) && !empty($bItem['qr_code'])) {
+            $qrImage = $bItem['qr_code'];
+            break;
+        }
+    }
+    // If not found on default, check first bank account with QR
+    if (empty($qrImage)) {
+        foreach ($bankAccounts as $bItem) {
+            if (!empty($bItem['qr_code'])) {
+                $qrImage = $bItem['qr_code'];
+                break;
+            }
+        }
+    }
+}
+if (empty($qrImage)) {
+    $qrImage = 'assets/images/siddhartha_qr.png';
+}
+
+$qrTitle = $siteSettings['qr_code_title'] ?? 'Fonepay / Mobile Banking QR';
+$qrDesc = $siteSettings['qr_code_description'] ?? 'Scan with any mobile banking app, eSewa, Khalti, or Fonepay to pay directly.';
+
+$qrImageUrl = (strpos($qrImage, 'http') === 0) ? $qrImage : ($basePath . ltrim($qrImage, '/'));
+$localQrPath = __DIR__ . '/../' . ltrim($qrImage, '/');
+if (file_exists($localQrPath)) {
+    $qrImageUrl .= '?v=' . filemtime($localQrPath);
 }
 
 // If no active QR and no active bank accounts, do not render section

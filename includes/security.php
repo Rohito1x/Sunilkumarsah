@@ -24,6 +24,7 @@ if (!headers_sent()) {
     header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0');
     header('Pragma: no-cache');
     header('Expires: 0');
+    header('X-LiteSpeed-Cache-Control: no-cache');
     header('X-Content-Type-Options: nosniff');
     header('X-Frame-Options: SAMEORIGIN');
     header('Referrer-Policy: strict-origin-when-cross-origin');
