@@ -1510,6 +1510,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $alert = ['type' => 'success', 'msg' => 'University PDF document deleted successfully.'];
         }
 
+        // PAYMENT RECEIPTS ACTIONS
+        if ($action === 'update_payment_receipt_status' && isset($_POST['id'])) {
+            $id = (int)$_POST['id'];
+            $status = trim((string)($_POST['status'] ?? 'Pending'));
+            $admin_notes = trim((string)($_POST['admin_notes'] ?? ''));
+
+            if (!in_array($status, ['Pending', 'Verified', 'Rejected'], true)) {
+                $status = 'Pending';
+            }
+
+            $stmt = $pdo->prepare('UPDATE payment_receipts SET status = ?, admin_notes = ? WHERE id = ?');
+            $stmt->execute([$status, $admin_notes, $id]);
+            logActivity("Updated Payment Receipt #$id status to $status");
+            $alert = ['type' => 'success', 'msg' => "Payment receipt #$id status updated to '$status'."];
+        }
+
+        if ($action === 'delete_payment_receipt' && isset($_POST['id'])) {
+            $id = (int)$_POST['id'];
+            $stmt = $pdo->prepare('SELECT receipt_path FROM payment_receipts WHERE id = ?');
+            $stmt->execute([$id]);
+            $filePath = $stmt->fetchColumn();
+            if ($filePath && file_exists(__DIR__ . '/../' . $filePath)) {
+                @unlink(__DIR__ . '/../' . $filePath);
+            }
+
+            $stmt = $pdo->prepare('DELETE FROM payment_receipts WHERE id = ?');
+            $stmt->execute([$id]);
+            logActivity("Deleted Payment Receipt #$id");
+            $alert = ['type' => 'success', 'msg' => "Payment receipt #$id deleted successfully."];
+        }
+
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
@@ -1737,6 +1768,24 @@ if (!isset($pdo) || !$pdo) {
             $dbSeoRedirects = [];
         }
 
+        // Fetch Payment Receipts
+        $dbPaymentReceipts = [];
+        $pendingReceiptsCount = 0;
+        $totalVerifiedAmount = 0.0;
+        try {
+            $dbPaymentReceipts = $pdo->query('SELECT * FROM payment_receipts ORDER BY created_at DESC')->fetchAll() ?: [];
+            foreach ($dbPaymentReceipts as $rc) {
+                if (($rc['status'] ?? 'Pending') === 'Pending') {
+                    $pendingReceiptsCount++;
+                }
+                if (($rc['status'] ?? '') === 'Verified') {
+                    $totalVerifiedAmount += (float)($rc['amount'] ?? 0);
+                }
+            }
+        } catch (\Throwable $e) {
+            $dbPaymentReceipts = [];
+        }
+
         // Map course stream names for display lists
         foreach ($dbStreams as $s) {
             $streamMap[$s['id']] = $s['name'];
@@ -1914,6 +1963,16 @@ require_once __DIR__ . '/includes/header.php';
                     <li class="nav-item"><button class="nav-link fw-bold px-3 rounded-pill btn-sm" id="subscribers-tab" data-bs-toggle="tab" data-bs-target="#subscribers-panel" type="button" role="tab">Subscribers</button></li>
                     <li class="nav-item"><button class="nav-link fw-bold px-3 rounded-pill btn-sm" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-panel" type="button" role="tab">Reviews & Feedback</button></li>
                     <li class="nav-item"><button class="nav-link fw-bold px-3 rounded-pill btn-sm" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff-panel" type="button" role="tab">Staff & Counselors (<?= count($dbTeamMembers) ?>)</button></li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold px-3 rounded-pill btn-sm position-relative text-dark" id="receipts-tab" data-bs-toggle="tab" data-bs-target="#receipts-panel" type="button" role="tab">
+                            <i class="fa-solid fa-receipt text-warning me-1"></i>Payment Receipts
+                            <?php if (!empty($pendingReceiptsCount)): ?>
+                                <span class="badge bg-danger rounded-pill ms-1" style="font-size: 10px;"><?= $pendingReceiptsCount ?></span>
+                            <?php else: ?>
+                                <span class="badge bg-light text-muted border rounded-pill ms-1" style="font-size: 10px;"><?= count($dbPaymentReceipts) ?></span>
+                            <?php endif; ?>
+                        </button>
+                    </li>
                     
                     <!-- Content CRUD Dropdown -->
                     <li class="nav-item dropdown">
@@ -1939,6 +1998,7 @@ require_once __DIR__ . '/includes/header.php';
                             <li><button class="dropdown-item" onclick="switchTab('settings-tab'); setTimeout(function(){ var el = document.getElementById('settings-about-section'); if(el) el.scrollIntoView({behavior: 'smooth'}); }, 150);"><i class="fa-solid fa-compass text-success me-2"></i>About Us (Mission, Vision, Values)</button></li>
                             <li><button class="dropdown-item" id="bank-accounts-tab" data-bs-toggle="tab" data-bs-target="#bank-accounts-panel" type="button" role="tab"><i class="fa-solid fa-qrcode text-primary me-2"></i>Bank Accounts & Payment QR</button></li>
                             <li><button class="dropdown-item" onclick="switchTab('bank-accounts-tab'); setTimeout(function(){ var el = document.getElementById('payment-qr-management-card'); if(el) el.scrollIntoView({behavior: 'smooth'}); }, 150);"><i class="fa-solid fa-camera text-success me-2"></i>Change Payment QR Code</button></li>
+                            <li><button class="dropdown-item" onclick="switchTab('receipts-tab');"><i class="fa-solid fa-receipt text-warning me-2"></i>Payment Receipts (Vouchers)</button></li>
                             <li><button class="dropdown-item" id="social-tab" data-bs-toggle="tab" data-bs-target="#social-panel" type="button" role="tab">Social Media Links</button></li>
                             <li><button class="dropdown-item" id="navigation-tab" data-bs-toggle="tab" data-bs-target="#navigation-panel" type="button" role="tab">Navigation Menu</button></li>
                             <li><button class="dropdown-item" id="countries-tab" data-bs-toggle="tab" data-bs-target="#countries-panel" type="button" role="tab">Countries (Forms)</button></li>
@@ -2827,6 +2887,336 @@ require_once __DIR__ . '/includes/header.php';
                                     </div>
                                 </form>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- PAYMENT RECEIPTS PANEL -->
+                    <div class="tab-pane fade" id="receipts-panel" role="tabpanel">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+                            <div>
+                                <h5 class="fw-bold text-primary mb-0"><i class="fa-solid fa-receipt text-warning me-2"></i>Student Payment Receipts & Vouchers</h5>
+                                <p class="text-muted small mb-0">View, verify, and track all submitted fee deposit receipts, bank transfer slips, and QR code payments.</p>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary rounded-pill px-3 py-2">Total: <?= count($dbPaymentReceipts) ?></span>
+                                <?php if (!empty($pendingReceiptsCount)): ?>
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><i class="fa-solid fa-clock me-1"></i><?= $pendingReceiptsCount ?> Pending</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <!-- Metric Summary Cards -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-primary-subtle text-primary rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                            <i class="fa-solid fa-receipt fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small fw-semibold">Total Receipts</div>
+                                            <div class="fs-4 fw-bold text-dark"><?= count($dbPaymentReceipts) ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-warning-subtle text-warning rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                            <i class="fa-solid fa-hourglass-half fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small fw-semibold">Pending Verification</div>
+                                            <div class="fs-4 fw-bold text-warning"><?= $pendingReceiptsCount ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-success-subtle text-success rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                            <i class="fa-solid fa-circle-check fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small fw-semibold">Verified Receipts</div>
+                                            <div class="fs-4 fw-bold text-success"><?= count(array_filter($dbPaymentReceipts, function($r){ return ($r['status'] ?? '') === 'Verified'; })) ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-info-subtle text-info rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                            <i class="fa-solid fa-money-bill-wave fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small fw-semibold">Total Verified Amount</div>
+                                            <div class="fs-5 fw-bold text-dark font-monospace">Rs. <?= number_format($totalVerifiedAmount, 2) ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filter & Search Bar -->
+                        <div class="card border-0 shadow-sm rounded-4 mb-4 p-3 bg-white">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-12 col-md-5">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                        <input type="text" id="receiptSearchInput" class="form-control bg-light border-start-0" placeholder="Search by student name, phone, email, or transaction ID..." onkeyup="filterReceiptsTable()">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <select id="receiptStatusFilter" class="form-select bg-light" onchange="filterReceiptsTable()">
+                                        <option value="">All Statuses</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Verified">Verified / Approved</option>
+                                        <option value="Rejected">Rejected</option>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <select id="receiptLocationFilter" class="form-select bg-light" onchange="filterReceiptsTable()">
+                                        <option value="">All Locations</option>
+                                        <?php 
+                                            $uniqueLocs = array_unique(array_filter(array_column($dbPaymentReceipts, 'location')));
+                                            foreach ($uniqueLocs as $uLoc): 
+                                        ?>
+                                            <option value="<?= htmlspecialchars($uLoc) ?>"><?= htmlspecialchars($uLoc) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Receipts Table -->
+                        <div class="table-responsive bg-white rounded-4 shadow-sm border mb-4">
+                            <table class="table align-middle table-hover mb-0" id="paymentReceiptsTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Date & Time</th>
+                                        <th>Student / Payer</th>
+                                        <th>Location / Branch</th>
+                                        <th>Amount & Method</th>
+                                        <th>Ref / Trans ID</th>
+                                        <th class="text-center">Receipt File</th>
+                                        <th>Status</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($dbPaymentReceipts)): ?>
+                                        <tr>
+                                            <td colspan="9" class="text-center text-muted py-5">
+                                                <i class="fa-solid fa-receipt fs-1 text-muted opacity-25 d-block mb-2"></i>
+                                                No payment receipts submitted yet.
+                                            </td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <?php foreach ($dbPaymentReceipts as $rec): ?>
+                                            <?php
+                                                $recExt = strtolower(pathinfo($rec['receipt_path'] ?? '', PATHINFO_EXTENSION));
+                                                $isPdf = ($recExt === 'pdf');
+                                                $recFileUrl = '../' . ltrim($rec['receipt_path'] ?? '', '/');
+                                                $phoneDigits = preg_replace('/\D+/', '', $rec['phone_number'] ?? '');
+                                                if (strlen($phoneDigits) === 10 && strpos($phoneDigits, '9') === 0) {
+                                                    $phoneDigits = '977' . $phoneDigits;
+                                                }
+                                            ?>
+                                            <tr class="receipt-row" data-status="<?= htmlspecialchars($rec['status'] ?? 'Pending') ?>" data-location="<?= htmlspecialchars($rec['location'] ?? '') ?>">
+                                                <td><span class="badge bg-light text-dark border">#<?= $rec['id'] ?></span></td>
+                                                <td>
+                                                    <div class="small fw-semibold text-dark"><?= date('M d, Y', strtotime($rec['created_at'])) ?></div>
+                                                    <div class="extra-small text-muted"><?= date('h:i A', strtotime($rec['created_at'])) ?></div>
+                                                </td>
+                                                <td>
+                                                    <strong class="text-dark d-block"><?= htmlspecialchars($rec['full_name']) ?></strong>
+                                                    <div class="d-flex align-items-center gap-2 extra-small text-muted mt-1">
+                                                        <a href="tel:<?= htmlspecialchars($rec['phone_number']) ?>" class="text-decoration-none text-muted">
+                                                            <i class="fa-solid fa-phone me-1"></i><?= htmlspecialchars($rec['phone_number']) ?>
+                                                        </a>
+                                                        <?php if (!empty($phoneDigits)): ?>
+                                                            <a href="https://wa.me/<?= htmlspecialchars($phoneDigits) ?>" target="_blank" class="text-success text-decoration-none" title="Chat on WhatsApp">
+                                                                <i class="fa-brands fa-whatsapp"></i>
+                                                            </a>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <div class="extra-small text-muted"><?= htmlspecialchars($rec['email']) ?></div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill">
+                                                        <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($rec['location']) ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="fw-bold text-success font-monospace" style="font-size: 15px;">
+                                                        Rs. <?= number_format((float)($rec['amount'] ?? 0), 2) ?>
+                                                    </div>
+                                                    <div class="extra-small text-muted"><?= htmlspecialchars($rec['payment_method'] ?? 'Fonepay') ?></div>
+                                                </td>
+                                                <td>
+                                                    <?php if (!empty($rec['transaction_id'])): ?>
+                                                        <code class="font-monospace text-primary"><?= htmlspecialchars($rec['transaction_id']) ?></code>
+                                                    <?php else: ?>
+                                                        <span class="text-muted extra-small">N/A</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td class="text-center">
+                                                    <?php if (!empty($rec['receipt_path'])): ?>
+                                                        <?php if ($isPdf): ?>
+                                                            <a href="<?= htmlspecialchars($recFileUrl) ?>" target="_blank" class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-2xs">
+                                                                <i class="fa-solid fa-file-pdf me-1"></i>View PDF
+                                                            </a>
+                                                        <?php else: ?>
+                                                            <a href="<?= htmlspecialchars($recFileUrl) ?>" target="_blank" title="Click to view full image">
+                                                                <img src="<?= htmlspecialchars($recFileUrl) ?>" alt="Receipt" class="rounded border p-1 bg-white shadow-2xs hover-scale" style="height: 48px; width: 48px; object-fit: contain;">
+                                                            </a>
+                                                        <?php endif; ?>
+                                                    <?php else: ?>
+                                                        <span class="text-muted small">No file</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td>
+                                                    <?php if ($rec['status'] === 'Verified'): ?>
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5">
+                                                            <i class="fa-solid fa-circle-check me-1"></i>Verified
+                                                        </span>
+                                                    <?php elseif ($rec['status'] === 'Rejected'): ?>
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1.5">
+                                                            <i class="fa-solid fa-circle-xmark me-1"></i>Rejected
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-1.5">
+                                                            <i class="fa-solid fa-clock me-1"></i>Pending
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex justify-content-center gap-1">
+                                                        <!-- Quick Approve Button -->
+                                                        <?php if ($rec['status'] !== 'Verified'): ?>
+                                                            <form method="POST" class="d-inline">
+                                                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                                                <input type="hidden" name="action" value="update_payment_receipt_status">
+                                                                <input type="hidden" name="id" value="<?= $rec['id'] ?>">
+                                                                <input type="hidden" name="status" value="Verified">
+                                                                <button type="submit" class="btn btn-outline-success btn-sm rounded-circle p-2" title="Mark as Verified" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+                                                                    <i class="fa-solid fa-check"></i>
+                                                                </button>
+                                                            </form>
+                                                        <?php endif; ?>
+
+                                                        <!-- View Details & Notes Modal Button -->
+                                                        <button class="btn btn-outline-primary btn-sm rounded-circle p-2" data-bs-toggle="modal" data-bs-target="#viewReceiptModal<?= $rec['id'] ?>" title="View Full Details" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+                                                            <i class="fa-solid fa-eye"></i>
+                                                        </button>
+
+                                                        <!-- Delete Button -->
+                                                        <form method="POST" class="d-inline" onsubmit="return confirm('Permanently delete this receipt submission?');">
+                                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                                            <input type="hidden" name="action" value="delete_payment_receipt">
+                                                            <input type="hidden" name="id" value="<?= $rec['id'] ?>">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle p-2" title="Delete Receipt" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+                                                                <i class="fa-solid fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <!-- VIEW & EDIT RECEIPT DETAILS MODAL -->
+                                            <div class="modal fade" id="viewReceiptModal<?= $rec['id'] ?>" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                                                        <div class="modal-header bg-light">
+                                                            <h5 class="modal-title fw-bold text-primary">
+                                                                <i class="fa-solid fa-receipt me-2"></i>Payment Receipt #<?= $rec['id'] ?> Details
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <form method="POST">
+                                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                                            <input type="hidden" name="action" value="update_payment_receipt_status">
+                                                            <input type="hidden" name="id" value="<?= $rec['id'] ?>">
+
+                                                            <div class="modal-body p-4">
+                                                                <div class="row g-4">
+                                                                    <!-- Payer & Transaction Information -->
+                                                                    <div class="col-12 col-md-6">
+                                                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                                                            <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Payer & Payment Info</h6>
+                                                                            <p class="small mb-2"><strong class="text-dark">Student Name:</strong> <?= htmlspecialchars($rec['full_name']) ?></p>
+                                                                            <p class="small mb-2"><strong class="text-dark">Phone:</strong> <a href="tel:<?= htmlspecialchars($rec['phone_number']) ?>"><?= htmlspecialchars($rec['phone_number']) ?></a></p>
+                                                                            <p class="small mb-2"><strong class="text-dark">Email:</strong> <a href="mailto:<?= htmlspecialchars($rec['email']) ?>"><?= htmlspecialchars($rec['email']) ?></a></p>
+                                                                            <p class="small mb-2"><strong class="text-dark">Location / Branch:</strong> <span class="badge bg-info-subtle text-info border"><?= htmlspecialchars($rec['location']) ?></span></p>
+                                                                            <p class="small mb-2"><strong class="text-dark">Amount Paid:</strong> <strong class="text-success font-monospace">Rs. <?= number_format((float)($rec['amount'] ?? 0), 2) ?></strong></p>
+                                                                            <p class="small mb-2"><strong class="text-dark">Payment Method:</strong> <?= htmlspecialchars($rec['payment_method']) ?></p>
+                                                                            <p class="small mb-2"><strong class="text-dark">Transaction ID:</strong> <?= htmlspecialchars($rec['transaction_id'] ?: 'N/A') ?></p>
+                                                                            <p class="small mb-2"><strong class="text-dark">Submitted At:</strong> <?= date('F d, Y h:i A', strtotime($rec['created_at'])) ?></p>
+                                                                            <?php if (!empty($rec['remarks'])): ?>
+                                                                                <p class="small mb-0"><strong class="text-dark">Student Remarks:</strong> <?= nl2br(htmlspecialchars($rec['remarks'])) ?></p>
+                                                                            <?php endif; ?>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Receipt File & Admin Actions -->
+                                                                    <div class="col-12 col-md-6">
+                                                                        <div class="p-3 bg-light rounded-3 border h-100 text-center">
+                                                                            <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Attached Receipt / Voucher</h6>
+                                                                            <?php if (!empty($rec['receipt_path'])): ?>
+                                                                                <?php if ($isPdf): ?>
+                                                                                    <div class="p-4 bg-white rounded-3 border mb-3">
+                                                                                        <i class="fa-solid fa-file-pdf text-danger fs-1 mb-2 d-block"></i>
+                                                                                        <div class="small fw-semibold text-dark text-break mb-3"><?= htmlspecialchars(basename($rec['receipt_path'])) ?></div>
+                                                                                        <a href="<?= htmlspecialchars($recFileUrl) ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-4">
+                                                                                            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Open PDF Receipt
+                                                                                        </a>
+                                                                                    </div>
+                                                                                <?php else: ?>
+                                                                                    <div class="p-2 bg-white rounded-3 border mb-3">
+                                                                                        <a href="<?= htmlspecialchars($recFileUrl) ?>" target="_blank">
+                                                                                            <img src="<?= htmlspecialchars($recFileUrl) ?>" alt="Receipt" class="img-fluid rounded" style="max-height: 220px; object-fit: contain;">
+                                                                                        </a>
+                                                                                        <div class="mt-2">
+                                                                                            <a href="<?= htmlspecialchars($recFileUrl) ?>" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                                                                                <i class="fa-solid fa-expand me-1"></i>View Full Image
+                                                                                            </a>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                <?php endif; ?>
+                                                                            <?php endif; ?>
+
+                                                                            <div class="text-start mt-3">
+                                                                                <label class="form-label fw-bold text-dark small">Verification Status</label>
+                                                                                <select name="status" class="form-select form-select-sm mb-3">
+                                                                                    <option value="Pending" <?= $rec['status'] === 'Pending' ? 'selected' : '' ?>>Pending Verification</option>
+                                                                                    <option value="Verified" <?= $rec['status'] === 'Verified' ? 'selected' : '' ?>>Verified & Approved</option>
+                                                                                    <option value="Rejected" <?= $rec['status'] === 'Rejected' ? 'selected' : '' ?>>Rejected</option>
+                                                                                </select>
+
+                                                                                <label class="form-label fw-bold text-dark small">Internal Admin Notes / Accounting ID</label>
+                                                                                <textarea name="admin_notes" class="form-control form-control-sm" rows="2" placeholder="e.g. Verified with bank statement on Nov 10..."><?= htmlspecialchars($rec['admin_notes'] ?? '') ?></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer bg-light border-0">
+                                                                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                                                                <button type="submit" class="btn btn-primary rounded-pill px-5">Save Updates</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -7390,6 +7780,34 @@ require_once __DIR__ . '/includes/header.php';
                     };
                     reader.readAsDataURL(input.files[0]);
                 }
+            }
+
+            // Filter and search student payment receipts
+            function filterReceiptsTable() {
+                var searchInput = document.getElementById('receiptSearchInput');
+                var statusSelect = document.getElementById('receiptStatusFilter');
+                var locationSelect = document.getElementById('receiptLocationFilter');
+
+                var searchVal = (searchInput ? searchInput.value : '').toLowerCase().trim();
+                var statusVal = statusSelect ? statusSelect.value : '';
+                var locationVal = locationSelect ? locationSelect.value : '';
+
+                var rows = document.querySelectorAll('#paymentReceiptsTable tbody tr.receipt-row');
+                rows.forEach(function(row) {
+                    var rowText = row.innerText.toLowerCase();
+                    var rowStatus = row.getAttribute('data-status') || '';
+                    var rowLocation = row.getAttribute('data-location') || '';
+
+                    var matchesSearch = !searchVal || rowText.indexOf(searchVal) !== -1;
+                    var matchesStatus = !statusVal || rowStatus === statusVal;
+                    var matchesLocation = !locationVal || rowLocation === locationVal;
+
+                    if (matchesSearch && matchesStatus && matchesLocation) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
             }
         </script>
 

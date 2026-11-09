@@ -226,6 +226,97 @@ if ($action === 'submit_review' || $action === 'review') {
     }
 }
 
+// 5. Payment Receipt Submission (.jpg, .jpeg, .png, .pdf with location)
+if ($action === 'submit_payment_receipt' || $action === 'payment_receipt') {
+    $fullName = isset($_POST['full_name']) ? trim((string)$_POST['full_name']) : '';
+    $email = isset($_POST['email']) ? trim((string)$_POST['email']) : '';
+    $phone = isset($_POST['phone_number']) ? trim((string)$_POST['phone_number']) : '';
+    $location = isset($_POST['location']) ? trim((string)$_POST['location']) : '';
+    $customLocation = isset($_POST['custom_location']) ? trim((string)$_POST['custom_location']) : '';
+    if ($location === 'Online / Other Location' && $customLocation !== '') {
+        $location = 'Other: ' . $customLocation;
+    } elseif ($customLocation !== '' && empty($location)) {
+        $location = $customLocation;
+    }
+    $amount = isset($_POST['amount']) ? (float)$_POST['amount'] : 0.0;
+    $paymentMethod = isset($_POST['payment_method']) ? trim((string)$_POST['payment_method']) : 'Fonepay / Bank QR';
+    $transactionId = isset($_POST['transaction_id']) ? trim((string)$_POST['transaction_id']) : '';
+    $remarks = isset($_POST['remarks']) ? trim((string)$_POST['remarks']) : '';
+
+    if ($fullName === '' || $email === '' || $phone === '' || $location === '') {
+        jsonResponse(false, 'Full name, email, phone number, and location are required.');
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        jsonResponse(false, 'Please provide a valid email address.');
+    }
+
+    if ($amount <= 0) {
+        jsonResponse(false, 'Please enter a valid payment amount.');
+    }
+
+    // Verify receipt file is present
+    if (!isset($_FILES['receipt_file']) || $_FILES['receipt_file']['error'] === UPLOAD_ERR_NO_FILE) {
+        jsonResponse(false, 'Please attach your payment receipt file (.jpg, .jpeg, .png, or .pdf).');
+    }
+
+    // Process file upload strictly allowing jpg, jpeg, png, pdf
+    $receiptAllowedMimes = [
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png'  => 'image/png',
+        'pdf'  => 'application/pdf'
+    ];
+
+    $uploadDir = __DIR__ . '/uploads/receipts/';
+    $uploadResult = SecureUploader::process(
+        $_FILES['receipt_file'],
+        $uploadDir,
+        'receipt_',
+        $receiptAllowedMimes,
+        10 * 1024 * 1024 // 10MB limit
+    );
+
+    if (!$uploadResult['success']) {
+        jsonResponse(false, 'Receipt upload failed: ' . $uploadResult['error']);
+    }
+
+    $receiptPath = 'uploads/receipts/' . $uploadResult['filename'];
+
+    // Auto-create payment_receipts table if not exists (defensive fallback)
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS `payment_receipts` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `full_name` VARCHAR(150) NOT NULL,
+            `email` VARCHAR(150) NOT NULL,
+            `phone_number` VARCHAR(50) NOT NULL,
+            `location` VARCHAR(150) NOT NULL,
+            `amount` DECIMAL(12,2) DEFAULT NULL,
+            `payment_method` VARCHAR(100) DEFAULT 'Fonepay / Bank QR',
+            `transaction_id` VARCHAR(100) DEFAULT NULL,
+            `receipt_path` VARCHAR(255) NOT NULL,
+            `remarks` TEXT DEFAULT NULL,
+            `status` VARCHAR(30) DEFAULT 'Pending',
+            `admin_notes` TEXT DEFAULT NULL,
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX `idx_status` (`status`),
+            INDEX `idx_location` (`location`),
+            INDEX `idx_created` (`created_at`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    } catch (\Throwable $e) {}
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO payment_receipts (full_name, email, phone_number, location, amount, payment_method, transaction_id, receipt_path, remarks, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')");
+        $stmt->execute([$fullName, $email, $phone, $location, $amount, $paymentMethod, $transactionId, $receiptPath, $remarks]);
+        $receiptId = $pdo->lastInsertId();
+
+        jsonResponse(true, 'Your payment receipt #' . $receiptId . ' has been submitted successfully! Our accounting and admissions team will verify your payment and issue an official receipt.');
+    } catch (PDOException $e) {
+        error_log("Payment receipt submission DB error: " . $e->getMessage());
+        jsonResponse(false, 'Database error while saving receipt. Please contact our support team.', [], 500);
+    }
+}
+
 jsonResponse(false, 'Invalid action');
 
 

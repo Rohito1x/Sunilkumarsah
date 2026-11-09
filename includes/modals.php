@@ -363,6 +363,280 @@ if (isset($pdo)) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+<!-- Global Payment Receipt Submission Modal -->
+<div class="modal fade" id="paymentReceiptModal" tabindex="-1" aria-labelledby="paymentReceiptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+            <div class="modal-header py-3 px-4 text-white" style="background: linear-gradient(135deg, #0458A0 0%, #022340 100%);">
+                <div>
+                    <h5 class="modal-title fw-bold text-white mb-0" id="paymentReceiptModalLabel">
+                        <i class="fa-solid fa-receipt text-warning me-2"></i>Send Payment Receipt / Voucher
+                    </h5>
+                    <small class="text-white-50">Upload your payment proof in <strong>.jpg, .jpeg, .pdf, or .png</strong> format along with your location.</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 p-md-5 bg-white">
+                <div id="payment-receipt-alert-container"></div>
+
+                <form id="payment-receipt-form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="<?= h(class_exists('Csrf') ? Csrf::getToken() : ($_SESSION['csrf_token'] ?? '')) ?>">
+                    <input type="hidden" name="action" value="submit_payment_receipt">
+
+                    <!-- Payer Information -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-semibold text-dark small">Student / Payer Full Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-user"></i></span>
+                                <input type="text" class="form-control bg-light border-start-0" name="full_name" placeholder="Full name of student or parent" required>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-semibold text-dark small">Phone / WhatsApp Number <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-phone"></i></span>
+                                <input type="tel" class="form-control bg-light border-start-0" name="phone_number" placeholder="e.g. 9807765812" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-semibold text-dark small">Email Address <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-envelope"></i></span>
+                                <input type="email" class="form-control bg-light border-start-0" name="email" placeholder="e.g. student@example.com" required>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <!-- LOCATION OPTION -->
+                            <label class="form-label fw-semibold text-dark small">Location / Branch <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-location-dot text-danger"></i></span>
+                                <select name="location" id="receipt-location-select" class="form-select bg-light border-start-0" required>
+                                    <option value="">-- Choose Location / Nearest Branch --</option>
+                                    <option value="Biratnagar (Head Office - Main Road)">Biratnagar (Head Office - Main Road)</option>
+                                    <option value="Kathmandu (Counseling & Processing)">Kathmandu (Counseling & Processing)</option>
+                                    <option value="Janakpur (Branch Office)">Janakpur (Branch Office)</option>
+                                    <option value="Dharan / Itahari">Dharan / Itahari</option>
+                                    <option value="Chitwan (Bharatpur)">Chitwan (Bharatpur)</option>
+                                    <option value="Pokhara">Pokhara</option>
+                                    <option value="Butwal">Butwal</option>
+                                    <option value="Bhadrapur / Birtamode">Bhadrapur / Birtamode</option>
+                                    <option value="India (Direct University Transfer)">India (Direct University Transfer)</option>
+                                    <option value="Online / Other Location">Online / Other Location</option>
+                                </select>
+                            </div>
+                            <input type="text" name="custom_location" id="receipt-custom-location" class="form-control bg-light mt-2" placeholder="Please specify your city / district" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Payment Details -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-semibold text-dark small">Amount Paid (NPR / INR) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted fw-bold">Rs.</span>
+                                <input type="number" step="0.01" min="1" class="form-control bg-light border-start-0 font-monospace fw-bold" name="amount" placeholder="e.g. 25000" required>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-semibold text-dark small">Payment Method / Deposited To <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-building-columns"></i></span>
+                                <select name="payment_method" class="form-select bg-light border-start-0" required>
+                                    <option value="Fonepay / Mobile Banking QR" selected>Fonepay / Mobile Banking QR Scanner</option>
+                                    <option value="Citizens Bank International Ltd.">Citizens Bank International Ltd.</option>
+                                    <option value="Siddhartha Bank Ltd.">Siddhartha Bank Ltd.</option>
+                                    <option value="Bank Transfer (ConnectIPS / Wire)">Bank Transfer (ConnectIPS / Wire)</option>
+                                    <option value="eSewa / Khalti Wallet">eSewa / Khalti Digital Wallet</option>
+                                    <option value="Cash Deposit at Office Counter">Cash Deposit at Office Counter</option>
+                                    <option value="Other Method">Other Payment Method</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-semibold text-dark small">Transaction / Reference ID (Optional)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-hashtag"></i></span>
+                                <input type="text" class="form-control bg-light border-start-0 font-monospace" name="transaction_id" placeholder="e.g. Fonepay Trace ID / UTR / Voucher No.">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-semibold text-dark small">Course / Remarks (Optional)</label>
+                            <input type="text" class="form-control bg-light" name="remarks" placeholder="e.g. Admission fee for B.Tech / Nursing">
+                        </div>
+                    </div>
+
+                    <!-- Payment Receipt File Upload (.jpg, .jpeg, .pdf, .png) -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark small d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-paperclip text-primary me-1"></i> Attach Payment Receipt File <span class="text-danger">*</span></span>
+                            <span class="badge bg-light text-primary border" style="font-size: 11px;">.jpg, .jpeg, .png, .pdf</span>
+                        </label>
+                        <div class="border border-2 border-dashed rounded-4 p-3 text-center bg-light position-relative hover-lift transition-smooth">
+                            <input type="file" name="receipt_file" id="receipt-file-input" class="form-control" accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf" required>
+                            <div class="form-text small text-muted mt-2">
+                                <i class="fa-solid fa-circle-check text-success me-1"></i>Allowed formats: <strong>JPG, JPEG, PNG, PDF</strong> (Max size: 10 MB).
+                            </div>
+
+                            <!-- Live Attachment Preview Container -->
+                            <div id="receipt-file-preview-container" class="mt-3 p-3 bg-white rounded-3 border d-none">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div id="receipt-preview-icon" class="fs-2 text-danger">
+                                            <i class="fa-solid fa-file-pdf"></i>
+                                        </div>
+                                        <img id="receipt-preview-image" src="" alt="Receipt Preview" class="rounded border p-1 d-none" style="max-height: 60px; max-width: 60px; object-fit: contain;">
+                                        <div class="text-start">
+                                            <div id="receipt-preview-filename" class="fw-bold small text-dark text-break">filename.pdf</div>
+                                            <div id="receipt-preview-filesize" class="text-muted extra-small">0 KB</div>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
+                                        <i class="fa-solid fa-check me-1"></i>Valid File
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Actions -->
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 pt-2 border-top">
+                        <?php
+                            $waNumber = $siteSettings['contact_whatsapp'] ?? '9807765812';
+                            $waDigits = preg_replace('/\D+/', '', $waNumber);
+                            if (strlen($waDigits) === 10 && strpos($waDigits, '9') === 0) {
+                                $waDigits = '977' . $waDigits;
+                            }
+                        ?>
+                        <a href="https://wa.me/<?= h($waDigits) ?>?text=<?= urlencode('Hello Vision Point, I have deposited fees and would like to send my payment receipt.') ?>" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success rounded-pill px-4 py-2.5 fw-semibold btn-sm w-100 w-sm-auto">
+                            <i class="fa-brands fa-whatsapp me-2 fs-6"></i>Or Send via WhatsApp
+                        </a>
+
+                        <button type="submit" id="btn-submit-payment-receipt" class="btn btn-primary rounded-pill px-5 py-2.5 fw-bold shadow hover-scale w-100 w-sm-auto">
+                            <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                            <i class="fa-solid fa-paper-plane me-2"></i>Send Payment Receipt
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Location option "Other" toggle
+    const receiptLocSelect = document.getElementById('receipt-location-select');
+    const receiptCustomLoc = document.getElementById('receipt-custom-location');
+    if (receiptLocSelect && receiptCustomLoc) {
+        receiptLocSelect.addEventListener('change', function() {
+            if (this.value === 'Online / Other Location') {
+                receiptCustomLoc.style.display = 'block';
+                receiptCustomLoc.required = true;
+                receiptCustomLoc.focus();
+            } else {
+                receiptCustomLoc.style.display = 'none';
+                receiptCustomLoc.required = false;
+            }
+        });
+    }
+
+    // 2. Receipt file preview (Image vs PDF)
+    const receiptFileInput = document.getElementById('receipt-file-input');
+    const previewContainer = document.getElementById('receipt-file-preview-container');
+    const previewIcon = document.getElementById('receipt-preview-icon');
+    const previewImage = document.getElementById('receipt-preview-image');
+    const previewFilename = document.getElementById('receipt-preview-filename');
+    const previewFilesize = document.getElementById('receipt-preview-filesize');
+
+    if (receiptFileInput && previewContainer) {
+        receiptFileInput.addEventListener('change', function() {
+            const file = this.files && this.files[0];
+            if (!file) {
+                previewContainer.classList.add('d-none');
+                return;
+            }
+
+            const fileName = file.name;
+            const fileSize = (file.size / 1024).toFixed(1) + ' KB';
+            const fileExt = fileName.split('.').pop().toLowerCase();
+
+            previewFilename.textContent = fileName;
+            previewFilesize.textContent = fileSize;
+            previewContainer.classList.remove('d-none');
+
+            if (['jpg', 'jpeg', 'png'].includes(fileExt)) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.classList.remove('d-none');
+                    previewIcon.classList.add('d-none');
+                };
+                reader.readAsDataURL(file);
+            } else if (fileExt === 'pdf') {
+                previewImage.classList.add('d-none');
+                previewIcon.classList.remove('d-none');
+                previewIcon.innerHTML = '<i class="fa-solid fa-file-pdf text-danger"></i>';
+            } else {
+                previewImage.classList.add('d-none');
+                previewIcon.classList.remove('d-none');
+                previewIcon.innerHTML = '<i class="fa-solid fa-file-lines text-primary"></i>';
+            }
+        });
+    }
+
+    // 3. Payment Receipt AJAX submission
+    const receiptForm = document.getElementById('payment-receipt-form');
+    if (receiptForm) {
+        receiptForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-payment-receipt');
+            const alertBox = document.getElementById('payment-receipt-alert-container');
+            const spinner = btn.querySelector('.spinner-border');
+
+            if (spinner) spinner.classList.remove('d-none');
+            btn.disabled = true;
+
+            const formData = new FormData(receiptForm);
+
+            fetch('<?= h($basePath ?? '/') ?>submit_form.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (spinner) spinner.classList.add('d-none');
+                btn.disabled = false;
+                if (data.success) {
+                    alertBox.innerHTML = '<div class="alert alert-success rounded-3 mb-4"><i class="fa-solid fa-circle-check me-2"></i><strong>Success!</strong> ' + data.message + '</div>';
+                    receiptForm.reset();
+                    if (previewContainer) previewContainer.classList.add('d-none');
+                    if (receiptCustomLoc) receiptCustomLoc.style.display = 'none';
+                    setTimeout(() => {
+                        const modalEl = document.getElementById('paymentReceiptModal');
+                        if (modalEl && typeof bootstrap !== 'undefined') {
+                            const modal = bootstrap.Modal.getInstance(modalEl);
+                            if (modal) modal.hide();
+                        }
+                    }, 4000);
+                } else {
+                    alertBox.innerHTML = '<div class="alert alert-danger rounded-3 mb-4"><i class="fa-solid fa-triangle-exclamation me-2"></i>' + data.message + '</div>';
+                }
+            })
+            .catch(() => {
+                if (spinner) spinner.classList.add('d-none');
+                btn.disabled = false;
+                alertBox.innerHTML = '<div class="alert alert-danger rounded-3 mb-4"><i class="fa-solid fa-triangle-exclamation me-2"></i>Submission failed. Please check your network connection and try again.</div>';
+            });
+        });
+    }
+
     const modalStars = document.querySelectorAll('.modal-star-picker-icon');
     const modalRatingInput = document.getElementById('modal-selected-rating-val');
     const modalRatingLabel = document.getElementById('modal-rating-text-label');

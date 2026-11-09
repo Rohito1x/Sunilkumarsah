@@ -121,6 +121,19 @@ if ($pdo) {
         'seo_pages' => [
             'meta_keywords' => "TEXT DEFAULT NULL",
             'twitter_card' => "VARCHAR(50) DEFAULT 'summary_large_image'"
+        ],
+        'payment_receipts' => [
+            'full_name' => "VARCHAR(150) NOT NULL",
+            'email' => "VARCHAR(150) NOT NULL",
+            'phone_number' => "VARCHAR(50) NOT NULL",
+            'location' => "VARCHAR(150) NOT NULL",
+            'amount' => "DECIMAL(12,2) DEFAULT NULL",
+            'payment_method' => "VARCHAR(100) DEFAULT 'Fonepay / Bank QR'",
+            'transaction_id' => "VARCHAR(100) DEFAULT NULL",
+            'receipt_path' => "VARCHAR(255) NOT NULL",
+            'remarks' => "TEXT DEFAULT NULL",
+            'status' => "VARCHAR(30) DEFAULT 'Pending'",
+            'admin_notes' => "TEXT DEFAULT NULL"
         ]
     ];
 
@@ -188,6 +201,26 @@ if ($pdo) {
             `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             INDEX `idx_source` (`source_url`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        // Auto-ensure payment_receipts table exists
+        $pdo->exec("CREATE TABLE IF NOT EXISTS `payment_receipts` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `full_name` VARCHAR(150) NOT NULL,
+            `email` VARCHAR(150) NOT NULL,
+            `phone_number` VARCHAR(50) NOT NULL,
+            `location` VARCHAR(150) NOT NULL,
+            `amount` DECIMAL(12,2) DEFAULT NULL,
+            `payment_method` VARCHAR(100) DEFAULT 'Fonepay / Bank QR',
+            `transaction_id` VARCHAR(100) DEFAULT NULL,
+            `receipt_path` VARCHAR(255) NOT NULL,
+            `remarks` TEXT DEFAULT NULL,
+            `status` VARCHAR(30) DEFAULT 'Pending',
+            `admin_notes` TEXT DEFAULT NULL,
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX `idx_status` (`status`),
+            INDEX `idx_location` (`location`),
+            INDEX `idx_created` (`created_at`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         // Seed initial default SEO pages if empty

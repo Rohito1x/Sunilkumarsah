@@ -227,9 +227,43 @@ if ($qrEnabled !== '1' && empty($bankAccounts)) {
                                 <span class="badge bg-light text-dark border border-light-subtle px-2 py-1" style="font-size: 10.5px;"><i class="fa-solid fa-bolt me-1 text-warning"></i>Khalti</span>
                             </div>
                         </div>
+
+                        <!-- Send Payment Receipt Quick Button -->
+                        <div class="mt-3 pt-2">
+                            <button type="button" class="btn btn-primary w-100 rounded-pill py-2.5 fw-bold shadow-sm hover-scale d-flex align-items-center justify-content-center gap-2" data-bs-toggle="modal" data-bs-target="#paymentReceiptModal">
+                                <i class="fa-solid fa-file-invoice-dollar fs-5 text-warning"></i>
+                                <span>Send Payment Receipt</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             <?php endif; ?>
+        </div>
+
+        <!-- Payment Confirmation & Receipt Upload Banner -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card border-0 rounded-4 shadow-sm p-4 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, #0458A0 0%, #022340 100%);">
+                    <div class="row align-items-center g-3">
+                        <div class="col-12 col-lg-8">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-white bg-opacity-20 text-white rounded-circle p-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 54px; height: 54px;">
+                                    <i class="fa-solid fa-receipt fs-3 text-warning"></i>
+                                </div>
+                                <div>
+                                    <h4 class="fw-bold text-white mb-1 fs-5">Completed Your Fee Deposit or Bank Transfer?</h4>
+                                    <p class="text-white-50 small mb-0">Upload your payment receipt in <strong>.jpg, .jpeg, .pdf, or .png</strong> format and select your location / branch for immediate accounting verification.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4 text-lg-end d-flex flex-wrap gap-2 justify-content-lg-end">
+                            <button type="button" class="btn btn-warning rounded-pill px-4 py-2.5 fw-bold text-dark shadow-sm hover-scale" data-bs-toggle="modal" data-bs-target="#paymentReceiptModal">
+                                <i class="fa-solid fa-cloud-arrow-up me-2"></i>Send Payment Receipt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
