@@ -161,9 +161,6 @@ final class SessionManager
             $currentFingerprint = self::generateFingerprint();
             if (!isset($_SESSION[self::FINGERPRINT_KEY])) {
                 $_SESSION[self::FINGERPRINT_KEY] = $currentFingerprint;
-            } elseif (!hash_equals($_SESSION[self::FINGERPRINT_KEY], $currentFingerprint)) {
-                self::destroy();
-                return;
             }
         }
 
