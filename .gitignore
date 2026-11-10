@@ -9,8 +9,10 @@ ehthumbs.db
 desktop.ini
 
 # Environment and Secret Files
-.env
-.env.*
+!.env
+!.env.example
+.env.local
+.env.*.local
 *.local
 *.log
 php_errors.log

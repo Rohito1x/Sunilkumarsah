@@ -30,9 +30,9 @@ if ($devMode) {
 
 $host = defined('DB_HOST') ? DB_HOST : (getenv('DB_HOST') ?: 'localhost');
 $port = defined('DB_PORT') ? DB_PORT : (getenv('DB_PORT') ?: '3306');
-$dbname = defined('DB_NAME') ? DB_NAME : (getenv('DB_NAME') ?: 'zptvncco_visionpoint');
-$username = defined('DB_USER') ? DB_USER : (getenv('DB_USER') ?: 'zptvncco_visionpoint');
-$password = defined('DB_PASS') ? DB_PASS : (getenv('DB_PASS') !== false ? getenv('DB_PASS') : 'Visionpoint98185@#');
+$dbname = defined('DB_NAME') ? DB_NAME : (getenv('DB_NAME') ?: 'zptvncco_Sunil');
+$username = defined('DB_USER') ? DB_USER : (getenv('DB_USER') ?: 'zptvncco_sah');
+$password = defined('DB_PASS') ? DB_PASS : (getenv('DB_PASS') !== false ? getenv('DB_PASS') : 'Rohit98185@#');
 $charset = defined('DB_CHARSET') ? DB_CHARSET : 'utf8mb4';
 
 $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
@@ -48,8 +48,8 @@ try {
     ]);
 } catch (PDOException $e) {
     $dbError = $e->getMessage();
-    // Fallback: Try alternate casing on Linux/cPanel (e.g. zptvncco_Visionpoint vs zptvncco_visionpoint)
-    $altDbName = ($dbname === strtolower($dbname)) ? 'zptvncco_Visionpoint' : strtolower($dbname);
+    // Fallback: Try alternate casing on Linux/cPanel (e.g. zptvncco_Sunil vs zptvncco_sunil)
+    $altDbName = ($dbname === strtolower($dbname)) ? 'zptvncco_Sunil' : strtolower($dbname);
     if ($altDbName !== $dbname) {
         try {
             $dsnAlt = "mysql:host={$host};port={$port};dbname={$altDbName};charset={$charset}";
