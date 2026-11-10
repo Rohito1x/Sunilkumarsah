@@ -1,8 +1,14 @@
 <?php
 require_once __DIR__ . '/../includes/db.php';
 
-// Auth check
-if (!isset($_SESSION['admin_id'])) {
+// Auth check with dual-layer fallback
+if (!isset($_SESSION['admin_id']) || (int)$_SESSION['admin_id'] <= 0) {
+    if (class_exists('SessionManager')) {
+        SessionManager::restoreAuthFromCookie();
+    }
+}
+
+if (!isset($_SESSION['admin_id']) || (int)$_SESSION['admin_id'] <= 0) {
     header('Location: ../login.php');
     exit;
 }

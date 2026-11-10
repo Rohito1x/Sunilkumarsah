@@ -24,7 +24,13 @@ if (isset($pdo)) {
     }
 }
 
-$isAdmin = isset($_SESSION['admin_id']);
+if (!isset($_SESSION['admin_id']) || (int)$_SESSION['admin_id'] <= 0) {
+    if (class_exists('SessionManager')) {
+        SessionManager::restoreAuthFromCookie();
+    }
+}
+
+$isAdmin = isset($_SESSION['admin_id']) && (int)$_SESSION['admin_id'] > 0;
 if (!$isAdmin) {
     header('Location: ../login.php');
     exit;
