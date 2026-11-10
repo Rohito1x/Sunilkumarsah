@@ -151,6 +151,26 @@ if ($pdo) {
         }
     }
 
+    // Auto-ensure admin_users table exists & has an active administrator
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS `admin_users` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `email` VARCHAR(150) NOT NULL UNIQUE,
+            `password_hash` VARCHAR(255) NOT NULL,
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        $adminCount = (int)$pdo->query("SELECT COUNT(*) FROM `admin_users`")->fetchColumn();
+        if ($adminCount === 0) {
+            $initEmail = defined('ADMIN_EMAIL') ? strtolower(trim(ADMIN_EMAIL)) : 'admin@visionpoint.edu.np';
+            $initHash = password_hash('adminSecure2026!', PASSWORD_BCRYPT);
+            $stmtInit = $pdo->prepare("INSERT INTO `admin_users` (`email`, `password_hash`) VALUES (?, ?)");
+            $stmtInit->execute([$initEmail, $initHash]);
+        }
+    } catch (PDOException $e) {
+        // Safe to ignore if permissions are restricted
+    }
+
     // Auto-ensure login_attempts table exists for rate-limiting
     try {
         $pdo->exec("CREATE TABLE IF NOT EXISTS `login_attempts` (

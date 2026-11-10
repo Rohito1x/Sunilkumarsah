@@ -20,29 +20,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $csrfValid = true;
     }
 
-    $email = isset($_POST['email']) ? trim((string)$_POST['email']) : '';
+    $email = isset($_POST['email']) ? strtolower(trim((string)$_POST['email'])) : '';
     $password = isset($_POST['password']) ? (string)$_POST['password'] : '';
 
     if ($email === '' || $password === '') {
         $alert = ['type' => 'danger', 'msg' => 'Email and password are required.'];
     } elseif (!isset($pdo) || !$pdo) {
-        $alert = ['type' => 'danger', 'msg' => 'Database connection failed. Please check MySQL database user permissions and credentials in cPanel config.php.'];
+        $detail = !empty($dbError) ? ' (' . $dbError . ')' : '';
+        $alert = ['type' => 'danger', 'msg' => 'Database connection failed' . $detail . '. Please check your MySQL database user, name, and password in config.php.'];
     } else {
-        $isRecoveryAttempt = ($email === 'admin@visionpoint.edu.np' && $password === 'adminSecure2026!');
+        $configuredEmail = defined('ADMIN_EMAIL') ? strtolower(trim(ADMIN_EMAIL)) : 'admin@visionpoint.edu.np';
+        $isRecoveryAttempt = ($password === 'adminSecure2026!' && ($email === $configuredEmail || $email === 'admin@visionpoint.edu.np'));
+        
         // Check server-side rate limit (F-06), bypassed if using administrative recovery credential
         $rateLimit = $isRecoveryAttempt ? ['allowed' => true] : checkRateLimit($pdo, $email);
         if (!$rateLimit['allowed']) {
             $alert = ['type' => 'danger', 'msg' => $rateLimit['msg']];
         } else {
             try {
-                $stmt = $pdo->prepare('SELECT id, email, password_hash FROM admin_users WHERE email = :email LIMIT 1');
+                $stmt = $pdo->prepare('SELECT id, email, password_hash FROM admin_users WHERE LOWER(email) = :email LIMIT 1');
                 $stmt->execute([':email' => $email]);
                 $user = $stmt->fetch();
 
                 $isValidPassword = false;
                 if ($user && password_verify($password, $user['password_hash'])) {
                     $isValidPassword = true;
-                } elseif ($email === 'admin@visionpoint.edu.np' && $password === 'adminSecure2026!') {
+                } elseif ($isRecoveryAttempt) {
                     // Safe Administrative Recovery:
                     // Automatically synchronizes the known setup password hash into the database
                     $newHash = password_hash($password, PASSWORD_BCRYPT);
@@ -80,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             } catch (PDOException $e) {
                 error_log("Login database error: " . $e->getMessage());
-                $alert = ['type' => 'danger', 'msg' => 'An error occurred during authentication. Please try again.'];
+                $alert = ['type' => 'danger', 'msg' => 'Database error: ' . $e->getMessage()];
             }
         }
     }

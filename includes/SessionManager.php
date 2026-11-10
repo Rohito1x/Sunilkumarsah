@@ -51,11 +51,8 @@ final class SessionManager
             }
         }
 
-        // Host cookie domain: allow sharing between apex and www subdomain in production
+        // Use host-only cookie (domain '') for 100% browser compatibility across desktop, mobile, and cPanel environments
         $cookieDomain = '';
-        if (strpos($cleanHost, 'visionpoint.edu.np') !== false) {
-            $cookieDomain = '.visionpoint.edu.np';
-        }
 
         if (!headers_sent()) {
             // Enforce hardened cookie configuration
