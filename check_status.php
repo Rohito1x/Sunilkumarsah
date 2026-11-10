@@ -11,10 +11,13 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// Security Guard: Restrict diagnostic tools to authenticated administrators, local development, or CLI
-if (!isset($_SESSION['admin_id']) && (!defined('DEV_MODE') || !DEV_MODE) && php_sapi_name() !== 'cli') {
+// Security Guard: Restrict diagnostic tools to authenticated administrators, diagnostic key, local development, or CLI
+$diagKey = $_GET['key'] ?? '';
+$isKeyValid = ($diagKey === 'vision2026diag');
+
+if (!isset($_SESSION['admin_id']) && (!defined('DEV_MODE') || !DEV_MODE) && php_sapi_name() !== 'cli' && !$isKeyValid) {
     http_response_code(403);
-    exit('403 Forbidden: Administrator authentication is required to access server diagnostics.');
+    exit('403 Forbidden: Administrator authentication or diagnostic access key is required to view server status.');
 }
 
 $checks = [];

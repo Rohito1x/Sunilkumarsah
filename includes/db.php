@@ -47,26 +47,26 @@ try {
         PDO::ATTR_TIMEOUT => 5
     ]);
 } catch (PDOException $e) {
-    // If unknown database error, attempt lowercase database name (common on Linux/cPanel)
-    if ($dbname !== strtolower($dbname)) {
+    $dbError = $e->getMessage();
+    // Fallback: Try alternate casing on Linux/cPanel (e.g. zptvncco_Visionpoint vs zptvncco_visionpoint)
+    $altDbName = ($dbname === strtolower($dbname)) ? 'zptvncco_Visionpoint' : strtolower($dbname);
+    if ($altDbName !== $dbname) {
         try {
-            $dbnameLower = strtolower($dbname);
-            $dsnLower = "mysql:host={$host};port={$port};dbname={$dbnameLower};charset={$charset}";
-            $pdo = new PDO($dsnLower, $username, $password, [
+            $dsnAlt = "mysql:host={$host};port={$port};dbname={$altDbName};charset={$charset}";
+            $pdo = new PDO($dsnAlt, $username, $password, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
                 PDO::ATTR_TIMEOUT => 5
             ]);
-            $dbname = $dbnameLower;
+            $dbname = $altDbName;
+            $dbError = null;
         } catch (PDOException $e2) {
             $pdo = null;
             $dbError = $e2->getMessage();
             error_log("Database connection failure: " . $dbError);
         }
     } else {
-        $pdo = null;
-        $dbError = $e->getMessage();
         error_log("Database connection failure: " . $dbError);
     }
 }
