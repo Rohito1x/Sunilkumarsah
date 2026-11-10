@@ -6,8 +6,26 @@ if (class_exists('SessionManager')) {
     SessionManager::restoreAuthFromCookie();
 }
 
-if (isset($_SESSION['admin_id']) && (int)$_SESSION['admin_id'] > 0) {
-    header('Location: vision/dashboard.php');
+$isAlreadyLoggedIn = isset($_SESSION['admin_id']) && (int)$_SESSION['admin_id'] > 0;
+
+// Loop breaker & re-authentication handler:
+// If redirected here with ?reauth=1 (meaning dashboard access could not be validated)
+// or ?logout=1, clear broken/stale session and remain on login.php. NEVER bounce back!
+if (isset($_GET['reauth']) || isset($_GET['logout'])) {
+    if (class_exists('SessionManager')) {
+        SessionManager::destroy();
+    } else {
+        $_SESSION = [];
+        @session_destroy();
+    }
+    $isAlreadyLoggedIn = false;
+}
+
+if ($isAlreadyLoggedIn && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    if (!headers_sent()) {
+        header('Cache-Control: private, no-cache, no-store, must-revalidate');
+    }
+    header('Location: /vision/dashboard.php');
     exit;
 }
 
@@ -90,7 +108,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Flush and commit session data to disk before sending redirect
                     @session_write_close();
 
-                    header('Location: vision/dashboard.php');
+                    if (!headers_sent()) {
+                        header('Cache-Control: private, no-cache, no-store, must-revalidate');
+                    }
+                    header('Location: /vision/dashboard.php');
                     exit;
                 }
             } catch (PDOException $e) {
@@ -99,6 +120,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+}
+
+if (isset($_GET['reauth']) && empty($alert)) {
+    $alert = ['type' => 'info', 'msg' => 'Session expired or required re-authentication. Please enter your administrator credentials.'];
+} elseif (isset($_GET['logout']) && empty($alert)) {
+    $alert = ['type' => 'success', 'msg' => 'You have been successfully signed out.'];
 }
 
 // Ensure active CSRF token is available for the form

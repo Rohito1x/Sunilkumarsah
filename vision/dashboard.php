@@ -9,7 +9,10 @@ if (!isset($_SESSION['admin_id']) || (int)$_SESSION['admin_id'] <= 0) {
 }
 
 if (!isset($_SESSION['admin_id']) || (int)$_SESSION['admin_id'] <= 0) {
-    header('Location: ../login.php');
+    if (!headers_sent()) {
+        header('Cache-Control: private, no-cache, no-store, must-revalidate');
+    }
+    header('Location: /login.php?reauth=1');
     exit;
 }
 

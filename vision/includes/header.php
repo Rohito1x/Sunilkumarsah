@@ -1,6 +1,10 @@
 <?php
 if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
+    if (class_exists('SessionManager')) {
+        SessionManager::start();
+    } else {
+        session_start();
+    }
 }
 
 if (!function_exists('h')) {
@@ -32,7 +36,10 @@ if (!isset($_SESSION['admin_id']) || (int)$_SESSION['admin_id'] <= 0) {
 
 $isAdmin = isset($_SESSION['admin_id']) && (int)$_SESSION['admin_id'] > 0;
 if (!$isAdmin) {
-    header('Location: ../login.php');
+    if (!headers_sent()) {
+        header('Cache-Control: private, no-cache, no-store, must-revalidate');
+    }
+    header('Location: /login.php?reauth=1');
     exit;
 }
 ?>
@@ -120,7 +127,7 @@ if (!$isAdmin) {
                 <i class="fa-solid fa-gauge me-2 fs-4 text-white"></i>
             <?php endif; ?>
             <h5 class="text-white fw-bold mb-1 mt-1" style="font-size: 1.1rem; letter-spacing: 0.5px;"><?= h($siteSettings['site_name'] ?? 'Vision Point Educational Service') ?></h5>
-            <p class="text-white-50 small mb-0" style="font-size: 0.75rem; word-break: break-all;"><i class="fa-solid fa-user-shield me-1"></i><?= htmlspecialchars($_SESSION['admin_email']) ?></p>
+            <p class="text-white-50 small mb-0" style="font-size: 0.75rem; word-break: break-all;"><i class="fa-solid fa-user-shield me-1"></i><?= htmlspecialchars($_SESSION['admin_email'] ?? 'admin@visionpoint.edu.np') ?></p>
         </div>
         <nav class="sidebar-menu flex-grow-1">
             <a class="active" href="dashboard.php"><i class="fa-solid fa-house"></i>Dashboard</a>
@@ -147,7 +154,7 @@ if (!$isAdmin) {
                 <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill"><i class="fa-solid fa-shield-halved me-1"></i> ADMIN CONSOLE</span>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <span class="text-muted small"><i class="fa-solid fa-circle-user me-1 text-primary"></i>Logged in as: <strong><?= htmlspecialchars($_SESSION['admin_email']) ?></strong></span>
+                <span class="text-muted small"><i class="fa-solid fa-circle-user me-1 text-primary"></i>Logged in as: <strong><?= htmlspecialchars($_SESSION['admin_email'] ?? 'admin@visionpoint.edu.np') ?></strong></span>
                 <a href="../logout.php" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="fa-solid fa-power-off me-1"></i>Logout</a>
             </div>
         </div>

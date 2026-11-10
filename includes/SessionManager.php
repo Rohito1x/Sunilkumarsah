@@ -15,6 +15,36 @@ final class SessionManager
     private const MAX_INACTIVITY_SECONDS = 86400 * 7; // 7 days
 
     /**
+     * Determines whether the current request is conducted over HTTPS.
+     */
+    public static function isHttps(): bool
+    {
+        return (
+            (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+            || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+            || (!empty($_SERVER['HTTP_CF_VISITOR']) && strpos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false)
+        );
+    }
+
+    /**
+     * Calculates the normalized cookie domain. Returns leading dot domain for real domains,
+     * or empty string for localhost and IP addresses.
+     */
+    public static function getCookieDomain(): string
+    {
+        $host = $_SERVER['HTTP_HOST'] ?? '';
+        $host = preg_replace('/:\d+$/', '', $host);
+        if (!empty($host) && !filter_var($host, FILTER_VALIDATE_IP) && $host !== 'localhost') {
+            $domainBase = preg_replace('/^www\./i', '', $host);
+            if (strpos($domainBase, '.') !== false) {
+                return '.' . $domainBase;
+            }
+        }
+        return '';
+    }
+
+    /**
      * Initializes a hardened PHP session with resilient cookie parameters.
      */
     public static function start(): void
@@ -24,35 +54,43 @@ final class SessionManager
             return;
         }
 
-        // Only assign fallback path if server has no save_path configured at all
+        // Resilient session save path: check server default, then local project directory, then sys temp
         $currentSavePath = @session_save_path();
-        if (empty($currentSavePath)) {
-            $sysTemp = sys_get_temp_dir();
-            if (!empty($sysTemp) && @is_dir($sysTemp) && @is_writable($sysTemp)) {
-                @session_save_path($sysTemp);
+        if (empty($currentSavePath) || !@is_dir($currentSavePath) || !@is_writable($currentSavePath)) {
+            $localSessions = dirname(__DIR__) . '/sessions';
+            if (@is_dir($localSessions) && @is_writable($localSessions)) {
+                @session_save_path($localSessions);
+            } else {
+                $sysTemp = sys_get_temp_dir();
+                if (!empty($sysTemp) && @is_dir($sysTemp) && @is_writable($sysTemp)) {
+                    @session_save_path($sysTemp);
+                }
             }
         }
 
         if (!headers_sent()) {
-            // Universal cookie configuration (works across HTTP, HTTPS, Cloudflare & reverse proxies)
             @ini_set('session.use_only_cookies', '1');
             @ini_set('session.use_trans_sid', '0');
 
-            session_set_cookie_params([
+            $domain = self::getCookieDomain();
+            $cookieParams = [
                 'lifetime' => 86400 * 7,      // 7 days
                 'path'     => '/',
-                'domain'   => '',             // Host-only cookie for 100% browser compatibility
-                'secure'   => false,          // Works seamlessly across SSL proxies & direct connections
-                'httponly' => true,           // Deny JavaScript document.cookie access
-                'samesite' => 'Lax'           // Cross-site request forgery defense
-            ]);
+                'secure'   => self::isHttps(),
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ];
+            if (!empty($domain)) {
+                $cookieParams['domain'] = $domain;
+            }
+            session_set_cookie_params($cookieParams);
         }
 
         if (session_status() !== PHP_SESSION_ACTIVE) {
             @session_start();
         }
 
-        // Automatically restore authenticated session from signed cookie if session file was refreshed
+        // Automatically restore authenticated session from signed cookie if session file was dropped
         self::restoreAuthFromCookie();
 
         self::validateIntegrity();
@@ -75,19 +113,22 @@ final class SessionManager
         // Safely regenerate session ID without destroying previous session file prematurely
         @session_regenerate_id(false);
 
-        // Explicitly flush the session cookie header so LiteSpeed doesn't lose the cookie on 302 redirect
+        // Explicitly set the session cookie header so LiteSpeed doesn't lose the cookie on 302 redirect
         if (!headers_sent()) {
             $sessId = session_id();
             if (!empty($sessId)) {
-                setcookie(
-                    session_name(),
-                    $sessId,
-                    time() + (86400 * 7),
-                    '/',
-                    '',
-                    false,
-                    true
-                );
+                $domain = self::getCookieDomain();
+                $options = [
+                    'expires'  => time() + (86400 * 7),
+                    'path'     => '/',
+                    'secure'   => self::isHttps(),
+                    'httponly' => true,
+                    'samesite' => 'Lax'
+                ];
+                if (!empty($domain)) {
+                    $options['domain'] = $domain;
+                }
+                setcookie(session_name(), $sessId, $options);
             }
         }
 
@@ -97,28 +138,37 @@ final class SessionManager
 
     /**
      * Sets a cryptographically signed HMAC auth cookie as an unbreakable fallback.
+     * Uses dot-delimited hex encoding (userId.expires.hexEmail.signature) to ensure
+     * zero special characters, avoiding all cookie urlencoding/decoding discrepancies.
      */
     public static function setAuthCookie(int $userId, string $userEmail): void
     {
         $expires = time() + (86400 * 7); // 7 days
-        $payload = $userId . '|' . strtolower(trim($userEmail)) . '|' . $expires;
+        $cleanEmail = strtolower(trim($userEmail));
+        $hexEmail = bin2hex($cleanEmail);
+        $payload = $userId . '.' . $expires . '.' . $hexEmail;
         $sig = hash_hmac('sha256', $payload, self::AUTH_SECRET);
-        $token = base64_encode($payload . '|' . $sig);
+        $token = $payload . '.' . $sig;
 
         if (!headers_sent()) {
-            setcookie(self::AUTH_COOKIE_NAME, $token, [
+            $domain = self::getCookieDomain();
+            $options = [
                 'expires'  => $expires,
                 'path'     => '/',
-                'domain'   => '',
-                'secure'   => false,
+                'secure'   => self::isHttps(),
                 'httponly' => true,
                 'samesite' => 'Lax'
-            ]);
+            ];
+            if (!empty($domain)) {
+                $options['domain'] = $domain;
+            }
+            setcookie(self::AUTH_COOKIE_NAME, $token, $options);
         }
     }
 
     /**
      * Restores an active admin session from the signed auth cookie if $_SESSION was dropped.
+     * Supports both the robust dot-hex format and the legacy base64 format.
      */
     public static function restoreAuthFromCookie(): bool
     {
@@ -130,30 +180,51 @@ final class SessionManager
             return false;
         }
 
-        $token = (string)$_COOKIE[self::AUTH_COOKIE_NAME];
-        $raw = base64_decode($token, true);
-        if (!$raw) {
-            return false;
+        $token = trim((string)$_COOKIE[self::AUTH_COOKIE_NAME]);
+
+        // 1. Primary: Dot-hex format (userId.expires.hexEmail.signature)
+        if (strpos($token, '.') !== false) {
+            $parts = explode('.', $token);
+            if (count($parts) === 4) {
+                list($userId, $expires, $hexEmail, $sig) = $parts;
+                if ((int)$expires >= time()) {
+                    $payload = $userId . '.' . $expires . '.' . $hexEmail;
+                    $expectedSig = hash_hmac('sha256', $payload, self::AUTH_SECRET);
+
+                    if (hash_equals($expectedSig, $sig)) {
+                        $userEmail = @hex2bin($hexEmail);
+                        if ($userEmail !== false && !empty($userEmail)) {
+                            $_SESSION['admin_id'] = (int)$userId;
+                            $_SESSION['admin_email'] = $userEmail;
+                            $_SESSION[self::LAST_ACTIVITY_KEY] = time();
+                            return true;
+                        }
+                    }
+                }
+            }
         }
 
-        $parts = explode('|', $raw);
-        if (count($parts) !== 4) {
-            return false;
-        }
+        // 2. Fallback: Legacy base64 pipe format (restores + from spaces)
+        $normalized = str_replace(' ', '+', $token);
+        $raw = base64_decode($normalized, true);
+        if ($raw) {
+            $parts = explode('|', $raw);
+            if (count($parts) === 4) {
+                list($userId, $userEmail, $expires, $sig) = $parts;
+                if ((int)$expires >= time()) {
+                    $payload = $userId . '|' . $userEmail . '|' . $expires;
+                    $expectedSig = hash_hmac('sha256', $payload, self::AUTH_SECRET);
 
-        list($userId, $userEmail, $expires, $sig) = $parts;
-
-        if ((int)$expires < time()) {
-            return false;
-        }
-
-        $payload = $userId . '|' . $userEmail . '|' . $expires;
-        $expectedSig = hash_hmac('sha256', $payload, self::AUTH_SECRET);
-
-        if (hash_equals($expectedSig, $sig)) {
-            $_SESSION['admin_id'] = (int)$userId;
-            $_SESSION['admin_email'] = $userEmail;
-            return true;
+                    if (hash_equals($expectedSig, $sig)) {
+                        $_SESSION['admin_id'] = (int)$userId;
+                        $_SESSION['admin_email'] = $userEmail;
+                        $_SESSION[self::LAST_ACTIVITY_KEY] = time();
+                        // Automatically upgrade to modern dot-hex token
+                        self::setAuthCookie((int)$userId, $userEmail);
+                        return true;
+                    }
+                }
+            }
         }
 
         return false;
@@ -170,27 +241,37 @@ final class SessionManager
 
         $_SESSION = [];
 
+        $domain = self::getCookieDomain();
+        $isHttps = self::isHttps();
+
         if (ini_get('session.use_cookies')) {
-            setcookie(
-                session_name(),
-                '',
-                time() - 42000,
-                '/',
-                '',
-                false,
-                true
-            );
+            $options = [
+                'expires'  => time() - 86400,
+                'path'     => '/',
+                'secure'   => $isHttps,
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ];
+            if (!empty($domain)) {
+                $options['domain'] = $domain;
+            }
+            setcookie(session_name(), '', $options);
+            setcookie(session_name(), '', time() - 86400, '/');
         }
 
         if (!headers_sent()) {
-            setcookie(self::AUTH_COOKIE_NAME, '', [
-                'expires'  => time() - 42000,
+            $options = [
+                'expires'  => time() - 86400,
                 'path'     => '/',
-                'domain'   => '',
-                'secure'   => false,
+                'secure'   => $isHttps,
                 'httponly' => true,
                 'samesite' => 'Lax'
-            ]);
+            ];
+            if (!empty($domain)) {
+                $options['domain'] = $domain;
+            }
+            setcookie(self::AUTH_COOKIE_NAME, '', $options);
+            setcookie(self::AUTH_COOKIE_NAME, '', time() - 86400, '/');
         }
 
         @session_destroy();
